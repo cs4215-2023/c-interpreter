@@ -7,10 +7,7 @@ primaryExpression:
 	| '(' expression ')';
 
 postfixExpression:
-	(
-		primaryExpression
-		| '__extension__'? '(' typeName ')' '{' initializerList ','? '}'
-	) (
+	(primaryExpression) (
 		'[' expression ']'
 		| '(' argumentExpressionList? ')'
 		| ('.' | '->') Identifier
@@ -114,8 +111,7 @@ typeSpecifier: (
 		| 'unsigned'
 	)
 	| structOrUnionSpecifier
-	| typedefName
-	| '__typeof__' '(' constantExpression ')'; // GCC extension
+	| typedefName;
 
 structOrUnionSpecifier:
 	structOrUnion Identifier? '{' structDeclarationList '}'
@@ -126,7 +122,6 @@ structOrUnion: 'struct' | 'union';
 structDeclarationList: structDeclaration+;
 
 structDeclaration:
-	// The first two rules have priority order and cannot be simplified to one expression.
 	specifierQualifierList structDeclaratorList ';'
 	| specifierQualifierList ';';
 
@@ -138,63 +133,20 @@ structDeclarator:
 	declarator
 	| declarator? ':' constantExpression;
 
-enumeratorList: enumerator (',' enumerator)*;
+typeQualifier: 'const';
 
-enumerator: enumerationConstant ('=' constantExpression)?;
+functionSpecifier: ( 'inline');
 
-enumerationConstant: Identifier;
-
-typeQualifier: 'const' | 'restrict' | 'volatile' | '_Atomic';
-
-functionSpecifier: (
-		'inline'
-		| '_Noreturn'
-		| '__inline__' // GCC extension
-		| '__stdcall'
-	)
-	| gccAttributeSpecifier
-	| '__declspec' '(' Identifier ')';
-
-declarator: pointer? directDeclarator gccDeclaratorExtension*;
+declarator: pointer? directDeclarator;
 
 directDeclarator:
 	Identifier
 	| '(' declarator ')'
 	| directDeclarator '[' typeQualifierList? assignmentExpression? ']'
-	| directDeclarator '[' 'static' typeQualifierList? assignmentExpression ']'
-	| directDeclarator '[' typeQualifierList 'static' assignmentExpression ']'
 	| directDeclarator '[' typeQualifierList? '*' ']'
 	| directDeclarator '(' parameterTypeList ')'
 	| directDeclarator '(' identifierList? ')'
-	| Identifier ':' DigitSequence // bit field
-	| vcSpecificModifer Identifier // Visual C Extension
-	| '(' vcSpecificModifer declarator ')'; // Visual C Extension
-
-vcSpecificModifer: (
-		'__cdecl'
-		| '__clrcall'
-		| '__stdcall'
-		| '__fastcall'
-		| '__thiscall'
-		| '__vectorcall'
-	);
-
-gccDeclaratorExtension:
-	'__asm' '(' StringLiteral+ ')'
-	| gccAttributeSpecifier;
-
-gccAttributeSpecifier:
-	'__attribute__' '(' '(' gccAttributeList ')' ')';
-
-gccAttributeList: gccAttribute? (',' gccAttribute?)*;
-
-gccAttribute:
-	~(
-		','
-		| '('
-		| ')'
-	) // relaxed def for "identifier or reserved word"
-	('(' argumentExpressionList? ')')?;
+	| Identifier ':' DigitSequence; // bit field
 
 nestedParenthesesBlock: (
 		~('(' | ')')
@@ -205,7 +157,7 @@ pointer: (('*' | '^') typeQualifierList?)+; // ^ - Blocks language extension
 
 typeQualifierList: typeQualifier+;
 
-parameterTypeList: parameterList (',' '...')?;
+parameterTypeList: parameterList (',')?;
 
 parameterList: parameterDeclaration (',' parameterDeclaration)*;
 
@@ -217,22 +169,16 @@ identifierList: Identifier (',' Identifier)*;
 
 typeName: specifierQualifierList abstractDeclarator?;
 
-abstractDeclarator:
-	pointer
-	| pointer? directAbstractDeclarator gccDeclaratorExtension*;
+abstractDeclarator: pointer | pointer? directAbstractDeclarator;
 
 directAbstractDeclarator:
-	'(' abstractDeclarator ')' gccDeclaratorExtension*
+	'(' abstractDeclarator ')'
 	| '[' typeQualifierList? assignmentExpression? ']'
-	| '[' 'static' typeQualifierList? assignmentExpression ']'
-	| '[' typeQualifierList 'static' assignmentExpression ']'
 	| '[' '*' ']'
-	| '(' parameterTypeList? ')' gccDeclaratorExtension*
+	| '(' parameterTypeList? ')'
 	| directAbstractDeclarator '[' typeQualifierList? assignmentExpression? ']'
-	| directAbstractDeclarator '[' 'static' typeQualifierList? assignmentExpression ']'
-	| directAbstractDeclarator '[' typeQualifierList 'static' assignmentExpression ']'
 	| directAbstractDeclarator '[' '*' ']'
-	| directAbstractDeclarator '(' parameterTypeList? ')' gccDeclaratorExtension*;
+	| directAbstractDeclarator '(' parameterTypeList? ')';
 
 typedefName: Identifier;
 
@@ -372,7 +318,6 @@ Semi: ';';
 Comma: ',';
 
 Assign: '=';
-// '*=' | '/=' | '%=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '^=' | '|='
 StarAssign: '*=';
 DivAssign: '/=';
 ModAssign: '%=';
@@ -391,44 +336,29 @@ Arrow: '->';
 Dot: '.';
 Ellipsis: '...';
 
-Identifier: IdentifierNondigit ( IdentifierNondigit | Digit)*;
+Identifier:
+	IdentifierCharacters (IdentifierCharacters | Digit)*;
 
-fragment IdentifierNondigit:
-	Nondigit; //|   // other implementation-defined characters...
+fragment IdentifierCharacters: Characters;
 
-fragment Nondigit: [a-zA-Z_];
+fragment Characters: [a-zA-Z_];
 
 fragment Digit: [0-9];
 
 Constant:
 	IntegerConstant
 	| FloatingConstant
-	//|   EnumerationConstant
 	| CharacterConstant;
 
-fragment IntegerConstant:
-	DecimalConstant IntegerSuffix?
-	| BinaryConstant;
+fragment IntegerConstant: BinaryConstant;
 
 fragment BinaryConstant: '0' [bB] [0-1]+;
 
 fragment DecimalConstant: NonzeroDigit Digit*;
 
-fragment HexadecimalPrefix: '0' [xX];
-
 fragment NonzeroDigit: [1-9];
 
-fragment IntegerSuffix:
-	UnsignedSuffix LongSuffix?
-	| UnsignedSuffix LongLongSuffix
-	| LongSuffix UnsignedSuffix?
-	| LongLongSuffix UnsignedSuffix?;
-
 fragment UnsignedSuffix: [uU];
-
-fragment LongSuffix: [lL];
-
-fragment LongLongSuffix: 'll' | 'LL';
 
 fragment FloatingConstant: DecimalFloatingConstant;
 
@@ -475,12 +405,6 @@ fragment SChar:
 	| EscapeSequence
 	| '\\\n' // Added line
 	| '\\\r\n'; // Added line
-
-LineDirective:
-	'#' Whitespace? DecimalConstant Whitespace? StringLiteral ~[\r\n]* -> skip;
-
-PragmaDirective:
-	'#' Whitespace? 'pragma' Whitespace ~[\r\n]* -> skip;
 
 Whitespace: [ \t]+ -> skip;
 
