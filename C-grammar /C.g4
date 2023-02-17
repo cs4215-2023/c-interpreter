@@ -110,14 +110,12 @@ typeSpecifier: (
 		| 'signed'
 		| 'unsigned'
 	)
-	| structOrUnionSpecifier
+	| structSpecifier
 	| typedefName;
 
-structOrUnionSpecifier:
-	structOrUnion Identifier? '{' structDeclarationList '}'
-	| structOrUnion Identifier;
-
-structOrUnion: 'struct' | 'union';
+structSpecifier:
+	Struct Identifier? '{' structDeclarationList '}'
+	| Struct Identifier;
 
 structDeclarationList: structDeclaration+;
 
@@ -237,7 +235,6 @@ functionDefinition:
 
 declarationList: declaration+;
 
-Auto: 'auto';
 Break: 'break';
 Case: 'case';
 Char: 'char';
@@ -245,42 +242,18 @@ Const: 'const';
 Continue: 'continue';
 Default: 'default';
 Do: 'do';
-Double: 'double';
 Else: 'else';
-Enum: 'enum';
-Extern: 'extern';
 Float: 'float';
 For: 'for';
-Goto: 'goto';
 If: 'if';
-Inline: 'inline';
 Int: 'int';
 Long: 'long';
-Register: 'register';
-Restrict: 'restrict';
 Return: 'return';
-Short: 'short';
 Signed: 'signed';
-Sizeof: 'sizeof';
-Static: 'static';
 Struct: 'struct';
-Typedef: 'typedef';
-Union: 'union';
 Unsigned: 'unsigned';
 Void: 'void';
-Volatile: 'volatile';
 While: 'while';
-
-Alignas: '_Alignas';
-Alignof: '_Alignof';
-Atomic: '_Atomic';
-Bool: '_Bool';
-Complex: '_Complex';
-Generic: '_Generic';
-Imaginary: '_Imaginary';
-Noreturn: '_Noreturn';
-StaticAssert: '_Static_assert';
-ThreadLocal: '_Thread_local';
 
 LeftParen: '(';
 RightParen: ')';
@@ -334,7 +307,6 @@ NotEqual: '!=';
 
 Arrow: '->';
 Dot: '.';
-Ellipsis: '...';
 
 Identifier:
 	IdentifierCharacters (IdentifierCharacters | Digit)*;
