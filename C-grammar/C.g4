@@ -236,11 +236,8 @@ functionDefinition:
 declarationList: declaration+;
 
 Break: 'break';
-Case: 'case';
 Char: 'char';
-Const: 'const';
 Continue: 'continue';
-Default: 'default';
 Do: 'do';
 Else: 'else';
 Float: 'float';
