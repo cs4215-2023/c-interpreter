@@ -238,6 +238,7 @@ declarationList: declaration+;
 Break: 'break';
 Char: 'char';
 Continue: 'continue';
+Const: 'const';
 Do: 'do';
 Else: 'else';
 Float: 'float';
