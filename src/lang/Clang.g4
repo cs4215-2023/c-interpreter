@@ -9,7 +9,7 @@ primaryExpression:
 postfixExpression:
 	(primaryExpression) (
 		'[' inner = expression ']'
-		| '(' inner = argumentExpressionList? ')'
+		| '(' argumentExpressionList? ')'
 		| ('.' | '->') Identifier
 		| ('++' | '--')
 	)*;
@@ -115,7 +115,8 @@ declarationSpecifier:
 
 initDeclaratorList: initDeclarator (',' initDeclarator)*;
 
-initDeclarator: declarator ('=' initializer)?;
+initDeclarator:
+	left = declarator (operator = '=' right = initializer)?;
 
 typeSpecifier: (
 		'void'
