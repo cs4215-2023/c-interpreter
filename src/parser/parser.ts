@@ -6,20 +6,9 @@ import { RuleNode } from 'antlr4ts/tree/RuleNode'
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import * as es from 'estree'
 
-import { CalcLexer } from '../lang/CalcLexer'
-import {
-  AdditionContext,
-  CalcParser,
-  DivisionContext,
-  ExpressionContext,
-  MultiplicationContext,
-  NumberContext,
-  ParenthesesContext,
-  PowerContext,
-  StartContext,
-  SubtractionContext
-} from '../lang/CalcParser'
-import { CalcVisitor } from '../lang/CalcVisitor'
+import { ClangLexer } from '../lang/ClangLexer'
+import { ClangParser, ExpressionContext } from '../lang/ClangParser'
+import { ClangVisitor } from '../lang/ClangVisitor'
 import { Context, ErrorSeverity, ErrorType, SourceError } from '../types'
 import { stripIndent } from '../utils/formatters'
 
@@ -108,80 +97,8 @@ export class TrailingCommaError implements SourceError {
   }
 }
 
-function contextToLocation(ctx: ExpressionContext): es.SourceLocation {
-  return {
-    start: {
-      line: ctx.start.line,
-      column: ctx.start.charPositionInLine
-    },
-    end: {
-      line: ctx.stop ? ctx.stop.line : ctx.start.line,
-      column: ctx.stop ? ctx.stop.charPositionInLine : ctx.start.charPositionInLine
-    }
-  }
-}
-class ExpressionGenerator implements CalcVisitor<es.Expression> {
-  visitNumber(ctx: NumberContext): es.Expression {
-    return {
-      type: 'Literal',
-      value: parseInt(ctx.text),
-      raw: ctx.text,
-      loc: contextToLocation(ctx)
-    }
-  }
-  visitParentheses(ctx: ParenthesesContext): es.Expression {
-    return this.visit(ctx.expression())
-  }
-  visitPower(ctx: PowerContext): es.Expression {
-    return {
-      type: 'BinaryExpression',
-      operator: '^',
-      left: this.visit(ctx._left),
-      right: this.visit(ctx._right),
-      loc: contextToLocation(ctx)
-    }
-  }
-
-  visitMultiplication(ctx: MultiplicationContext): es.Expression {
-    return {
-      type: 'BinaryExpression',
-      operator: '*',
-      left: this.visit(ctx._left),
-      right: this.visit(ctx._right),
-      loc: contextToLocation(ctx)
-    }
-  }
-  visitDivision(ctx: DivisionContext): es.Expression {
-    return {
-      type: 'BinaryExpression',
-      operator: '/',
-      left: this.visit(ctx._left),
-      right: this.visit(ctx._right),
-      loc: contextToLocation(ctx)
-    }
-  }
-  visitAddition(ctx: AdditionContext): es.Expression {
-    return {
-      type: 'BinaryExpression',
-      operator: '+',
-      left: this.visit(ctx._left),
-      right: this.visit(ctx._right),
-      loc: contextToLocation(ctx)
-    }
-  }
-
-  visitSubtraction(ctx: SubtractionContext): es.Expression {
-    return {
-      type: 'BinaryExpression',
-      operator: '-',
-      left: this.visit(ctx._left),
-      right: this.visit(ctx._right),
-      loc: contextToLocation(ctx)
-    }
-  }
-
+class ExpressionGenerator implements ClangVisitor<es.Expression> {
   visitExpression?: ((ctx: ExpressionContext) => es.Expression) | undefined
-  visitStart?: ((ctx: StartContext) => es.Expression) | undefined
 
   visit(tree: ParseTree): es.Expression {
     return tree.accept(this)
@@ -238,11 +155,11 @@ function convertSource(expression: ExpressionContext): es.Program {
 export function parse(source: string, context: Context) {
   let program: es.Program | undefined
 
-  if (context.variant === 'calc') {
+  if (context.variant === 'Clang') {
     const inputStream = CharStreams.fromString(source)
-    const lexer = new CalcLexer(inputStream)
+    const lexer = new ClangLexer(inputStream)
     const tokenStream = new CommonTokenStream(lexer)
-    const parser = new CalcParser(tokenStream)
+    const parser = new ClangParser(tokenStream)
     parser.buildParseTree = true
     try {
       const tree = parser.expression()

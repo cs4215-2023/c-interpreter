@@ -1,4 +1,4 @@
-grammar C;
+grammar Clang;
 
 primaryExpression:
 	Identifier

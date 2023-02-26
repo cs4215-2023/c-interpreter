@@ -61,11 +61,11 @@ export interface Comment {
 export type ExecutionMethod = 'native' | 'interpreter' | 'auto'
 
 export enum Chapter {
-  CALC = 1
+  CLANG = 1
 }
 
 export enum Variant {
-  DEFAULT = 'calc'
+  DEFAULT = 'Clang'
 }
 
 export interface Language {

@@ -1,8 +1,8 @@
 {
-  "name": "calc-slang",
+  "name": "Clang-slang",
   "version": "1.0.10",
   "license": "Apache-2.0",
-  "description": "Calc language as a start point for CS4215's project",
+  "description": "Clang language as a start point for CS4215's project",
   "keywords": [
     "JavaScript",
     "interpreter",
@@ -36,7 +36,7 @@
     "dist"
   ],
   "bin": {
-    "calc-slang": "dist/repl/repl.js"
+    "Clang-slang": "dist/repl/repl.js"
   },
   "scripts": {
     "antlr4ts": "antlr4ts -visitor ./src/lang/C.g4",
@@ -59,12 +59,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yangdinglou/calc-slang.git"
+    "url": "git+https://github.com/yangdinglou/Clang-slang.git"
   },
   "bugs": {
-    "url": "https://github.com/yangdinglou/calc-slang/issues"
+    "url": "https://github.com/yangdinglou/Clang-slang/issues"
   },
-  "homepage": "https://github.com/yangdinglou/calc-slang",
+  "homepage": "https://github.com/yangdinglou/Clang-slang",
   "devDependencies": {
     "@types/jest": "^29.0.0",
     "@types/lodash.assignin": "^4.2.6",

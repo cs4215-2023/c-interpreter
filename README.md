@@ -1,6 +1,6 @@
-# calc-slang
+# Clang-slang
 
-Calculator language modified from js-slang.
+Clangulator language modified from js-slang.
 
 ## Possible Issues (and manual solutions)
 
@@ -31,13 +31,13 @@ Calculator language modified from js-slang.
 To build,
 
 ```{.}
-$ git clone https://github.com/yangdinglou/calc-slang
-$ cd calc-slang
+$ git clone https://github.com/yangdinglou/Clang-slang
+$ cd Clang-slang
 $ yarn
 $ yarn build
 ```
 
-To add \"calc-slang\" to your PATH, build it as per the above instructions, then
+To add \"Clang-slang\" to your PATH, build it as per the above instructions, then
 run
 
 ```{.}
@@ -45,31 +45,31 @@ $ cd dist
 $ npm link
 ```
 
-If you do not wish to add \"calc-slang\" to your PATH, replace \"calc-slang\" with
+If you do not wish to add \"Clang-slang\" to your PATH, replace \"Clang-slang\" with
 \"node dist/repl/repl.js\" in the following examples.
 
 To try out _Source_ in a REPL, run
 
 ```{.}
-$ calc-slang -c [chapter] # default: 1
+$ Clang-slang -c [chapter] # default: 1
 ```
 
 You can set additional options:
 
 ```{.}
-Usage: calc-slang [PROGRAM_STRING] [OPTION]
+Usage: Clang-slang [PROGRAM_STRING] [OPTION]
   -h, --help            display this help
   -e, --eval            don't show REPL, only display output of evaluation
 ```
 
 Currently, valid CHAPTER/VARIANT combinations are:
 
-- `--chapter=1 --variant=calc`
+- `--chapter=1 --variant=Clang`
 
 Hint: In `bash` you can take the `PROGRAM_STRING` out of a file as follows:
 
 ```{.}
-$ calc-slang -n -e "$(< my_source_program.js)"
+$ Clang-slang -n -e "$(< my_source_program.js)"
 ```
 
 # Documentation
@@ -86,11 +86,11 @@ Source is documented here: [https://docs.sourceacademy.org/](https://docs.source
 To build the documentation, run
 
 ```{.}
-$ git clone https://github.com/source-academy/calc-slang.git
-$ cd calc-slang
+$ git clone https://github.com/source-academy/Clang-slang.git
+$ cd Clang-slang
 $ yarn
 $ yarn install
-$ yarn jsdoc  # to make the web pages in calc-slang/docs/source
+$ yarn jsdoc  # to make the web pages in Clang-slang/docs/source
 $ cd docs/specs
 $ make        # to make the PDF documents using LaTeX
 ```
@@ -156,7 +156,7 @@ your own local frontend. Assume that you have built your own frontend locally,
 here is how you can make it use your own xx-slang, instead of the one that the
 Source Academy team has deployed to npm.
 
-First, build and link your local xx-slang: (don't forget to modify the "calc-slang" in both projects)
+First, build and link your local xx-slang: (don't forget to modify the "Clang-slang" in both projects)
 
 ```{.}
 $ cd xx-slang
