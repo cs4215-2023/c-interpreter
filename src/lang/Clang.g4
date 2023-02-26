@@ -4,12 +4,12 @@ primaryExpression:
 	Identifier
 	| Constant
 	| StringLiteral+
-	| '(' expression ')';
+	| '(' inner = expression ')';
 
 postfixExpression:
 	(primaryExpression) (
-		'[' expression ']'
-		| '(' argumentExpressionList? ')'
+		'[' inner = expression ']'
+		| '(' inner = argumentExpressionList? ')'
 		| ('.' | '->') Identifier
 		| ('++' | '--')
 	)*;
@@ -31,38 +31,53 @@ castExpression:
 	| DigitSequence; // for
 
 multiplicativeExpression:
-	castExpression (('*' | '/' | '%') castExpression)*;
+	left = castExpression (
+		(operator = '*' | operator = '/' | operator = '%') castExpression
+	)*;
 
 additiveExpression:
 	multiplicativeExpression (
-		('+' | '-') multiplicativeExpression
+		(operator = '+' | operator = '-') multiplicativeExpression
 	)*;
 
 shiftExpression:
-	additiveExpression (('<<' | '>>') additiveExpression)*;
+	additiveExpression (
+		(operator = '<<' | operator = '>>') additiveExpression
+	)*;
 
 relationalExpression:
-	shiftExpression (('<' | '>' | '<=' | '>=') shiftExpression)*;
+	shiftExpression (
+		(
+			operator = '<'
+			| operator = '>'
+			| operator = '<='
+			| operator = '>='
+		) shiftExpression
+	)*;
 
 equalityExpression:
-	relationalExpression (('==' | '!=') relationalExpression)*;
+	relationalExpression (
+		(operator = '==' | operator = '!=') relationalExpression
+	)*;
 
-andExpression: equalityExpression ( '&' equalityExpression)*;
+andExpression:
+	equalityExpression (operator = '&' equalityExpression)*;
 
-exclusiveOrExpression: andExpression ('^' andExpression)*;
+exclusiveOrExpression:
+	andExpression (operator = '^' andExpression)*;
 
 inclusiveOrExpression:
-	exclusiveOrExpression ('|' exclusiveOrExpression)*;
+	exclusiveOrExpression (operator = '|' exclusiveOrExpression)*;
 
 logicalAndExpression:
-	inclusiveOrExpression ('&&' inclusiveOrExpression)*;
+	inclusiveOrExpression (operator = '&&' inclusiveOrExpression)*;
 
 logicalOrExpression:
-	logicalAndExpression ('||' logicalAndExpression)*;
+	logicalAndExpression (operator = '||' logicalAndExpression)*;
 
 conditionalExpression:
-	logicalOrExpression (
-		'?' expression ':' conditionalExpression
+	test = logicalOrExpression (
+		'?' consequent = expression ':' alternate = conditionalExpression
 	)?;
 
 assignmentExpression:
@@ -148,7 +163,7 @@ directDeclarator:
 
 nestedParenthesesBlock: (
 		~('(' | ')')
-		| '(' nestedParenthesesBlock ')'
+		| '(' inner = nestedParenthesesBlock ')'
 	)*;
 
 pointer: (('*' | '^') typeQualifierList?)+; // ^ - Blocks language extension
@@ -170,7 +185,7 @@ typeName: specifierQualifierList abstractDeclarator?;
 abstractDeclarator: pointer | pointer? directAbstractDeclarator;
 
 directAbstractDeclarator:
-	'(' abstractDeclarator ')'
+	'(' inner = abstractDeclarator ')'
 	| '[' typeQualifierList? assignmentExpression? ']'
 	| '[' '*' ']'
 	| '(' parameterTypeList? ')'
@@ -191,7 +206,7 @@ designation: designatorList '=';
 
 designatorList: designator+;
 
-designator: '[' constantExpression ']' | '.' Identifier;
+designator: '[' inner = constantExpression ']' | '.' Identifier;
 
 statement:
 	compoundStatement
@@ -208,11 +223,13 @@ blockItem: statement | declaration;
 expressionStatement: expression? ';';
 
 selectionStatement:
-	'if' '(' expression ')' statement ('else' statement)?;
+	'if' '(' test = expression ')' consequent = statement (
+		'else' alternate = statement
+	)?;
 
 iterationStatement:
-	While '(' expression ')' statement
-	| Do statement While '(' expression ')' ';'
+	While '(' test = expression ')' consequent = statement
+	| Do consequent = statement While '(' test = expression ')' ';'
 	| For '(' forCondition ')' statement;
 
 forCondition: (forDeclaration | expression?) ';' forExpression? ';' forExpression?;
