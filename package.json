@@ -59,12 +59,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yangdinglou/Clang-slang.git"
+    "url": "git+https://github.com/cs4215-2023/c-interpreter"
   },
   "bugs": {
-    "url": "https://github.com/yangdinglou/Clang-slang/issues"
+    "url": "https://github.com/cs4215-2023/c-interpreter/issues"
   },
-  "homepage": "https://github.com/yangdinglou/Clang-slang",
+  "homepage": "https://github.com/cs4215-2023/c-interpreter",
   "devDependencies": {
     "@types/jest": "^29.0.0",
     "@types/lodash.assignin": "^4.2.6",
