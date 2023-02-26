@@ -1,5 +1,7 @@
 grammar Clang;
 
+start: compilationUnit;
+
 primaryExpression:
 	Identifier
 	| Constant
