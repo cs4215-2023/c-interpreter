@@ -40,250 +40,268 @@ expression:
 	// operator = '%' right = expression
 	| left = expression operator = '=' right = expression;
 
+statement:
+	'{' ((statement | expression)+)? '}'
+	| expression ';'
+	| selectionStatement
+	| iterationStatement;
+
 parenthesesExpression: '(' inner = expression ')';
 
 conditionalExpression:
 	test = expression '?' consequent = expression ':' alternate = expression;
 
-// primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
+selectionStatement:
+	'if' '(' test = expression ')' statement ('else' statement)?;
 
-// postfixExpression: (expression) ( '[' inner = expression ']' | '(' argumentExpressionList? ')' |
-// ('.' | '->') Identifier | ('++' | '--') )*;
+iterationStatement:
+	'while' '(' condition = expression ')' body = statement
+	| 'do' body = statement 'while' '(' condition = expression ')' ';'
+	| 'for' '(' condition = forCondition ')' body = statement;
 
-// argumentExpressionList: assignmentExpression (',' assignmentExpression)*;
+forCondition:
+	initialise = expression ';' endCondition = expression ';' increment = expression ';'
 
-// unaryExpression: ('++' | '--')* ( postfixExpression | unaryOperator castExpression );
+	// primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 
-// unaryOperator: '&' | '*' | '+' | '-' | '!';
+	// postfixExpression: (expression) ( '[' inner = expression ']' | '(' argumentExpressionList?
+	// ')' | ('.' | '->') Identifier | ('++' | '--') )*;
 
-// castExpression: '__extension__'? '(' typeName ')' castExpression | unaryExpression |
-// DigitSequence; // for
+	// argumentExpressionList: assignmentExpression (',' assignmentExpression)*;
 
-// // multiplicativeExpression: left = castExpression ( operator = '*' | operator = '/' | operator =
-// // '%' ) right = castExpression;
+	// unaryExpression: ('++' | '--')* ( postfixExpression | unaryOperator castExpression );
 
-// additiveExpression: multiplicativeExpression ( (operator = '+' | operator = '-')
-// multiplicativeExpression )*;
+	// unaryOperator: '&' | '*' | '+' | '-' | '!';
 
-// shiftExpression: additiveExpression ( (operator = '<<' | operator = '>>') additiveExpression )*;
+	// castExpression: '__extension__'? '(' typeName ')' castExpression | unaryExpression |
+	// DigitSequence; // for
 
-// relationalExpression: shiftExpression ( ( operator = '<' | operator = '>' | operator = '<=' |
-// operator = '>=' ) shiftExpression )*;
+	// // multiplicativeExpression: left = castExpression ( operator = '*' | operator = '/' |
+	// operator = // '%' ) right = castExpression;
 
-// equalityExpression: relationalExpression ( (operator = '==' | operator = '!=')
-// relationalExpression )*;
+	// additiveExpression: multiplicativeExpression ( (operator = '+' | operator = '-')
+	// multiplicativeExpression )*;
 
-// andExpression: equalityExpression (operator = '&' equalityExpression)*;
+	// shiftExpression: additiveExpression ( (operator = '<<' | operator = '>>') additiveExpression )*;
 
-// exclusiveOrExpression: andExpression (operator = '^' andExpression)*;
+	// relationalExpression: shiftExpression ( ( operator = '<' | operator = '>' | operator = '<=' |
+	// operator = '>=' ) shiftExpression )*;
 
-// inclusiveOrExpression: exclusiveOrExpression (operator = '|' exclusiveOrExpression)*;
+	// equalityExpression: relationalExpression ( (operator = '==' | operator = '!=')
+	// relationalExpression )*;
 
-// logicalAndExpression: inclusiveOrExpression (operator = '&&' inclusiveOrExpression)*;
+	// andExpression: equalityExpression (operator = '&' equalityExpression)*;
 
-// logicalOrExpression: logicalAndExpression (operator = '||' logicalAndExpression)*;
+	// exclusiveOrExpression: andExpression (operator = '^' andExpression)*;
 
-// conditionalExpression: test = logicalOrExpression ( '?' consequent = expression ':' alternate =
-// conditionalExpression )?;
+	// inclusiveOrExpression: exclusiveOrExpression (operator = '|' exclusiveOrExpression)*;
 
-// assignmentExpression: conditionalExpression | unaryExpression assignmentOperator
-// assignmentExpression | DigitSequence; // for
+	// logicalAndExpression: inclusiveOrExpression (operator = '&&' inclusiveOrExpression)*;
 
-// assignmentOperator: '=' | '*=' | '/=' | '%=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '^=' | '|=';
+	// logicalOrExpression: logicalAndExpression (operator = '||' logicalAndExpression)*;
 
-// expression: assignmentExpression (',' assignmentExpression)*;
+	// conditionalExpression: test = logicalOrExpression ( '?' consequent = expression ':' alternate
+	// = conditionalExpression )?;
 
-// constantExpression: conditionalExpression;
+	// assignmentExpression: conditionalExpression | unaryExpression assignmentOperator
+	// assignmentExpression | DigitSequence; // for
 
-// declaration: declarationSpecifiers initDeclaratorList? ';';
+	// assignmentOperator: '=' | '*=' | '/=' | '%=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '^=' | '|=';
 
-// declarationSpecifiers: declarationSpecifier+;
+	// expression: assignmentExpression (',' assignmentExpression)*;
 
-// declarationSpecifiers2: declarationSpecifier+;
+	// constantExpression: conditionalExpression;
 
-// declarationSpecifier: typeSpecifier | typeQualifier | functionSpecifier;
+	// declaration: declarationSpecifiers initDeclaratorList? ';';
 
-// initDeclaratorList: initDeclarator (',' initDeclarator)*;
+	// declarationSpecifiers: declarationSpecifier+;
 
-// initDeclarator: left = declarator (operator = '=' right = initializer)?;
+	// declarationSpecifiers2: declarationSpecifier+;
 
-// typeSpecifier: ( 'void' | 'char' | 'int' | 'float' | 'signed' | 'unsigned' ) | structSpecifier |
-// typedefName;
+	// declarationSpecifier: typeSpecifier | typeQualifier | functionSpecifier;
 
-// structSpecifier: Struct Identifier? '{' structDeclarationList '}' | Struct Identifier;
+	// initDeclaratorList: initDeclarator (',' initDeclarator)*;
 
-// structDeclarationList: structDeclaration+;
+	// initDeclarator: left = declarator (operator = '=' right = initializer)?;
 
-// structDeclaration: specifierQualifierList structDeclaratorList ';' | specifierQualifierList ';';
+	// typeSpecifier: ( 'void' | 'char' | 'int' | 'float' | 'signed' | 'unsigned' ) |
+	// structSpecifier | typedefName;
 
-// specifierQualifierList: (typeSpecifier | typeQualifier) specifierQualifierList?;
+	// structSpecifier: Struct Identifier? '{' structDeclarationList '}' | Struct Identifier;
 
-// structDeclaratorList: structDeclarator (',' structDeclarator)*;
+	// structDeclarationList: structDeclaration+;
 
-// structDeclarator: declarator | declarator? ':' constantExpression;
+	// structDeclaration: specifierQualifierList structDeclaratorList ';' | specifierQualifierList ';';
 
-// typeQualifier: 'const';
+	// specifierQualifierList: (typeSpecifier | typeQualifier) specifierQualifierList?;
 
-// functionSpecifier: ( 'inline');
+	// structDeclaratorList: structDeclarator (',' structDeclarator)*;
 
-// declarator: pointer? directDeclarator;
+	// structDeclarator: declarator | declarator? ':' constantExpression;
 
-// directDeclarator: Identifier | '(' declarator ')' | directDeclarator '[' typeQualifierList?
-// assignmentExpression? ']' | directDeclarator '[' typeQualifierList? '*' ']' | directDeclarator
-// '(' parameterTypeList ')' | directDeclarator '(' identifierList? ')' | Identifier ':'
-// DigitSequence; // bit field
+	// typeQualifier: 'const';
 
-// nestedParenthesesBlock: ( ~('(' | ')') | '(' inner = nestedParenthesesBlock ')' )*;
+	// functionSpecifier: ( 'inline');
 
-// pointer: (('*' | '^') typeQualifierList?)+; // ^ - Blocks language extension
+	// declarator: pointer? directDeclarator;
 
-// typeQualifierList: typeQualifier+;
+	// directDeclarator: Identifier | '(' declarator ')' | directDeclarator '[' typeQualifierList?
+	// assignmentExpression? ']' | directDeclarator '[' typeQualifierList? '*' ']' |
+	// directDeclarator '(' parameterTypeList ')' | directDeclarator '(' identifierList? ')' |
+	// Identifier ':' DigitSequence; // bit field
 
-// parameterTypeList: parameterList (',')?;
+	// nestedParenthesesBlock: ( ~('(' | ')') | '(' inner = nestedParenthesesBlock ')' )*;
 
-// parameterList: parameterDeclaration (',' parameterDeclaration)*;
+	// pointer: (('*' | '^') typeQualifierList?)+; // ^ - Blocks language extension
 
-// parameterDeclaration: declarationSpecifiers declarator | declarationSpecifiers2
-// abstractDeclarator?;
+	// typeQualifierList: typeQualifier+;
 
-// identifierList: Identifier (',' Identifier)*;
+	// parameterTypeList: parameterList (',')?;
 
-// typeName: specifierQualifierList abstractDeclarator?;
+	// parameterList: parameterDeclaration (',' parameterDeclaration)*;
 
-// abstractDeclarator: pointer | pointer? directAbstractDeclarator;
+	// parameterDeclaration: declarationSpecifiers declarator | declarationSpecifiers2
+	// abstractDeclarator?;
 
-// directAbstractDeclarator: '(' inner = abstractDeclarator ')' | '[' typeQualifierList?
-// assignmentExpression? ']' | '[' '*' ']' | '(' parameterTypeList? ')' | directAbstractDeclarator
-// '[' typeQualifierList? assignmentExpression? ']' | directAbstractDeclarator '[' '*' ']' |
-// directAbstractDeclarator '(' parameterTypeList? ')';
+	// identifierList: Identifier (',' Identifier)*;
 
-// typedefName: Identifier;
+	// typeName: specifierQualifierList abstractDeclarator?;
 
-// initializer: assignmentExpression | '{' initializerList ','? '}';
+	// abstractDeclarator: pointer | pointer? directAbstractDeclarator;
 
-// initializerList: designation? initializer (',' designation? initializer)*;
+	// directAbstractDeclarator: '(' inner = abstractDeclarator ')' | '[' typeQualifierList?
+	// assignmentExpression? ']' | '[' '*' ']' | '(' parameterTypeList? ')' |
+	// directAbstractDeclarator '[' typeQualifierList? assignmentExpression? ']' |
+	// directAbstractDeclarator '[' '*' ']' | directAbstractDeclarator '(' parameterTypeList? ')';
 
-// designation: designatorList '=';
+	// typedefName: Identifier;
 
-// designatorList: designator+;
+	// initializer: assignmentExpression | '{' initializerList ','? '}';
 
-// designator: '[' inner = constantExpression ']' | '.' Identifier;
+	// initializerList: designation? initializer (',' designation? initializer)*;
 
-// statement: compoundStatement | expressionStatement | selectionStatement | iterationStatement;
+	// designation: designatorList '=';
 
-// compoundStatement: '{' blockItemList? '}';
+	// designatorList: designator+;
 
-// blockItemList: blockItem+;
+	// designator: '[' inner = constantExpression ']' | '.' Identifier;
 
-// blockItem: statement | declaration;
+	// statement: compoundStatement | expressionStatement | selectionStatement | iterationStatement;
 
-// expressionStatement: expression? ';';
+	// compoundStatement: '{' blockItemList? '}';
 
-// selectionStatement: 'if' '(' test = expression ')' consequent = statement ( 'else' alternate =
-// statement )?;
+	// blockItemList: blockItem+;
 
-// iterationStatement: While '(' test = expression ')' consequent = statement | Do consequent =
-// statement While '(' test = expression ')' ';' | For '(' forCondition ')' statement;
+	// blockItem: statement | declaration;
 
-// forCondition: (forDeclaration | expression?) ';' forExpression? ';' forExpression?;
+	// expressionStatement: expression? ';';
 
-// forDeclaration: declarationSpecifiers initDeclaratorList?;
+	// selectionStatement: 'if' '(' test = expression ')' consequent = statement ( 'else' alternate
+	// = statement )?;
 
-// forExpression: assignmentExpression (',' assignmentExpression)*;
+	// iterationStatement: While '(' test = expression ')' consequent = statement | Do consequent =
+	// statement While '(' test = expression ')' ';' | For '(' forCondition ')' statement;
 
-// compilationUnit: translationUnit? EOF;
+	// forCondition: (forDeclaration | expression?) ';' forExpression? ';' forExpression?;
 
-// translationUnit: externalDeclaration+;
+	// forDeclaration: declarationSpecifiers initDeclaratorList?;
 
-// externalDeclaration: functionDefinition | declaration | ';'; // stray ;
+	// forExpression: assignmentExpression (',' assignmentExpression)*;
 
-// functionDefinition: declarationSpecifiers? declarator declarationList? compoundStatement;
+	// compilationUnit: translationUnit? EOF;
 
-// declarationList: declaration+;
+	// translationUnit: externalDeclaration+;
 
-// Break: 'break'; Char: 'char'; Continue: 'continue'; Const: 'const'; Do: 'do'; Else: 'else';
-// Float: 'float'; For: 'for'; If: 'if'; Int: 'int'; Long: 'long'; Return: 'return'; Signed:
-// 'signed'; Struct: 'struct'; Unsigned: 'unsigned'; Void: 'void'; While: 'while';
+	// externalDeclaration: functionDefinition | declaration | ';'; // stray ;
 
-// LeftParen: '('; RightParen: ')'; LeftBracket: '['; RightBracket: ']'; LeftBrace: '{'; RightBrace:
-// '}';
+	// functionDefinition: declarationSpecifiers? declarator declarationList? compoundStatement;
 
-// Less: '<'; LessEqual: '<='; Greater: '>'; GreaterEqual: '>='; LeftShift: '<<'; RightShift: '>>';
+	// declarationList: declaration+;
 
-// Plus: '+'; PlusPlus: '++'; Minus: '-'; MinusMinus: '--'; Star: '*'; Div: '/'; Mod: '%';
+	// Break: 'break'; Char: 'char'; Continue: 'continue'; Const: 'const'; Do: 'do'; Else: 'else';
+	// Float: 'float'; For: 'for'; If: 'if'; Int: 'int'; Long: 'long'; Return: 'return'; Signed:
+	// 'signed'; Struct: 'struct'; Unsigned: 'unsigned'; Void: 'void'; While: 'while';
 
-// And: '&'; Or: '|'; AndAnd: '&&'; OrOr: '||'; Caret: '^'; Not: '!'; Tilde: '~';
+	// LeftParen: '('; RightParen: ')'; LeftBracket: '['; RightBracket: ']'; LeftBrace: '{';
+	// RightBrace: '}';
 
-// Question: '?'; Colon: ':'; Semi: ';'; Comma: ',';
+	// Less: '<'; LessEqual: '<='; Greater: '>'; GreaterEqual: '>='; LeftShift: '<<'; RightShift: '>>';
 
-// Assign: '='; StarAssign: '*='; DivAssign: '/='; ModAssign: '%='; PlusAssign: '+='; MinusAssign:
-// '-='; LeftShiftAssign: '<<='; RightShiftAssign: '>>='; AndAssign: '&='; XorAssign: '^=';
-// OrAssign: '|=';
+	// Plus: '+'; PlusPlus: '++'; Minus: '-'; MinusMinus: '--'; Star: '*'; Div: '/'; Mod: '%';
 
-// Equal: '=='; NotEqual: '!=';
+	// And: '&'; Or: '|'; AndAnd: '&&'; OrOr: '||'; Caret: '^'; Not: '!'; Tilde: '~';
 
-// Arrow: '->'; Dot: '.';
+	// Question: '?'; Colon: ':'; Semi: ';'; Comma: ',';
 
-// Identifier: IdentifierCharacters (IdentifierCharacters | Digit)*;
+	// Assign: '='; StarAssign: '*='; DivAssign: '/='; ModAssign: '%='; PlusAssign: '+=';
+	// MinusAssign: '-='; LeftShiftAssign: '<<='; RightShiftAssign: '>>='; AndAssign: '&=';
+	// XorAssign: '^='; OrAssign: '|=';
 
-// fragment IdentifierCharacters: Characters;
+	// Equal: '=='; NotEqual: '!=';
 
-// fragment Characters: [a-zA-Z_];
+	// Arrow: '->'; Dot: '.';
 
-// fragment Digit: [0-9];
+	// Identifier: IdentifierCharacters (IdentifierCharacters | Digit)*;
 
-// Constant: IntegerConstant | FloatingConstant | CharacterConstant;
+	// fragment IdentifierCharacters: Characters;
 
-// fragment IntegerConstant: BinaryConstant;
+	// fragment Characters: [a-zA-Z_];
 
-// fragment BinaryConstant: '0' [bB] [0-1]+;
+	// fragment Digit: [0-9];
 
-// fragment DecimalConstant: NonzeroDigit Digit*;
+	// Constant: IntegerConstant | FloatingConstant | CharacterConstant;
 
-// fragment NonzeroDigit: [1-9];
+	// fragment IntegerConstant: BinaryConstant;
 
-// fragment UnsignedSuffix: [uU];
+	// fragment BinaryConstant: '0' [bB] [0-1]+;
 
-// fragment FloatingConstant: DecimalFloatingConstant;
+	// fragment DecimalConstant: NonzeroDigit Digit*;
 
-// fragment DecimalFloatingConstant: FractionalConstant ExponentPart? FloatingSuffix? |
-// DigitSequence ExponentPart FloatingSuffix?;
+	// fragment NonzeroDigit: [1-9];
 
-// fragment FractionalConstant: DigitSequence? '.' DigitSequence | DigitSequence '.';
+	// fragment UnsignedSuffix: [uU];
 
-// fragment ExponentPart: [eE] Sign? DigitSequence;
+	// fragment FloatingConstant: DecimalFloatingConstant;
 
-// fragment Sign: [+-];
+	// fragment DecimalFloatingConstant: FractionalConstant ExponentPart? FloatingSuffix? |
+	// DigitSequence ExponentPart FloatingSuffix?;
 
-// DigitSequence: Digit+;
+	// fragment FractionalConstant: DigitSequence? '.' DigitSequence | DigitSequence '.';
 
-// fragment BinaryExponentPart: [pP] Sign? DigitSequence;
+	// fragment ExponentPart: [eE] Sign? DigitSequence;
 
-// fragment FloatingSuffix: [flFL];
+	// fragment Sign: [+-];
 
-// fragment CharacterConstant: '\'' CCharSequence '\'' | 'L\'' CCharSequence '\'' | 'u\''
-// CCharSequence '\'' | 'U\'' CCharSequence '\'';
+	// DigitSequence: Digit+;
 
-// fragment CCharSequence: CChar+;
+	// fragment BinaryExponentPart: [pP] Sign? DigitSequence;
 
-// fragment CChar: ~['\\\r\n] | EscapeSequence;
+	// fragment FloatingSuffix: [flFL];
 
-// fragment EscapeSequence: SimpleEscapeSequence;
+	// fragment CharacterConstant: '\'' CCharSequence '\'' | 'L\'' CCharSequence '\'' | 'u\''
+	// CCharSequence '\'' | 'U\'' CCharSequence '\'';
 
-// fragment SimpleEscapeSequence: '\\' ['"?abfnrtv\\];
+	// fragment CCharSequence: CChar+;
 
-// StringLiteral: EncodingPrefix? '"' SCharSequence? '"';
+	// fragment CChar: ~['\\\r\n] | EscapeSequence;
 
-// fragment EncodingPrefix: 'u8' | 'u' | 'U' | 'L';
+	// fragment EscapeSequence: SimpleEscapeSequence;
 
-// fragment SCharSequence: SChar+;
+	// fragment SimpleEscapeSequence: '\\' ['"?abfnrtv\\];
 
-// fragment SChar: ~["\\\r\n] | EscapeSequence | '\\\n' // Added line | '\\\r\n'; // Added line
+	// StringLiteral: EncodingPrefix? '"' SCharSequence? '"';
 
-// Whitespace: [ \t]+ -> skip;
+	// fragment EncodingPrefix: 'u8' | 'u' | 'U' | 'L';
 
-// Newline: ( '\r' '\n'? | '\n') -> skip;
+	// fragment SCharSequence: SChar+;
 
-// BlockComment: '/*' .*? '*/' -> skip;
+	// fragment SChar: ~["\\\r\n] | EscapeSequence | '\\\n' // Added line | '\\\r\n'; // Added line
 
-// LineComment: '//' ~[\r\n]* -> skip;
+	// Whitespace: [ \t]+ -> skip;
+
+	// Newline: ( '\r' '\n'? | '\n') -> skip;
+
+	// BlockComment: '/*' .*? '*/' -> skip;
+
+	// LineComment: '//' ~[\r\n]* -> skip;
+	
