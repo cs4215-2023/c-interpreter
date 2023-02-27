@@ -1,6 +1,6 @@
 grammar Clang;
 
-start: (expression*)? EOF;
+start: (expression)*;
 
 type: 'void' | 'char' | 'int' | 'float' | 'signed' | 'unsigned';
 
@@ -57,7 +57,7 @@ selectionStatement:
 iterationStatement:
 	'while' '(' condition = expression ')' body = statement
 	| 'do' body = statement 'while' '(' condition = expression ')' ';'
-	| 'for' '(' condition = forCondition ')' body = statement;
+	| 'for' '(' forCondition ')' body = statement;
 
 forCondition:
 	initialise = expression ';' endCondition = expression ';' increment = expression ';';
