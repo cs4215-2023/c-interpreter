@@ -1,1 +1,1 @@
-antlr4-parse $1 start < $2
+antlr4-parse Clang.g4 start < $1
