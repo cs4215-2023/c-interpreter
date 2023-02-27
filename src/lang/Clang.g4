@@ -1,10 +1,12 @@
 grammar Clang;
 
-start: (expression)*;
-
 type: 'void' | 'char' | 'int' | 'float' | 'signed' | 'unsigned';
 
+IDENTIFIER: [a-z_] [a-zA-Z0-9_]*;
+
 SIMPLEESCAPESEQUENCE: '\\' ['"?abfnrtv\\];
+
+start: (expression)*;
 
 StringLiteral: '"' SCharSequence? '"';
 
@@ -17,8 +19,6 @@ SChar:
 	| '\\\r\n'; // Added line
 
 EscapeSequence: SIMPLEESCAPESEQUENCE;
-
-IDENTIFIER: [a-z_] [a-zA-Z0-9_]*;
 
 expression:
 	IDENTIFIER
