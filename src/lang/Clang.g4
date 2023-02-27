@@ -42,7 +42,7 @@ expression:
 
 statement:
 	'{' ((statement | expression)+)? '}'
-	| expression ';'
+	| expressionStatement
 	| selectionStatement
 	| iterationStatement;
 
@@ -50,6 +50,8 @@ parenthesesExpression: '(' inner = expression ')';
 
 conditionalExpression:
 	test = expression '?' consequent = expression ':' alternate = expression;
+
+expressionStatement: expression ';';
 
 selectionStatement:
 	'if' '(' test = expression ')' statement ('else' statement)?;
