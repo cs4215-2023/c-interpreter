@@ -3,7 +3,6 @@
 import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor'
 
 import { StartContext } from './ClangParser'
-import { TypeContext } from './ClangParser'
 import { ExpressionContext } from './ClangParser'
 import { StatementContext } from './ClangParser'
 import { ParenthesesExpressionContext } from './ClangParser'
@@ -27,13 +26,6 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
    * @return the visitor result
    */
   visitStart?: (ctx: StartContext) => Result
-
-  /**
-   * Visit a parse tree produced by `ClangParser.type`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitType?: (ctx: TypeContext) => Result
 
   /**
    * Visit a parse tree produced by `ClangParser.expression`.

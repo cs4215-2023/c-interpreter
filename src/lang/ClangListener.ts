@@ -3,7 +3,6 @@
 import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener'
 
 import { StartContext } from './ClangParser'
-import { TypeContext } from './ClangParser'
 import { ExpressionContext } from './ClangParser'
 import { StatementContext } from './ClangParser'
 import { ParenthesesExpressionContext } from './ClangParser'
@@ -28,17 +27,6 @@ export interface ClangListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitStart?: (ctx: StartContext) => void
-
-  /**
-   * Enter a parse tree produced by `ClangParser.type`.
-   * @param ctx the parse tree
-   */
-  enterType?: (ctx: TypeContext) => void
-  /**
-   * Exit a parse tree produced by `ClangParser.type`.
-   * @param ctx the parse tree
-   */
-  exitType?: (ctx: TypeContext) => void
 
   /**
    * Enter a parse tree produced by `ClangParser.expression`.

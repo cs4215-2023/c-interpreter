@@ -308,11 +308,3 @@ forCondition:
 // fragment SCharSequence: SChar+;
 
 // fragment SChar: ~["\\\r\n] | EscapeSequence | '\\\n' // Added line | '\\\r\n'; // Added line
-
-// Whitespace: [ \t]+ -> skip;
-
-// Newline: ( '\r' '\n'? | '\n') -> skip;
-
-// BlockComment: '/*' .*? '*/' -> skip;
-
-// LineComment: '//' ~[\r\n]* -> skip;
