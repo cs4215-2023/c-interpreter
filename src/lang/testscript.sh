@@ -1,0 +1,1 @@
+antlr4-parse $1 start < $2
