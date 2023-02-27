@@ -21,8 +21,8 @@ IDENTIFIER: [a-z_] [a-zA-Z0-9_]*;
 start: (expression)* EOF;
 
 expression:
-	type IDENTIFIER
-	| IDENTIFIER
+	IDENTIFIER
+	| StringLiteral
 	| '(' inner = expression ')'
 	| left = expression operator = '*' right = expression
 	| left = expression operator = '/' right = expression
@@ -41,6 +41,9 @@ expression:
 	| left = expression operator = '=' right = expression;
 
 parenthesesExpression: '(' inner = expression ')';
+
+conditionalExpression:
+	test = expression '?' consequent = expression ':' alternate = expression;
 
 // primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 
