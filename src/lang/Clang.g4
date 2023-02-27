@@ -1,6 +1,16 @@
 grammar Clang;
 
-type: 'void' | 'char' | 'int' | 'float' | 'signed' | 'unsigned';
+WHITESPACE: [ \t]+ -> skip;
+
+NEWLINE: ( '\r' '\n'? | '\n') -> skip;
+
+PRIMITIVETYPE:
+	'void'
+	| 'char'
+	| 'int'
+	| 'float'
+	| 'signed'
+	| 'unsigned';
 
 IDENTIFIER: [a-z_] [a-zA-Z0-9_]*;
 
