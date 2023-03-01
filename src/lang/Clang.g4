@@ -16,6 +16,14 @@ SIGN: ('-' | '+');
 
 IDENTIFIER: SIGN? [a-zA-Z_] [a-zA-Z0-9_]*;
 
+FORMATSPECIFIERS:
+	'"' '%d' '"'
+	| '"' '%i' '"'
+	| '"' '%c' '"'
+	| '"' '%f' '"'
+	| '"' '%s' '"'
+	| '"' '%p' '"';
+
 NUMBER: SIGN? [0-9_]+;
 
 PLUSPLUS: '++';
@@ -56,6 +64,7 @@ expression:
 	| pointerDerefernce
 	| pointerReference
 	| functionCall
+	| printf
 	| left = expression operator = '*' right = expression
 	| left = expression operator = '/' right = expression
 	| left = expression operator = '%' right = expression
@@ -131,6 +140,9 @@ functionCallParameters: (
 		| numberList
 		| identifierList
 	) (',' stringLiteralList | numberList | identifierList)*;
+
+printf:
+	'printf(' (StringLiteral | FORMATSPECIFIERS)* ',' identifierList ')';
 
 // primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 
