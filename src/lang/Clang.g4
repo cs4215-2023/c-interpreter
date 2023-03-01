@@ -50,6 +50,9 @@ expression:
 	| postFixExpression
 	| arrayInitialisation
 	| '(' inner = expression ')'
+	| pointer
+	| pointerDerefernce
+	| pointerReference
 	| left = expression operator = '*' right = expression
 	| left = expression operator = '/' right = expression
 	| left = expression operator = '%' right = expression
@@ -105,6 +108,12 @@ arrayInitialisation:
 		operator = '=' array = arrayContent
 		| StringLiteral
 	)?;
+
+pointer: PRIMITIVETYPE '*' IDENTIFIER;
+
+pointerDerefernce: '*' IDENTIFIER;
+
+pointerReference: '&' IDENTIFIER;
 
 function:
 	funcType = PRIMITIVETYPE (funcName = IDENTIFIER) (
