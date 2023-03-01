@@ -18,20 +18,15 @@ IDENTIFIER: SIGN? [a-z_] [a-zA-Z0-9_]*;
 
 NUMBER: SIGN? [0-9_]+;
 
-// SIMPLEESCAPESEQUENCE: '\\' ['"?abfnrtv\\];
+PLUSPLUS: '++';
+MINUSMINUS: '--';
 
 start: (statement)*;
 
 StringLiteral: '"' IDENTIFIER? '"';
 
-// SCharSequence: SChar+;
-
-// SChar: ~["\\\r\n] | EscapeSequence | '\\\n' // Added line | '\\\r\n'; // Added line
-
-// EscapeSequence: SIMPLEESCAPESEQUENCE;
-
 statement:
-	'{' ((statement | expression)+)? '}'
+	'{' ((statement)+)? '}'
 	| expressionStatement
 	| selectionStatement
 	| iterationStatement
@@ -43,6 +38,7 @@ expression:
 	| NUMBER
 	| StringLiteral
 	| IDENTIFIER
+	| postFixExpression
 	| '(' inner = expression ')'
 	| left = expression operator = '*' right = expression
 	| left = expression operator = '/' right = expression
@@ -63,9 +59,13 @@ expression:
 	| left = expression operator = '|' right = expression
 	| left = expression operator = '^' right = expression
 	| left = expression operator = '%' right = expression
-	| left = expression operator = '=' right = expression;
+	| left = expression operator = '=' right = expression
+	| left = expression operator = '-=' right = expression
+	| left = expression operator = '+=' right = expression;
 
 parenthesesExpression: '(' inner = expression ')';
+
+postFixExpression: (IDENTIFIER) (PLUSPLUS | MINUSMINUS);
 
 conditionalExpression:
 	test = expression '?' consequent = expression ':' alternate = expression;
@@ -73,7 +73,9 @@ conditionalExpression:
 expressionStatement: expression ';';
 
 selectionStatement:
-	'if' '(' test = expression ')' statement ('else' statement)?;
+	'if' '(' test = expression ')' consequentStatement = statement (
+		'else' alternateStatement = statement
+	)?;
 
 iterationStatement:
 	'while' '(' condition = expression ')' body = statement
@@ -86,13 +88,13 @@ forCondition:
 identifierWithType: idType = PRIMITIVETYPE id = IDENTIFIER;
 
 arrayIdentifierWithType:
-	idType = PRIMITIVETYPE id = IDENTIFIER '[' NUMBER? ']';
+	idType = PRIMITIVETYPE id = IDENTIFIER '[' size = NUMBER? ']';
 
 identifierWithTypeList:
 	identifierWithType (',' identifierWithType)*;
 
 function:
-	PRIMITIVETYPE (IDENTIFIER) (
+	funcType = PRIMITIVETYPE (funcName = IDENTIFIER) (
 		params = '(' identifierWithTypeList? ')'
 	) body = statement;
 
