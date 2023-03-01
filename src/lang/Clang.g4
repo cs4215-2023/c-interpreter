@@ -14,11 +14,13 @@ PRIMITIVETYPE:
 
 IDENTIFIER: [a-z_] [a-zA-Z0-9_]*;
 
+NUMBER: ('-' | '+')? [0-9_]+;
+
 // SIMPLEESCAPESEQUENCE: '\\' ['"?abfnrtv\\];
 
 start: (statement)*;
 
-// StringLiteral: '"' SCharSequence? '"';
+StringLiteral: '"' IDENTIFIER? '"';
 
 // SCharSequence: SChar+;
 
@@ -36,22 +38,28 @@ statement:
 
 expression:
 	identifierWithType
-	// | StringLiteral
+	| NUMBER
+	| StringLiteral
 	| '(' inner = expression ')'
 	| left = expression operator = '*' right = expression
 	| left = expression operator = '/' right = expression
 	| left = expression operator = '%' right = expression
 	| left = expression operator = '+' right = expression
 	| left = expression operator = '-' right = expression
-	// | left = expression operator = '<<' right = expression | left = expression operator = '>>'
-	// right = expression | left = expression operator = '>' right = expression | left = expression
-	// operator = '<' right = expression | left = expression operator = '>=' right = expression |
-	// left = expression operator = '<=' right = expression | left = expression operator = '=='
-	// right = expression | left = expression operator = '!=' right = expression | left = expression
-	// operator = '||' right = expression | left = expression operator = '&&' right = expression |
-	// left = expression operator = '&' right = expression | left = expression operator = '|' right
-	// = expression | left = expression operator = '^' right = expression | left = expression
-	// operator = '%' right = expression
+	| left = expression operator = '<<' right = expression
+	| left = expression operator = '>>' right = expression
+	| left = expression operator = '>' right = expression
+	| left = expression operator = '<' right = expression
+	| left = expression operator = '>=' right = expression
+	| left = expression operator = '<=' right = expression
+	| left = expression operator = '==' right = expression
+	| left = expression operator = '!=' right = expression
+	| left = expression operator = '||' right = expression
+	| left = expression operator = '&&' right = expression
+	| left = expression operator = '&' right = expression
+	| left = expression operator = '|' right = expression
+	| left = expression operator = '^' right = expression
+	| left = expression operator = '%' right = expression
 	| left = expression operator = '=' right = expression;
 
 parenthesesExpression: '(' inner = expression ')';
@@ -73,6 +81,9 @@ forCondition:
 	initialise = expression ';' endCondition = expression ';' increment = expression ';';
 
 identifierWithType: idType = PRIMITIVETYPE id = IDENTIFIER;
+
+arrayIdentifierWithType:
+	idType = PRIMITIVETYPE id = IDENTIFIER '[' NUMBER? ']';
 
 identifierWithTypeList:
 	identifierWithType (',' identifierWithType)*;
