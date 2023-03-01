@@ -31,9 +31,9 @@ MINUSMINUS: '--';
 
 start: (statement)*;
 
-StringLiteral: '"' IDENTIFIER? '"';
+stringLiteral: '"' IDENTIFIER? '"';
 
-stringLiteralList: StringLiteral (',' StringLiteral)*;
+stringLiteralList: stringLiteral (',' stringLiteral)*;
 
 identifierWithType: idType = PRIMITIVETYPE id = IDENTIFIER;
 
@@ -55,7 +55,7 @@ statement:
 expression:
 	identifierWithType
 	| NUMBER
-	| StringLiteral
+	| stringLiteral
 	| IDENTIFIER
 	| postFixExpression
 	| arrayInitialisation
@@ -118,7 +118,7 @@ arrayContent: '{' (identifierList | numberList) '}';
 arrayInitialisation:
 	arrayIdentifierWithType (
 		operator = '=' array = arrayContent
-		| StringLiteral
+		| stringLiteral
 	)?;
 
 pointer: PRIMITIVETYPE '*' IDENTIFIER;
@@ -142,7 +142,7 @@ functionCallParameters: (
 	) (',' stringLiteralList | numberList | identifierList)*;
 
 printf:
-	'printf(' (StringLiteral | FORMATSPECIFIERS)* ',' identifierList ')';
+	'printf(' (stringLiteral | FORMATSPECIFIERS)* ',' identifierList ')';
 
 // primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 
