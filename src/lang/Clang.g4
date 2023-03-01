@@ -14,25 +14,29 @@ PRIMITIVETYPE:
 
 IDENTIFIER: [a-z_] [a-zA-Z0-9_]*;
 
-SIMPLEESCAPESEQUENCE: '\\' ['"?abfnrtv\\];
+// SIMPLEESCAPESEQUENCE: '\\' ['"?abfnrtv\\];
 
-start: (expression)*;
+start: (statement)*;
 
-StringLiteral: '"' SCharSequence? '"';
+// StringLiteral: '"' SCharSequence? '"';
 
-SCharSequence: SChar+;
+// SCharSequence: SChar+;
 
-SChar:
-	~["\\\r\n]
-	| EscapeSequence
-	| '\\\n' // Added line
-	| '\\\r\n'; // Added line
+// SChar: ~["\\\r\n] | EscapeSequence | '\\\n' // Added line | '\\\r\n'; // Added line
 
-EscapeSequence: SIMPLEESCAPESEQUENCE;
+// EscapeSequence: SIMPLEESCAPESEQUENCE;
+
+statement:
+	'{' ((statement | expression)+)? '}'
+	| expressionStatement
+	| selectionStatement
+	| iterationStatement
+	| expression
+	| function;
 
 expression:
-	IDENTIFIER
-	| StringLiteral
+	identifierWithType
+	// | StringLiteral
 	| '(' inner = expression ')'
 	| left = expression operator = '*' right = expression
 	| left = expression operator = '/' right = expression
@@ -49,12 +53,6 @@ expression:
 	// = expression | left = expression operator = '^' right = expression | left = expression
 	// operator = '%' right = expression
 	| left = expression operator = '=' right = expression;
-
-statement:
-	'{' ((statement | expression)+)? '}'
-	| expressionStatement
-	| selectionStatement
-	| iterationStatement;
 
 parenthesesExpression: '(' inner = expression ')';
 
@@ -73,6 +71,16 @@ iterationStatement:
 
 forCondition:
 	initialise = expression ';' endCondition = expression ';' increment = expression ';';
+
+identifierWithType: idType = PRIMITIVETYPE id = IDENTIFIER;
+
+identifierWithTypeList:
+	identifierWithType (',' identifierWithType)*;
+
+function:
+	PRIMITIVETYPE (IDENTIFIER) (
+		params = '(' identifierWithTypeList? ')'
+	) body = '{' statement '}';
 
 // primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 
