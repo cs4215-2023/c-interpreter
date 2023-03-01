@@ -25,6 +25,8 @@ start: (statement)*;
 
 StringLiteral: '"' IDENTIFIER? '"';
 
+stringLiteralList: StringLiteral (',' StringLiteral)*;
+
 identifierWithType: idType = PRIMITIVETYPE id = IDENTIFIER;
 
 identifierWithTypeList:
@@ -121,7 +123,14 @@ function:
 		params = '(' identifierWithTypeList? ')'
 	) body = statement;
 
-functionCall: IDENTIFIER params = '(' identifierList? ')';
+functionCall:
+	IDENTIFIER params = '(' functionCallParameters ')';
+
+functionCallParameters: (
+		stringLiteralList
+		| numberList
+		| identifierList
+	) (',' stringLiteralList | numberList | identifierList)*;
 
 // primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 
