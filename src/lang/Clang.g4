@@ -25,6 +25,15 @@ start: (statement)*;
 
 StringLiteral: '"' IDENTIFIER? '"';
 
+identifierWithType: idType = PRIMITIVETYPE id = IDENTIFIER;
+
+identifierWithTypeList:
+	identifierWithType (',' identifierWithType)*;
+
+identifierList: IDENTIFIER (',' IDENTIFIER)*;
+
+numberList: NUMBER (',' NUMBER)*;
+
 statement:
 	'{' ((statement)+)? '}'
 	| expressionStatement
@@ -39,6 +48,7 @@ expression:
 	| StringLiteral
 	| IDENTIFIER
 	| postFixExpression
+	| arrayInitialisation
 	| '(' inner = expression ')'
 	| left = expression operator = '*' right = expression
 	| left = expression operator = '/' right = expression
@@ -85,13 +95,13 @@ iterationStatement:
 forCondition:
 	initialise = expression ';' endCondition = expression ';' increment = expression ';';
 
-identifierWithType: idType = PRIMITIVETYPE id = IDENTIFIER;
-
 arrayIdentifierWithType:
 	idType = PRIMITIVETYPE id = IDENTIFIER '[' size = NUMBER? ']';
 
-identifierWithTypeList:
-	identifierWithType (',' identifierWithType)*;
+arrayContent: '{' (identifierList | numberList) '}';
+
+arrayInitialisation:
+	arrayIdentifierWithType (operator = '=' array = arrayContent)?;
 
 function:
 	funcType = PRIMITIVETYPE (funcName = IDENTIFIER) (
