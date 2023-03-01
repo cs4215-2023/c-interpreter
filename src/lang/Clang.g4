@@ -12,9 +12,11 @@ PRIMITIVETYPE:
 	| 'signed'
 	| 'unsigned';
 
-IDENTIFIER: [a-z_] [a-zA-Z0-9_]*;
+SIGN: ('-' | '+');
 
-NUMBER: ('-' | '+')? [0-9_]+;
+IDENTIFIER: SIGN? [a-z_] [a-zA-Z0-9_]*;
+
+NUMBER: SIGN? [0-9_]+;
 
 // SIMPLEESCAPESEQUENCE: '\\' ['"?abfnrtv\\];
 
@@ -40,6 +42,7 @@ expression:
 	identifierWithType
 	| NUMBER
 	| StringLiteral
+	| IDENTIFIER
 	| '(' inner = expression ')'
 	| left = expression operator = '*' right = expression
 	| left = expression operator = '/' right = expression
@@ -91,7 +94,7 @@ identifierWithTypeList:
 function:
 	PRIMITIVETYPE (IDENTIFIER) (
 		params = '(' identifierWithTypeList? ')'
-	) body = '{' statement '}';
+	) body = statement;
 
 // primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 
