@@ -14,7 +14,7 @@ PRIMITIVETYPE:
 
 SIGN: ('-' | '+');
 
-IDENTIFIER: SIGN? [a-z_] [a-zA-Z0-9_]*;
+IDENTIFIER: SIGN? [a-zA-Z_] [a-zA-Z0-9_]*;
 
 NUMBER: SIGN? [0-9_]+;
 
@@ -101,7 +101,10 @@ arrayIdentifierWithType:
 arrayContent: '{' (identifierList | numberList) '}';
 
 arrayInitialisation:
-	arrayIdentifierWithType (operator = '=' array = arrayContent)?;
+	arrayIdentifierWithType (
+		operator = '=' array = arrayContent
+		| StringLiteral
+	)?;
 
 function:
 	funcType = PRIMITIVETYPE (funcName = IDENTIFIER) (
