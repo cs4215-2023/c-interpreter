@@ -49,10 +49,11 @@ expression:
 	| IDENTIFIER
 	| postFixExpression
 	| arrayInitialisation
-	| parenthesesExpression
+	| '(' inner = expression ')'
 	| pointer
 	| pointerDerefernce
 	| pointerReference
+	| functionCall
 	| left = expression operator = '*' right = expression
 	| left = expression operator = '/' right = expression
 	| left = expression operator = '%' right = expression
@@ -96,7 +97,7 @@ iterationStatement:
 	| 'for' '(' forCondition ')' body = statement;
 
 forCondition:
-	initialise = expression ';' endCondition = expression ';' increment = expression ';';
+	initialise = expression ';' endCondition = expression? ';' increment = expression;
 
 arrayIdentifierWithType:
 	idType = PRIMITIVETYPE id = IDENTIFIER '[' size = NUMBER? ']';
@@ -120,8 +121,7 @@ function:
 		params = '(' identifierWithTypeList? ')'
 	) body = statement;
 
-functionCall:
-	IDENTIFIER params = '(' identifierWithTypeList? ')';
+functionCall: IDENTIFIER params = '(' identifierList? ')';
 
 // primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 
