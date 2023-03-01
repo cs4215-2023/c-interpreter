@@ -49,7 +49,7 @@ expression:
 	| IDENTIFIER
 	| postFixExpression
 	| arrayInitialisation
-	| '(' inner = expression ')'
+	| parenthesesExpression
 	| pointer
 	| pointerDerefernce
 	| pointerReference
@@ -119,6 +119,9 @@ function:
 	funcType = PRIMITIVETYPE (funcName = IDENTIFIER) (
 		params = '(' identifierWithTypeList? ')'
 	) body = statement;
+
+functionCall:
+	IDENTIFIER params = '(' identifierWithTypeList? ')';
 
 // primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 
