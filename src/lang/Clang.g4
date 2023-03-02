@@ -1,58 +1,106 @@
 grammar Clang;
 
-start: (expression)*;
+WHITESPACE: [ \t]+ -> skip;
 
-type: 'void' | 'char' | 'int' | 'float' | 'signed' | 'unsigned';
+NEWLINE: ( '\r' '\n'? | '\n') -> skip;
 
-SIMPLEESCAPESEQUENCE: '\\' ['"?abfnrtv\\];
+PRIMITIVETYPE:
+	'void'
+	| 'char'
+	| 'int'
+	| 'float'
+	| 'signed'
+	| 'unsigned';
 
-StringLiteral: '"' SCharSequence? '"';
+SIGN: ('-' | '+');
 
-SCharSequence: SChar+;
+IDENTIFIER: SIGN? [a-zA-Z_] [a-zA-Z0-9_]*;
 
-SChar:
-	~["\\\r\n]
-	| EscapeSequence
-	| '\\\n' // Added line
-	| '\\\r\n'; // Added line
+FORMATSPECIFIERS:
+	'"' '%d' '"'
+	| '"' '%i' '"'
+	| '"' '%c' '"'
+	| '"' '%f' '"'
+	| '"' '%s' '"'
+	| '"' '%p' '"';
 
-EscapeSequence: SIMPLEESCAPESEQUENCE;
+NUMBER: SIGN? [0-9_]+;
 
-IDENTIFIER: [a-z_] [a-zA-Z0-9_]*;
+PLUSPLUS: '++';
+MINUSMINUS: '--';
+
+start: (statement)*;
+
+stringLiteral: '"' IDENTIFIER? '"';
+
+stringLiteralList: stringLiteral (',' stringLiteral)*;
+
+identifierWithType: idType = PRIMITIVETYPE id = IDENTIFIER;
+
+identifierWithTypeList:
+	identifierWithType (',' identifierWithType)*;
+
+identifierList: IDENTIFIER (',' IDENTIFIER)*;
+
+numberList: NUMBER (',' NUMBER)*;
+
+statement:
+	'{' ((statement)+)? '}'
+	| expressionStatement
+	| selectionStatement
+	| iterationStatement
+	| expression
+	| function;
 
 expression:
-	IDENTIFIER
-	| StringLiteral
+	identifierWithType
+	| NUMBER
+	| stringLiteral
+	| IDENTIFIER
+	| postFixExpression
+	| arrayInitialisation
 	| '(' inner = expression ')'
+	| pointer
+	| pointerDerefernce
+	| pointerReference
+	| functionCall
+	| printf
 	| left = expression operator = '*' right = expression
 	| left = expression operator = '/' right = expression
 	| left = expression operator = '%' right = expression
 	| left = expression operator = '+' right = expression
 	| left = expression operator = '-' right = expression
-	// | left = expression operator = '<<' right = expression | left = expression operator = '>>'
-	// right = expression | left = expression operator = '>' right = expression | left = expression
-	// operator = '<' right = expression | left = expression operator = '>=' right = expression |
-	// left = expression operator = '<=' right = expression | left = expression operator = '=='
-	// right = expression | left = expression operator = '!=' right = expression | left = expression
-	// operator = '||' right = expression | left = expression operator = '&&' right = expression |
-	// left = expression operator = '&' right = expression | left = expression operator = '|' right
-	// = expression | left = expression operator = '^' right = expression | left = expression
-	// operator = '%' right = expression
-	| left = expression operator = '=' right = expression;
-
-statement:
-	'{' ((statement | expression)+)? '}'
-	| expression ';'
-	| selectionStatement
-	| iterationStatement;
+	| left = expression operator = '<<' right = expression
+	| left = expression operator = '>>' right = expression
+	| left = expression operator = '>' right = expression
+	| left = expression operator = '<' right = expression
+	| left = expression operator = '>=' right = expression
+	| left = expression operator = '<=' right = expression
+	| left = expression operator = '==' right = expression
+	| left = expression operator = '!=' right = expression
+	| left = expression operator = '||' right = expression
+	| left = expression operator = '&&' right = expression
+	| left = expression operator = '&' right = expression
+	| left = expression operator = '|' right = expression
+	| left = expression operator = '^' right = expression
+	| left = expression operator = '%' right = expression
+	| left = expression operator = '=' right = expression
+	| left = expression operator = '-=' right = expression
+	| left = expression operator = '+=' right = expression;
 
 parenthesesExpression: '(' inner = expression ')';
+
+postFixExpression: (IDENTIFIER) (PLUSPLUS | MINUSMINUS);
 
 conditionalExpression:
 	test = expression '?' consequent = expression ':' alternate = expression;
 
+expressionStatement: expression ';';
+
 selectionStatement:
-	'if' '(' test = expression ')' statement ('else' statement)?;
+	'if' '(' test = expression ')' consequentStatement = statement (
+		'else' alternateStatement = statement
+	)?;
 
 iterationStatement:
 	'while' '(' condition = expression ')' body = statement
@@ -60,7 +108,41 @@ iterationStatement:
 	| 'for' '(' forCondition ')' body = statement;
 
 forCondition:
-	initialise = expression ';' endCondition = expression ';' increment = expression ';';
+	initialise = expression ';' endCondition = expression? ';' increment = expression;
+
+arrayIdentifierWithType:
+	idType = PRIMITIVETYPE id = IDENTIFIER '[' size = NUMBER? ']';
+
+arrayContent: '{' (identifierList | numberList) '}';
+
+arrayInitialisation:
+	arrayIdentifierWithType (
+		operator = '=' array = arrayContent
+		| stringLiteral
+	)?;
+
+pointer: PRIMITIVETYPE '*' IDENTIFIER;
+
+pointerDerefernce: '*' IDENTIFIER;
+
+pointerReference: '&' IDENTIFIER;
+
+function:
+	funcType = PRIMITIVETYPE (funcName = IDENTIFIER) (
+		params = '(' identifierWithTypeList? ')'
+	) body = statement;
+
+functionCall:
+	IDENTIFIER params = '(' functionCallParameters ')';
+
+functionCallParameters: (
+		stringLiteralList
+		| numberList
+		| identifierList
+	) (',' stringLiteralList | numberList | identifierList)*;
+
+printf:
+	'printf(' (stringLiteral | FORMATSPECIFIERS)* ',' identifierList ')';
 
 // primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 
@@ -296,11 +378,3 @@ forCondition:
 // fragment SCharSequence: SChar+;
 
 // fragment SChar: ~["\\\r\n] | EscapeSequence | '\\\n' // Added line | '\\\r\n'; // Added line
-
-// Whitespace: [ \t]+ -> skip;
-
-// Newline: ( '\r' '\n'? | '\n') -> skip;
-
-// BlockComment: '/*' .*? '*/' -> skip;
-
-// LineComment: '//' ~[\r\n]* -> skip;
