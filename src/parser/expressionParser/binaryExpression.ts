@@ -20,9 +20,6 @@ export class parserBinaryExpression extends ExpressionGenerator {
       loc: contextToLocation(ctx)
     }
   }
-  visitParentheses(ctx: ParenthesesExpressionContext): es.Expression {
-    return this.visit(ctx.expression())
-  }
 
   visitMultiplication(ctx: MultiplicationContext): es.Expression {
     return {

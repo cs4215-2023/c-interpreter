@@ -4,11 +4,18 @@ import { RuleNode } from 'antlr4ts/tree/RuleNode'
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import * as es from 'estree'
 
-import { ExpressionContext, StartContext } from '../../lang/ClangParser'
+import {
+  ExpressionContext,
+  ParenthesesExpressionContext,
+  StartContext
+} from '../../lang/ClangParser'
 import { ClangVisitor } from '../../lang/ClangVisitor'
 import { FatalSyntaxError } from '../errors'
 
 export class ExpressionGenerator implements ClangVisitor<es.Expression> {
+  visitParentheses(ctx: ParenthesesExpressionContext): es.Expression {
+    return this.visit(ctx.expression())
+  }
   visitExpression?: ((ctx: ExpressionContext) => es.Expression) | undefined
   visitStart?: ((ctx: StartContext) => es.Expression) | undefined
 
