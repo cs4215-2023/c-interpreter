@@ -45,6 +45,7 @@ import { NumberListContext } from './ClangParser'
 import { StatementContext } from './ClangParser'
 import { ExpressionContext } from './ClangParser'
 import { ParenthesesExpressionContext } from './ClangParser'
+import { StatementListContext } from './ClangParser'
 import { PostFixContext } from './ClangParser'
 import { ConditionalExpressionContext } from './ClangParser'
 import { ExpressionStatementContext } from './ClangParser'
@@ -403,6 +404,13 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
    * @return the visitor result
    */
   visitParenthesesExpression?: (ctx: ParenthesesExpressionContext) => Result
+
+  /**
+   * Visit a parse tree produced by `ClangParser.statementList`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitStatementList?: (ctx: StatementListContext) => Result
 
   /**
    * Visit a parse tree produced by `ClangParser.postFix`.

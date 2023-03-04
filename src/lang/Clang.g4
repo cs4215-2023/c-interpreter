@@ -45,11 +45,9 @@ identifierList: IDENTIFIER (',' IDENTIFIER)*;
 numberList: NUMBER (',' NUMBER)*;
 
 statement:
-	'{' ((statement)+)? '}'
-	| expressionStatement
+	expressionStatement
 	| selectionStatement
 	| iterationStatement
-	| expression
 	| function;
 
 expression:
@@ -89,6 +87,8 @@ expression:
 
 parenthesesExpression: '(' inner = expression ')';
 
+statementList: '{' ((statement)+)? '}';
+
 postFix: (IDENTIFIER) (PLUSPLUS | MINUSMINUS);
 
 conditionalExpression:
@@ -102,9 +102,9 @@ selectionStatement:
 	)?;
 
 iterationStatement:
-	'while' '(' condition = expression ')' body = statement
-	| 'do' body = statement 'while' '(' condition = expression ')' ';'
-	| 'for' '(' forCondition ')' body = statement;
+	'while' '(' condition = expression ')' body = statementList
+	| 'do' body = statementList 'while' '(' condition = expression ')' ';'
+	| 'for' '(' forCondition ')' body = statementList;
 
 forCondition:
 	initialise = expression ';' endCondition = expression? ';' increment = expression;
@@ -129,7 +129,7 @@ pointerReference: '&' IDENTIFIER;
 function:
 	funcType = PRIMITIVETYPE (funcName = IDENTIFIER) (
 		params = '(' identifierWithTypeList? ')'
-	) body = statement;
+	) body = statementList;
 
 functionCall:
 	IDENTIFIER params = '(' functionCallParameters ')';

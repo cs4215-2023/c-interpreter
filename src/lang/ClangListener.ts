@@ -45,6 +45,7 @@ import { NumberListContext } from './ClangParser'
 import { StatementContext } from './ClangParser'
 import { ExpressionContext } from './ClangParser'
 import { ParenthesesExpressionContext } from './ClangParser'
+import { StatementListContext } from './ClangParser'
 import { PostFixContext } from './ClangParser'
 import { ConditionalExpressionContext } from './ClangParser'
 import { ExpressionStatementContext } from './ClangParser'
@@ -605,6 +606,17 @@ export interface ClangListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitParenthesesExpression?: (ctx: ParenthesesExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by `ClangParser.statementList`.
+   * @param ctx the parse tree
+   */
+  enterStatementList?: (ctx: StatementListContext) => void
+  /**
+   * Exit a parse tree produced by `ClangParser.statementList`.
+   * @param ctx the parse tree
+   */
+  exitStatementList?: (ctx: StatementListContext) => void
 
   /**
    * Enter a parse tree produced by `ClangParser.postFix`.
