@@ -8,7 +8,7 @@ import { ExpressionContext, StartContext } from '../../lang/ClangParser'
 import { ClangVisitor } from '../../lang/ClangVisitor'
 import { FatalSyntaxError } from '../errors'
 
-class ExpressionGenerator implements ClangVisitor<es.Expression> {
+export class ExpressionGenerator implements ClangVisitor<es.Expression> {
   visitExpression?: ((ctx: ExpressionContext) => es.Expression) | undefined
   visitStart?: ((ctx: StartContext) => es.Expression) | undefined
 
