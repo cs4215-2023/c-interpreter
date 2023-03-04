@@ -46,7 +46,7 @@ numberList: NUMBER (',' NUMBER)*;
 
 statement:
 	expressionStatement
-	| selectionStatement
+	| conditionalStatement
 	| iterationStatement
 	| function;
 
@@ -96,7 +96,7 @@ conditionalExpression:
 
 expressionStatement: expression ';';
 
-selectionStatement:
+conditionalStatement:
 	'if' '(' test = expression ')' consequentStatement = statement (
 		'else' alternateStatement = statement
 	)?;
