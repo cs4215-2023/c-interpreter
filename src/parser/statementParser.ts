@@ -29,6 +29,7 @@ export class StatementParser implements ClangVisitor<es.Statement> {
   visit(tree: ParseTree): es.Statement {
     return tree.accept(this)
   }
+
   visitChildren(node: RuleNode): es.Statement {
     const statements: es.Statement[] = []
     for (let i = 0; i < node.childCount; i++) {
@@ -39,9 +40,11 @@ export class StatementParser implements ClangVisitor<es.Statement> {
       body: statements
     }
   }
+
   visitTerminal(node: TerminalNode): es.Statement {
     return node.accept(this)
   }
+
   visitErrorNode(node: ErrorNode): es.Statement {
     throw new FatalSyntaxError(
       {
@@ -59,6 +62,7 @@ export class StatementParser implements ClangVisitor<es.Statement> {
   }
 
   visitStatement(ctx: StatementContext): es.Statement {
+    // TODO: add other types of statements
     const exp = ctx.expressionStatement()
     if (exp != undefined) {
       return this.visitExpression(exp)
