@@ -2,7 +2,7 @@ import * as es from 'estree'
 
 import { ExpressionContext } from '../lang/ClangParser'
 
-function contextToLocation(ctx: ExpressionContext): es.SourceLocation {
+export function contextToLocation(ctx: ExpressionContext): es.SourceLocation {
   return {
     start: {
       line: ctx.start.line,
