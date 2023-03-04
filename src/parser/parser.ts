@@ -6,10 +6,10 @@ import { ClangLexer } from '../lang/ClangLexer'
 import { ClangParser } from '../lang/ClangParser'
 import { Context, ErrorSeverity } from '../types'
 import { FatalSyntaxError } from './errors'
-import { convertSource } from './util'
+import { StatementParser } from './statementParser'
 
 export function parse(source: string, context: Context) {
-  let program: es.Program | undefined
+  let body: es.Statement | undefined
 
   if (context.variant === 'Clang') {
     const inputStream = CharStreams.fromString(source)
@@ -17,9 +17,10 @@ export function parse(source: string, context: Context) {
     const tokenStream = new CommonTokenStream(lexer)
     const parser = new ClangParser(tokenStream)
     parser.buildParseTree = true
+    const statementParser = new StatementParser()
     try {
-      const tree = parser.statement()
-      program = convertSource(tree)
+      const expression = parser.start()
+      body = expression.accept(statementParser)
     } catch (error) {
       if (error instanceof FatalSyntaxError) {
         context.errors.push(error)
@@ -28,8 +29,8 @@ export function parse(source: string, context: Context) {
       }
     }
     const hasErrors = context.errors.find(m => m.severity === ErrorSeverity.ERROR)
-    if (program && !hasErrors) {
-      return program
+    if (body && !hasErrors) {
+      return { type: 'Program', body }
     } else {
       return undefined
     }
