@@ -5,7 +5,6 @@ import {
   DivisionContext,
   MultiplicationContext,
   NumberExpressionContext,
-  ParenthesesExpressionContext,
   SubtractionContext
 } from '../../lang/ClangParser'
 import { contextToLocation } from '../util'

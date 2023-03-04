@@ -52,21 +52,3 @@ export class ExpressionParser implements ClangVisitor<es.Expression> {
     )
   }
 }
-
-function convertExpression(expression: ExpressionContext): es.Expression {
-  const generator = new ExpressionParser()
-  return expression.accept(generator)
-}
-
-export function convertSource(expression: ExpressionContext): es.Program {
-  return {
-    type: 'Program',
-    sourceType: 'script',
-    body: [
-      {
-        type: 'ExpressionStatement',
-        expression: convertExpression(expression)
-      }
-    ]
-  }
-}

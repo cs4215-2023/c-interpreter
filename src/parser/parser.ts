@@ -6,7 +6,7 @@ import { ClangLexer } from '../lang/ClangLexer'
 import { ClangParser } from '../lang/ClangParser'
 import { Context, ErrorSeverity } from '../types'
 import { FatalSyntaxError } from './errors'
-import { convertSource } from './expressionParser'
+import { convertSource } from './util'
 
 export function parse(source: string, context: Context) {
   let program: es.Program | undefined
@@ -18,7 +18,7 @@ export function parse(source: string, context: Context) {
     const parser = new ClangParser(tokenStream)
     parser.buildParseTree = true
     try {
-      const tree = parser.expression()
+      const tree = parser.statement()
       program = convertSource(tree)
     } catch (error) {
       if (error instanceof FatalSyntaxError) {
