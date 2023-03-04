@@ -49,7 +49,6 @@ statement:
 	| expressionStatement
 	| selectionStatement
 	| iterationStatement
-	| expression
 	| function;
 
 expression:
