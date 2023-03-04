@@ -45,52 +45,51 @@ identifierList: IDENTIFIER (',' IDENTIFIER)*;
 numberList: NUMBER (',' NUMBER)*;
 
 statement:
-	'{' ((statement)+)? '}'
-	| expressionStatement
+	expressionStatement
 	| selectionStatement
 	| iterationStatement
-	| expression
 	| function;
 
 expression:
-	identifierWithType
-	| NUMBER
-	| stringLiteral
-	| IDENTIFIER
-	| postFixExpression
-	| arrayInitialisation
-	| '(' inner = expression ')'
-	| pointer
-	| pointerDerefernce
-	| pointerReference
-	| functionCall
-	| printf
-	| left = expression operator = '*' right = expression
-	| left = expression operator = '/' right = expression
-	| left = expression operator = '%' right = expression
-	| left = expression operator = '+' right = expression
-	| left = expression operator = '-' right = expression
-	| left = expression operator = '<<' right = expression
-	| left = expression operator = '>>' right = expression
-	| left = expression operator = '>' right = expression
-	| left = expression operator = '<' right = expression
-	| left = expression operator = '>=' right = expression
-	| left = expression operator = '<=' right = expression
-	| left = expression operator = '==' right = expression
-	| left = expression operator = '!=' right = expression
-	| left = expression operator = '||' right = expression
-	| left = expression operator = '&&' right = expression
-	| left = expression operator = '&' right = expression
-	| left = expression operator = '|' right = expression
-	| left = expression operator = '^' right = expression
-	| left = expression operator = '%' right = expression
-	| left = expression operator = '=' right = expression
-	| left = expression operator = '-=' right = expression
-	| left = expression operator = '+=' right = expression;
+	identifierWithType										# TypedIdentifierExpression
+	| NUMBER												# NumberExpression
+	| stringLiteral											# StringLiteralExpression
+	| IDENTIFIER											# IdentifierExpression
+	| postFix												# PostFixNotationExpression
+	| arrayInitialisation									# ArrayInitialisationExpression
+	| '(' inner = expression ')'							# ParenthesisExpression
+	| pointer												# PointerExpression
+	| pointerDerefernce										# PointerDereferenceExpression
+	| pointerReference										# PointerReferenceExpression
+	| functionCall											# FunctionCallExpression
+	| printf												# PrintfExpression
+	| left = expression operator = '*' right = expression	# Multiplication
+	| left = expression operator = '/' right = expression	# Division
+	| left = expression operator = '%' right = expression	# ModulusDivision
+	| left = expression operator = '+' right = expression	# Addition
+	| left = expression operator = '-' right = expression	# Subtraction
+	| left = expression operator = '<<' right = expression	# BitShiftLeft
+	| left = expression operator = '>>' right = expression	# BitShiftRight
+	| left = expression operator = '>' right = expression	# GreaterThan
+	| left = expression operator = '<' right = expression	# LesserThan
+	| left = expression operator = '>=' right = expression	# GreaterThanOrEqual
+	| left = expression operator = '<=' right = expression	# LesserThanOrEqual
+	| left = expression operator = '==' right = expression	# EqualityChecking
+	| left = expression operator = '!=' right = expression	# NotEqual
+	| left = expression operator = '||' right = expression	# Or
+	| left = expression operator = '&&' right = expression	# And
+	| left = expression operator = '&' right = expression	# BitwiseAnd
+	| left = expression operator = '|' right = expression	# BitwiseOr
+	| left = expression operator = '^' right = expression	# Xor
+	| left = expression operator = '=' right = expression	# Assignment
+	| left = expression operator = '-=' right = expression	# AssignAndMinusOne
+	| left = expression operator = '+=' right = expression	# AssignAndAddOne;
 
 parenthesesExpression: '(' inner = expression ')';
 
-postFixExpression: (IDENTIFIER) (PLUSPLUS | MINUSMINUS);
+statementList: '{' ((statement)+)? '}';
+
+postFix: (IDENTIFIER) (PLUSPLUS | MINUSMINUS);
 
 conditionalExpression:
 	test = expression '?' consequent = expression ':' alternate = expression;
@@ -103,9 +102,9 @@ selectionStatement:
 	)?;
 
 iterationStatement:
-	'while' '(' condition = expression ')' body = statement
-	| 'do' body = statement 'while' '(' condition = expression ')' ';'
-	| 'for' '(' forCondition ')' body = statement;
+	'while' '(' condition = expression ')' body = statementList
+	| 'do' body = statementList 'while' '(' condition = expression ')' ';'
+	| 'for' '(' forCondition ')' body = statementList;
 
 forCondition:
 	initialise = expression ';' endCondition = expression? ';' increment = expression;
@@ -130,7 +129,7 @@ pointerReference: '&' IDENTIFIER;
 function:
 	funcType = PRIMITIVETYPE (funcName = IDENTIFIER) (
 		params = '(' identifierWithTypeList? ')'
-	) body = statement;
+	) body = statementList;
 
 functionCall:
 	IDENTIFIER params = '(' functionCallParameters ')';

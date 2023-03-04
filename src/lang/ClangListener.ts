@@ -2,6 +2,39 @@
 
 import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener'
 
+import { TypedIdentifierExpressionContext } from './ClangParser'
+import { NumberExpressionContext } from './ClangParser'
+import { StringLiteralExpressionContext } from './ClangParser'
+import { IdentifierExpressionContext } from './ClangParser'
+import { PostFixNotationExpressionContext } from './ClangParser'
+import { ArrayInitialisationExpressionContext } from './ClangParser'
+import { ParenthesisExpressionContext } from './ClangParser'
+import { PointerExpressionContext } from './ClangParser'
+import { PointerDereferenceExpressionContext } from './ClangParser'
+import { PointerReferenceExpressionContext } from './ClangParser'
+import { FunctionCallExpressionContext } from './ClangParser'
+import { PrintfExpressionContext } from './ClangParser'
+import { MultiplicationContext } from './ClangParser'
+import { DivisionContext } from './ClangParser'
+import { ModulusDivisionContext } from './ClangParser'
+import { AdditionContext } from './ClangParser'
+import { SubtractionContext } from './ClangParser'
+import { BitShiftLeftContext } from './ClangParser'
+import { BitShiftRightContext } from './ClangParser'
+import { GreaterThanContext } from './ClangParser'
+import { LesserThanContext } from './ClangParser'
+import { GreaterThanOrEqualContext } from './ClangParser'
+import { LesserThanOrEqualContext } from './ClangParser'
+import { EqualityCheckingContext } from './ClangParser'
+import { NotEqualContext } from './ClangParser'
+import { OrContext } from './ClangParser'
+import { AndContext } from './ClangParser'
+import { BitwiseAndContext } from './ClangParser'
+import { BitwiseOrContext } from './ClangParser'
+import { XorContext } from './ClangParser'
+import { AssignmentContext } from './ClangParser'
+import { AssignAndMinusOneContext } from './ClangParser'
+import { AssignAndAddOneContext } from './ClangParser'
 import { StartContext } from './ClangParser'
 import { StringLiteralContext } from './ClangParser'
 import { StringLiteralListContext } from './ClangParser'
@@ -12,7 +45,8 @@ import { NumberListContext } from './ClangParser'
 import { StatementContext } from './ClangParser'
 import { ExpressionContext } from './ClangParser'
 import { ParenthesesExpressionContext } from './ClangParser'
-import { PostFixExpressionContext } from './ClangParser'
+import { StatementListContext } from './ClangParser'
+import { PostFixContext } from './ClangParser'
 import { ConditionalExpressionContext } from './ClangParser'
 import { ExpressionStatementContext } from './ClangParser'
 import { SelectionStatementContext } from './ClangParser'
@@ -34,6 +68,435 @@ import { PrintfContext } from './ClangParser'
  * `ClangParser`.
  */
 export interface ClangListener extends ParseTreeListener {
+  /**
+   * Enter a parse tree produced by the `TypedIdentifierExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterTypedIdentifierExpression?: (ctx: TypedIdentifierExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `TypedIdentifierExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitTypedIdentifierExpression?: (ctx: TypedIdentifierExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `NumberExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterNumberExpression?: (ctx: NumberExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `NumberExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitNumberExpression?: (ctx: NumberExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `StringLiteralExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterStringLiteralExpression?: (ctx: StringLiteralExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `StringLiteralExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitStringLiteralExpression?: (ctx: StringLiteralExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `IdentifierExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterIdentifierExpression?: (ctx: IdentifierExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `IdentifierExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitIdentifierExpression?: (ctx: IdentifierExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `PostFixNotationExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterPostFixNotationExpression?: (ctx: PostFixNotationExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `PostFixNotationExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitPostFixNotationExpression?: (ctx: PostFixNotationExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `ArrayInitialisationExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterArrayInitialisationExpression?: (ctx: ArrayInitialisationExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `ArrayInitialisationExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitArrayInitialisationExpression?: (ctx: ArrayInitialisationExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `ParenthesisExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterParenthesisExpression?: (ctx: ParenthesisExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `ParenthesisExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitParenthesisExpression?: (ctx: ParenthesisExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `PointerExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterPointerExpression?: (ctx: PointerExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `PointerExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitPointerExpression?: (ctx: PointerExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `PointerDereferenceExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterPointerDereferenceExpression?: (ctx: PointerDereferenceExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `PointerDereferenceExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitPointerDereferenceExpression?: (ctx: PointerDereferenceExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `PointerReferenceExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterPointerReferenceExpression?: (ctx: PointerReferenceExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `PointerReferenceExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitPointerReferenceExpression?: (ctx: PointerReferenceExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `FunctionCallExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterFunctionCallExpression?: (ctx: FunctionCallExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `FunctionCallExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitFunctionCallExpression?: (ctx: FunctionCallExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `PrintfExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterPrintfExpression?: (ctx: PrintfExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `PrintfExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitPrintfExpression?: (ctx: PrintfExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `Multiplication`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterMultiplication?: (ctx: MultiplicationContext) => void
+  /**
+   * Exit a parse tree produced by the `Multiplication`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitMultiplication?: (ctx: MultiplicationContext) => void
+
+  /**
+   * Enter a parse tree produced by the `Division`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterDivision?: (ctx: DivisionContext) => void
+  /**
+   * Exit a parse tree produced by the `Division`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitDivision?: (ctx: DivisionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `ModulusDivision`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterModulusDivision?: (ctx: ModulusDivisionContext) => void
+  /**
+   * Exit a parse tree produced by the `ModulusDivision`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitModulusDivision?: (ctx: ModulusDivisionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `Addition`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterAddition?: (ctx: AdditionContext) => void
+  /**
+   * Exit a parse tree produced by the `Addition`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitAddition?: (ctx: AdditionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `Subtraction`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterSubtraction?: (ctx: SubtractionContext) => void
+  /**
+   * Exit a parse tree produced by the `Subtraction`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitSubtraction?: (ctx: SubtractionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `BitShiftLeft`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterBitShiftLeft?: (ctx: BitShiftLeftContext) => void
+  /**
+   * Exit a parse tree produced by the `BitShiftLeft`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitBitShiftLeft?: (ctx: BitShiftLeftContext) => void
+
+  /**
+   * Enter a parse tree produced by the `BitShiftRight`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterBitShiftRight?: (ctx: BitShiftRightContext) => void
+  /**
+   * Exit a parse tree produced by the `BitShiftRight`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitBitShiftRight?: (ctx: BitShiftRightContext) => void
+
+  /**
+   * Enter a parse tree produced by the `GreaterThan`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterGreaterThan?: (ctx: GreaterThanContext) => void
+  /**
+   * Exit a parse tree produced by the `GreaterThan`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitGreaterThan?: (ctx: GreaterThanContext) => void
+
+  /**
+   * Enter a parse tree produced by the `LesserThan`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterLesserThan?: (ctx: LesserThanContext) => void
+  /**
+   * Exit a parse tree produced by the `LesserThan`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitLesserThan?: (ctx: LesserThanContext) => void
+
+  /**
+   * Enter a parse tree produced by the `GreaterThanOrEqual`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterGreaterThanOrEqual?: (ctx: GreaterThanOrEqualContext) => void
+  /**
+   * Exit a parse tree produced by the `GreaterThanOrEqual`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitGreaterThanOrEqual?: (ctx: GreaterThanOrEqualContext) => void
+
+  /**
+   * Enter a parse tree produced by the `LesserThanOrEqual`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterLesserThanOrEqual?: (ctx: LesserThanOrEqualContext) => void
+  /**
+   * Exit a parse tree produced by the `LesserThanOrEqual`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitLesserThanOrEqual?: (ctx: LesserThanOrEqualContext) => void
+
+  /**
+   * Enter a parse tree produced by the `EqualityChecking`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterEqualityChecking?: (ctx: EqualityCheckingContext) => void
+  /**
+   * Exit a parse tree produced by the `EqualityChecking`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitEqualityChecking?: (ctx: EqualityCheckingContext) => void
+
+  /**
+   * Enter a parse tree produced by the `NotEqual`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterNotEqual?: (ctx: NotEqualContext) => void
+  /**
+   * Exit a parse tree produced by the `NotEqual`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitNotEqual?: (ctx: NotEqualContext) => void
+
+  /**
+   * Enter a parse tree produced by the `Or`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterOr?: (ctx: OrContext) => void
+  /**
+   * Exit a parse tree produced by the `Or`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitOr?: (ctx: OrContext) => void
+
+  /**
+   * Enter a parse tree produced by the `And`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterAnd?: (ctx: AndContext) => void
+  /**
+   * Exit a parse tree produced by the `And`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitAnd?: (ctx: AndContext) => void
+
+  /**
+   * Enter a parse tree produced by the `BitwiseAnd`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterBitwiseAnd?: (ctx: BitwiseAndContext) => void
+  /**
+   * Exit a parse tree produced by the `BitwiseAnd`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitBitwiseAnd?: (ctx: BitwiseAndContext) => void
+
+  /**
+   * Enter a parse tree produced by the `BitwiseOr`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterBitwiseOr?: (ctx: BitwiseOrContext) => void
+  /**
+   * Exit a parse tree produced by the `BitwiseOr`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitBitwiseOr?: (ctx: BitwiseOrContext) => void
+
+  /**
+   * Enter a parse tree produced by the `Xor`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterXor?: (ctx: XorContext) => void
+  /**
+   * Exit a parse tree produced by the `Xor`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitXor?: (ctx: XorContext) => void
+
+  /**
+   * Enter a parse tree produced by the `Assignment`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterAssignment?: (ctx: AssignmentContext) => void
+  /**
+   * Exit a parse tree produced by the `Assignment`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitAssignment?: (ctx: AssignmentContext) => void
+
+  /**
+   * Enter a parse tree produced by the `AssignAndMinusOne`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterAssignAndMinusOne?: (ctx: AssignAndMinusOneContext) => void
+  /**
+   * Exit a parse tree produced by the `AssignAndMinusOne`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitAssignAndMinusOne?: (ctx: AssignAndMinusOneContext) => void
+
+  /**
+   * Enter a parse tree produced by the `AssignAndAddOne`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterAssignAndAddOne?: (ctx: AssignAndAddOneContext) => void
+  /**
+   * Exit a parse tree produced by the `AssignAndAddOne`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitAssignAndAddOne?: (ctx: AssignAndAddOneContext) => void
+
   /**
    * Enter a parse tree produced by `ClangParser.start`.
    * @param ctx the parse tree
@@ -145,15 +608,26 @@ export interface ClangListener extends ParseTreeListener {
   exitParenthesesExpression?: (ctx: ParenthesesExpressionContext) => void
 
   /**
-   * Enter a parse tree produced by `ClangParser.postFixExpression`.
+   * Enter a parse tree produced by `ClangParser.statementList`.
    * @param ctx the parse tree
    */
-  enterPostFixExpression?: (ctx: PostFixExpressionContext) => void
+  enterStatementList?: (ctx: StatementListContext) => void
   /**
-   * Exit a parse tree produced by `ClangParser.postFixExpression`.
+   * Exit a parse tree produced by `ClangParser.statementList`.
    * @param ctx the parse tree
    */
-  exitPostFixExpression?: (ctx: PostFixExpressionContext) => void
+  exitStatementList?: (ctx: StatementListContext) => void
+
+  /**
+   * Enter a parse tree produced by `ClangParser.postFix`.
+   * @param ctx the parse tree
+   */
+  enterPostFix?: (ctx: PostFixContext) => void
+  /**
+   * Exit a parse tree produced by `ClangParser.postFix`.
+   * @param ctx the parse tree
+   */
+  exitPostFix?: (ctx: PostFixContext) => void
 
   /**
    * Enter a parse tree produced by `ClangParser.conditionalExpression`.

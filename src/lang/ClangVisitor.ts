@@ -2,6 +2,39 @@
 
 import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor'
 
+import { TypedIdentifierExpressionContext } from './ClangParser'
+import { NumberExpressionContext } from './ClangParser'
+import { StringLiteralExpressionContext } from './ClangParser'
+import { IdentifierExpressionContext } from './ClangParser'
+import { PostFixNotationExpressionContext } from './ClangParser'
+import { ArrayInitialisationExpressionContext } from './ClangParser'
+import { ParenthesisExpressionContext } from './ClangParser'
+import { PointerExpressionContext } from './ClangParser'
+import { PointerDereferenceExpressionContext } from './ClangParser'
+import { PointerReferenceExpressionContext } from './ClangParser'
+import { FunctionCallExpressionContext } from './ClangParser'
+import { PrintfExpressionContext } from './ClangParser'
+import { MultiplicationContext } from './ClangParser'
+import { DivisionContext } from './ClangParser'
+import { ModulusDivisionContext } from './ClangParser'
+import { AdditionContext } from './ClangParser'
+import { SubtractionContext } from './ClangParser'
+import { BitShiftLeftContext } from './ClangParser'
+import { BitShiftRightContext } from './ClangParser'
+import { GreaterThanContext } from './ClangParser'
+import { LesserThanContext } from './ClangParser'
+import { GreaterThanOrEqualContext } from './ClangParser'
+import { LesserThanOrEqualContext } from './ClangParser'
+import { EqualityCheckingContext } from './ClangParser'
+import { NotEqualContext } from './ClangParser'
+import { OrContext } from './ClangParser'
+import { AndContext } from './ClangParser'
+import { BitwiseAndContext } from './ClangParser'
+import { BitwiseOrContext } from './ClangParser'
+import { XorContext } from './ClangParser'
+import { AssignmentContext } from './ClangParser'
+import { AssignAndMinusOneContext } from './ClangParser'
+import { AssignAndAddOneContext } from './ClangParser'
 import { StartContext } from './ClangParser'
 import { StringLiteralContext } from './ClangParser'
 import { StringLiteralListContext } from './ClangParser'
@@ -12,7 +45,8 @@ import { NumberListContext } from './ClangParser'
 import { StatementContext } from './ClangParser'
 import { ExpressionContext } from './ClangParser'
 import { ParenthesesExpressionContext } from './ClangParser'
-import { PostFixExpressionContext } from './ClangParser'
+import { StatementListContext } from './ClangParser'
+import { PostFixContext } from './ClangParser'
 import { ConditionalExpressionContext } from './ClangParser'
 import { ExpressionStatementContext } from './ClangParser'
 import { SelectionStatementContext } from './ClangParser'
@@ -37,6 +71,270 @@ import { PrintfContext } from './ClangParser'
  * operations with no return type.
  */
 export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
+  /**
+   * Visit a parse tree produced by the `TypedIdentifierExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitTypedIdentifierExpression?: (ctx: TypedIdentifierExpressionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `NumberExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitNumberExpression?: (ctx: NumberExpressionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `StringLiteralExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitStringLiteralExpression?: (ctx: StringLiteralExpressionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `IdentifierExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitIdentifierExpression?: (ctx: IdentifierExpressionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `PostFixNotationExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitPostFixNotationExpression?: (ctx: PostFixNotationExpressionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `ArrayInitialisationExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitArrayInitialisationExpression?: (ctx: ArrayInitialisationExpressionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `ParenthesisExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitParenthesisExpression?: (ctx: ParenthesisExpressionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `PointerExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitPointerExpression?: (ctx: PointerExpressionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `PointerDereferenceExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitPointerDereferenceExpression?: (ctx: PointerDereferenceExpressionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `PointerReferenceExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitPointerReferenceExpression?: (ctx: PointerReferenceExpressionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `FunctionCallExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitFunctionCallExpression?: (ctx: FunctionCallExpressionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `PrintfExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitPrintfExpression?: (ctx: PrintfExpressionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `Multiplication`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitMultiplication?: (ctx: MultiplicationContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `Division`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitDivision?: (ctx: DivisionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `ModulusDivision`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitModulusDivision?: (ctx: ModulusDivisionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `Addition`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitAddition?: (ctx: AdditionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `Subtraction`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitSubtraction?: (ctx: SubtractionContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `BitShiftLeft`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitBitShiftLeft?: (ctx: BitShiftLeftContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `BitShiftRight`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitBitShiftRight?: (ctx: BitShiftRightContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `GreaterThan`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitGreaterThan?: (ctx: GreaterThanContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `LesserThan`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitLesserThan?: (ctx: LesserThanContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `GreaterThanOrEqual`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitGreaterThanOrEqual?: (ctx: GreaterThanOrEqualContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `LesserThanOrEqual`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitLesserThanOrEqual?: (ctx: LesserThanOrEqualContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `EqualityChecking`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitEqualityChecking?: (ctx: EqualityCheckingContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `NotEqual`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitNotEqual?: (ctx: NotEqualContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `Or`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitOr?: (ctx: OrContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `And`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitAnd?: (ctx: AndContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `BitwiseAnd`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitBitwiseAnd?: (ctx: BitwiseAndContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `BitwiseOr`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitBitwiseOr?: (ctx: BitwiseOrContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `Xor`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitXor?: (ctx: XorContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `Assignment`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitAssignment?: (ctx: AssignmentContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `AssignAndMinusOne`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitAssignAndMinusOne?: (ctx: AssignAndMinusOneContext) => Result
+
+  /**
+   * Visit a parse tree produced by the `AssignAndAddOne`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitAssignAndAddOne?: (ctx: AssignAndAddOneContext) => Result
+
   /**
    * Visit a parse tree produced by `ClangParser.start`.
    * @param ctx the parse tree
@@ -108,11 +406,18 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
   visitParenthesesExpression?: (ctx: ParenthesesExpressionContext) => Result
 
   /**
-   * Visit a parse tree produced by `ClangParser.postFixExpression`.
+   * Visit a parse tree produced by `ClangParser.statementList`.
    * @param ctx the parse tree
    * @return the visitor result
    */
-  visitPostFixExpression?: (ctx: PostFixExpressionContext) => Result
+  visitStatementList?: (ctx: StatementListContext) => Result
+
+  /**
+   * Visit a parse tree produced by `ClangParser.postFix`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitPostFix?: (ctx: PostFixContext) => Result
 
   /**
    * Visit a parse tree produced by `ClangParser.conditionalExpression`.
