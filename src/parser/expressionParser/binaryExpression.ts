@@ -9,9 +9,9 @@ import {
   SubtractionContext
 } from '../../lang/ClangParser'
 import { contextToLocation } from '../util'
-import { ExpressionGenerator } from '.'
+import { ExpressionParser } from '.'
 
-export class parserBinaryExpression extends ExpressionGenerator {
+export class parserBinaryExpression extends ExpressionParser {
   visitNumber(ctx: NumberExpressionContext): es.Expression {
     return {
       type: 'Literal',

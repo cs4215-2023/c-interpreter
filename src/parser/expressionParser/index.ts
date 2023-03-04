@@ -12,7 +12,7 @@ import {
 import { ClangVisitor } from '../../lang/ClangVisitor'
 import { FatalSyntaxError } from '../errors'
 
-export class ExpressionGenerator implements ClangVisitor<es.Expression> {
+export class ExpressionParser implements ClangVisitor<es.Expression> {
   visitParentheses(ctx: ParenthesesExpressionContext): es.Expression {
     return this.visit(ctx.expression())
   }
@@ -54,7 +54,7 @@ export class ExpressionGenerator implements ClangVisitor<es.Expression> {
 }
 
 function convertExpression(expression: ExpressionContext): es.Expression {
-  const generator = new ExpressionGenerator()
+  const generator = new ExpressionParser()
   return expression.accept(generator)
 }
 
