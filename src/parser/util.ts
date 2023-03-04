@@ -14,3 +14,8 @@ export function contextToLocation(ctx: ExpressionContext): es.SourceLocation {
     }
   }
 }
+
+// Interface that helps with class composition
+export interface Constructable {
+  new (...args: any[]): any;
+}
