@@ -7,7 +7,7 @@ import * as es from 'estree'
 import { ExpressionStatementContext, StatementContext } from '../lang/ClangParser'
 import { ClangVisitor } from '../lang/ClangVisitor'
 import { FatalSyntaxError } from './errors'
-import { ExpressionParser } from './expressionParser'
+import ExpressionParser from './expressionParser'
 
 export class StatementParser implements ClangVisitor<es.Statement> {
   private expressionParser = new ExpressionParser()
