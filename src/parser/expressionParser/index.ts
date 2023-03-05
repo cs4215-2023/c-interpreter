@@ -3,6 +3,7 @@ import { ParseTree } from 'antlr4ts/tree/ParseTree'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import * as es from 'estree'
+import { flow } from 'lodash'
 
 import {
   ExpressionContext,
@@ -11,8 +12,11 @@ import {
 } from '../../lang/ClangParser'
 import { ClangVisitor } from '../../lang/ClangVisitor'
 import { FatalSyntaxError } from '../errors'
+import { parserBinaryExpression } from './binaryExpression'
+import { parserComparatorExpression } from './comparatorParser'
+import { parserLogicalOpExpression } from './logicalOpParser'
 
-export class ExpressionParser implements ClangVisitor<es.Expression> {
+class BaseParser implements ClangVisitor<es.Expression> {
   visitParentheses(ctx: ParenthesesExpressionContext): es.Expression {
     return this.visit(ctx.expression())
   }
@@ -52,3 +56,11 @@ export class ExpressionParser implements ClangVisitor<es.Expression> {
     )
   }
 }
+
+const ParsingBehaviors = flow(
+  parserComparatorExpression,
+  parserBinaryExpression,
+  parserLogicalOpExpression
+)(BaseParser)
+
+export default class ExpressionParser extends ParsingBehaviors {}
