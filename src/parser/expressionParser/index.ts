@@ -12,6 +12,7 @@ import { contextToLocation } from '../util'
 import { parserComparatorExpression } from './comparatorParser'
 import { parserBinaryExpression } from './intBinaryOpParser'
 import { parserLogicalOpExpression } from './logicalOpParser'
+import { parserUnaryOpExpression } from './unaryOpParser'
 
 class BaseParser implements ClangVisitor<es.Expression> {
   visitNumber(ctx: NumberExpressionContext): es.Expression {
@@ -64,7 +65,8 @@ class BaseParser implements ClangVisitor<es.Expression> {
 const ParsingBehaviors = flow(
   parserComparatorExpression,
   parserBinaryExpression,
-  parserLogicalOpExpression
+  parserLogicalOpExpression,
+  parserUnaryOpExpression
 )(BaseParser)
 
 export default class ExpressionParser extends ParsingBehaviors {}
