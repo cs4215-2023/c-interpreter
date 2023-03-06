@@ -124,10 +124,16 @@ conditionalStatement:
 		'else' '{' alternateStatement = statement* '}'
 	)?;
 
-iterationStatement:
-	'while' '(' condition = expression ')' '{' body = statement* '}'
-	| 'do' '{' body = statement* '}' 'while' '(' condition = expression ')' ';'
-	| 'for' '(' innerForCondition = forCondition ')' '{' body = statement '}';
+iterationStatement: whileLoop | doWhileLoop | forLoop;
+
+whileLoop:
+	'while' '(' condition = expression ')' '{' body = statement* '}';
+
+doWhileLoop:
+	'do' '{' body = statement* '}' 'while' '(' condition = expression ')' ';';
+
+forLoop:
+	'for' '(' innerForCondition = forCondition ')' '{' body = statement '}';
 
 forCondition:
 	initialise = expression ';' test = expression? ';' update = expression;
