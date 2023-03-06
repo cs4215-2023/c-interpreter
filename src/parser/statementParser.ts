@@ -4,7 +4,12 @@ import { RuleNode } from 'antlr4ts/tree/RuleNode'
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import * as es from 'estree'
 
-import { ExpressionStatementContext, StartContext, StatementContext } from '../lang/ClangParser'
+import {
+  ConditionalStatementContext,
+  ExpressionStatementContext,
+  StartContext,
+  StatementContext
+} from '../lang/ClangParser'
 import { ClangVisitor } from '../lang/ClangVisitor'
 import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
@@ -73,5 +78,14 @@ export class StatementParser implements ClangVisitor<es.Statement> {
 
   visitExpression(ctx: ExpressionStatementContext): es.Statement {
     return this.wrapAsExpressionStatement(this.expressionParser.visit(ctx))
+  }
+
+  visitConditionalStatement(ctx: ConditionalStatementContext): es.Statement {
+    return {
+      type: 'IfStatement',
+      test: this.expressionParser.visit(ctx._test),
+      alternate: this.visitStatement(ctx._alternateStatement),
+      consequent: this.visitStatement(ctx._consequentStatement)
+    }
   }
 }
