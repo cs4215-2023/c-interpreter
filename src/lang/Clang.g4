@@ -4,7 +4,6 @@ WHITESPACE: [ \t]+ -> skip;
 
 NEWLINE: ( '\r' '\n'? | '\n') -> skip;
 
-
 PRIMITIVETYPE:
 	'void'
 	| 'char'
@@ -27,12 +26,12 @@ FORMATSPECIFIERS:
 
 NUMBER: SIGN? [0-9_]+;
 CHAR: '\'' ~[\])] '\'';
-FLOAT: ('0'..'9')+ '.' ('0'..'9')*;
+FLOAT: ('0' ..'9')+ '.' ('0' ..'9')*;
 
 PLUSPLUS: '++';
 MINUSMINUS: '--';
 
-start: (statement)*;
+start: (statement)* EOF;
 
 stringLiteral: '"' IDENTIFIER? '"';
 
