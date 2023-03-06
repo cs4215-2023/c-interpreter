@@ -3,6 +3,7 @@ import * as es from 'estree'
 import {
   AdditionContext,
   DivisionContext,
+  ModulusDivisionContext,
   MultiplicationContext,
   SubtractionContext
 } from '../../lang/ClangParser'
@@ -44,6 +45,16 @@ export const parserBinaryExpression = <T extends Constructable>(
       return {
         type: 'BinaryExpression',
         operator: '-',
+        left: this.visit(ctx._left),
+        right: this.visit(ctx._right),
+        loc: contextToLocation(ctx)
+      }
+    }
+
+    visitModulusDivision(ctx: ModulusDivisionContext): es.Expression {
+      return {
+        type: 'BinaryExpression',
+        operator: '%',
         left: this.visit(ctx._left),
         right: this.visit(ctx._right),
         loc: contextToLocation(ctx)
