@@ -9,8 +9,8 @@ import { NumberExpressionContext, ParenthesesExpressionContext } from '../../lan
 import { ClangVisitor } from '../../lang/ClangVisitor'
 import { FatalSyntaxError } from '../errors'
 import { contextToLocation } from '../util'
-import { parserBinaryExpression } from './binaryExpression'
 import { parserComparatorExpression } from './comparatorParser'
+import { parserBinaryExpression } from './intBinaryOpParser'
 import { parserLogicalOpExpression } from './logicalOpParser'
 
 class BaseParser implements ClangVisitor<es.Expression> {

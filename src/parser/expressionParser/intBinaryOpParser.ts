@@ -4,7 +4,6 @@ import {
   AdditionContext,
   DivisionContext,
   MultiplicationContext,
-  NumberExpressionContext,
   SubtractionContext
 } from '../../lang/ClangParser'
 import { Constructable, contextToLocation } from '../util'
@@ -13,15 +12,6 @@ export const parserBinaryExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    visitNumber(ctx: NumberExpressionContext): es.Expression {
-      return {
-        type: 'Literal',
-        value: parseInt(ctx.text),
-        raw: ctx.text,
-        loc: contextToLocation(ctx)
-      }
-    }
-
     visitMultiplication(ctx: MultiplicationContext): es.Expression {
       return {
         type: 'BinaryExpression',
