@@ -132,7 +132,7 @@ iterationStatement:
 	| 'for' '(' forCondition ')' body = statementList;
 
 forCondition:
-	initialise = expression ';' endCondition = expression? ';' increment = expression;
+	initialise = expression ';' test = expression? ';' update = expression body = statementList;
 
 arrayIdentifierWithType:
 	idType = PRIMITIVETYPE id = IDENTIFIER '[' size = NUMBER? ']';
