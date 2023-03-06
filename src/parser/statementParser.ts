@@ -4,12 +4,13 @@ import { RuleNode } from 'antlr4ts/tree/RuleNode'
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import * as es from 'estree'
 
-import { ExpressionStatementContext, StatementContext } from '../lang/ClangParser'
+import { ExpressionStatementContext, StartContext, StatementContext } from '../lang/ClangParser'
 import { ClangVisitor } from '../lang/ClangVisitor'
 import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
 
 export class StatementParser implements ClangVisitor<es.Statement> {
+  visitStart?: ((ctx: StartContext) => es.Statement) | undefined
   private expressionParser = new ExpressionParser()
 
   private defaultResponse(): es.Statement {
