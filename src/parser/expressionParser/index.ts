@@ -12,6 +12,7 @@ import { contextToLocation } from '../util'
 import { parserComparatorExpression } from './comparatorParser'
 import { parserBinaryExpression } from './intBinaryOpParser'
 import { parserLogicalOpExpression } from './logicalOpParser'
+import { parserPostFixExpression } from './postFixParser'
 import { parserUnaryOpExpression } from './unaryOpParser'
 
 class BaseParser implements ClangVisitor<es.Expression> {
@@ -66,7 +67,8 @@ const ParsingBehaviors = flow(
   parserComparatorExpression,
   parserBinaryExpression,
   parserLogicalOpExpression,
-  parserUnaryOpExpression
+  parserUnaryOpExpression,
+  parserPostFixExpression
 )(BaseParser)
 
 export default class ExpressionParser extends ParsingBehaviors {}
