@@ -48,7 +48,7 @@ FLOAT: ('0' ..'9')+ '.' ('0' ..'9')*;
 PLUSPLUS: '++';
 MINUSMINUS: '--';
 
-start: (statement)* EOF;
+start: (statement)*;
 
 stringLiteral: '"' IDENTIFIER? '"';
 
@@ -112,8 +112,6 @@ expression:
 
 parenthesesExpression: '(' inner = expression ')';
 
-statementList: '{' ((statement)+)? '}';
-
 postFix: argument = IDENTIFIER (PLUSPLUS | MINUSMINUS);
 
 conditionalExpression:
@@ -122,17 +120,17 @@ conditionalExpression:
 expressionStatement: expression ';';
 
 conditionalStatement:
-	'if' '(' test = expression ')' consequentStatement = statement (
-		'else' alternateStatement = statement
+	'if' '(' test = expression ')' '{' consequentStatement = statement* '}' (
+		'else' '{' alternateStatement = statement* '}'
 	)?;
 
 iterationStatement:
-	'while' '(' condition = expression ')' body = statementList
-	| 'do' body = statementList 'while' '(' condition = expression ')' ';'
-	| 'for' '(' forCondition ')' body = statementList;
+	'while' '(' condition = expression ')' '{' body = statement* '}'
+	| 'do' '{' body = statement* '}' 'while' '(' condition = expression ')' ';'
+	| 'for' '(' innerForCondition = forCondition ')' '{' body = statement '}';
 
 forCondition:
-	initialise = expression ';' test = expression? ';' update = expression body = statementList;
+	initialise = expression ';' test = expression? ';' update = expression;
 
 arrayIdentifierWithType:
 	idType = PRIMITIVETYPE id = IDENTIFIER '[' size = NUMBER? ']';
@@ -154,7 +152,7 @@ pointerReference: operator = BITWISEAND argument = IDENTIFIER;
 function:
 	funcType = PRIMITIVETYPE (funcName = IDENTIFIER) (
 		params = '(' identifierWithTypeList? ')'
-	) body = statementList;
+	) '{' body = statement* '}';
 
 functionCall:
 	IDENTIFIER params = '(' functionCallParameters ')';
