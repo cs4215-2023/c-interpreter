@@ -254,7 +254,7 @@ export type ContiguousArrayElements = ContiguousArrayElementExpression[]
 // Types used in type checker for type inference/type error checker for Source Typed variant
 // =======================================
 
-export type PrimitiveType = 'boolean' | 'null' | 'number' | 'string' | 'undefined'
+export type PrimitiveType = 'string'
 
 export type TSAllowedTypes = 'any' | 'void'
 
@@ -308,7 +308,7 @@ export type Type =
 
 export interface Primitive {
   kind: 'primitive'
-  name: PrimitiveType | TSAllowedTypes
+  name: PrimitiveType
   // Value is needed for Source Typed type error checker due to existence of literal types
   value?: string | number | boolean
 }
