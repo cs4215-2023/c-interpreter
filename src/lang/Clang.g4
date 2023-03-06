@@ -115,7 +115,7 @@ parenthesesExpression: '(' inner = expression ')';
 
 statementList: '{' ((statement)+)? '}';
 
-postFix: (IDENTIFIER) (PLUSPLUS | MINUSMINUS);
+postFix: argument = IDENTIFIER (PLUSPLUS | MINUSMINUS);
 
 conditionalExpression:
 	test = expression '?' consequent = expression ':' alternate = expression;
