@@ -108,7 +108,8 @@ expression:
 	| left = expression operator = MINUSEQUAL right = expression			# AssignAndMinusOne
 	| left = expression operator = PLUSEQUAL right = expression				# AssignAndAddOne
 	| operators = SUB argument = expression									# Negative
-	| operators = ADD argument = expression									# Positive;
+	| operators = ADD argument = expression									# Positive
+	| operators = NOT argument = expression									# Not;
 
 parenthesesExpression: '(' inner = expression ')';
 
