@@ -27,13 +27,9 @@ WHITESPACE: [ \t]+ -> skip;
 
 NEWLINE: ( '\r' '\n'? | '\n') -> skip;
 
-PRIMITIVETYPE:
-	'void'
-	| 'char'
-	| 'int'
-	| 'float'
-	| 'signed'
-	| 'unsigned';
+PRIMITIVETYPE: 'void' | 'char' | 'int' | 'float';
+
+SIGNEDTYPE: 'signed' | 'unsigned';
 
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
@@ -58,7 +54,10 @@ stringLiteral: '"' IDENTIFIER? '"';
 
 stringLiteralList: stringLiteral (',' stringLiteral)*;
 
-identifierWithType: idType = PRIMITIVETYPE id = IDENTIFIER;
+identifierWithType: idType = type id = IDENTIFIER;
+
+type:
+	signed = SIGNEDTYPE? primType = PRIMITIVETYPE # PrimitiveType;
 
 identifierWithTypeList:
 	identifierWithType (',' identifierWithType)*;
