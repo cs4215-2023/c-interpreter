@@ -5,23 +5,27 @@ import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import * as es from 'estree'
 import { flow } from 'lodash'
 
-import {
-  ExpressionContext,
-  ParenthesesExpressionContext,
-  StartContext
-} from '../../lang/ClangParser'
+import { NumberExpressionContext, ParenthesesExpressionContext } from '../../lang/ClangParser'
 import { ClangVisitor } from '../../lang/ClangVisitor'
 import { FatalSyntaxError } from '../errors'
+import { contextToLocation } from '../util'
 import { parserBinaryExpression } from './binaryExpression'
 import { parserComparatorExpression } from './comparatorParser'
 import { parserLogicalOpExpression } from './logicalOpParser'
 
 class BaseParser implements ClangVisitor<es.Expression> {
+  visitNumber(ctx: NumberExpressionContext): es.Expression {
+    return {
+      type: 'Literal',
+      value: parseInt(ctx.text),
+      raw: ctx.text,
+      loc: contextToLocation(ctx)
+    }
+  }
+
   visitParentheses(ctx: ParenthesesExpressionContext): es.Expression {
     return this.visit(ctx.expression())
   }
-  visitExpression?: ((ctx: ExpressionContext) => es.Expression) | undefined
-  visitStart?: ((ctx: StartContext) => es.Expression) | undefined
 
   visit(tree: ParseTree): es.Expression {
     return tree.accept(this)
