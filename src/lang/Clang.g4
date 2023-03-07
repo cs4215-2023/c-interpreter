@@ -56,8 +56,8 @@ stringLiteralList: stringLiteral (',' stringLiteral)*;
 
 identifierWithType: idType = type id = IDENTIFIER;
 
-type:
-	signed = SIGNEDTYPE? primType = PRIMITIVETYPE # PrimitiveType;
+// rename so as not to conflict with built in type
+type: signed = SIGNEDTYPE? primType = PRIMITIVETYPE;
 
 identifierWithTypeList:
 	identifierWithType (',' identifierWithType)*;
@@ -157,7 +157,7 @@ pointerReference: operator = BITWISEAND argument = IDENTIFIER;
 
 function:
 	funcType = PRIMITIVETYPE (funcName = IDENTIFIER) (
-		params = '(' identifierWithTypeList? ')'
+		'(' params = identifierWithTypeList ')'
 	) '{' body = statement* '}';
 
 functionCall:
