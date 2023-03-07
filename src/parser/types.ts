@@ -58,6 +58,7 @@ export interface ExpressionMap {
   UpdateExpression: UpdateExpression
 }
 
+// TODO: add type of expression
 type Expression = ExpressionMap[keyof ExpressionMap]
 
 export type BaseExpression = BaseNode
