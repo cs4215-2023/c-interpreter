@@ -161,4 +161,21 @@ export type AssignmentOperator = '=' | '+=' | '-='
 
 export type UpdateOperator = '++' | '--'
 
-export type Type = 'void' | 'char' | 'int' | 'float'
+export type Type = PrimitiveType | FunctionType
+
+export type PrimitiveValueType = 'int' | 'float' | 'char' | 'bool' | 'void'
+
+export type SignedType = 'signed' | 'unsigned'
+
+export interface PrimitiveType {
+  type: 'PrimitiveType'
+  signed: SignedType | undefined
+  valueType: PrimitiveValueType
+}
+
+export interface FunctionType {
+  type: 'FunctionType'
+  signed: SignedType | undefined
+  parameterType: Type[]
+  returnType: Type
+}
