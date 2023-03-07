@@ -1,17 +1,60 @@
-import { PrimitiveTypeContext } from '../lang/ClangParser'
-import { Type } from '../types'
-import { Constructable } from './util'
+import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
+import { ParseTree } from 'antlr4ts/tree/ParseTree'
+import { RuleNode } from 'antlr4ts/tree/RuleNode'
+import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
+
+import { IdentifierWithTypeContext } from '../lang/ClangParser'
+import { ClangVisitor } from '../lang/ClangVisitor'
+import { FatalSyntaxError } from './errors'
+import ExpressionParser from './expressionParser'
+import { PrimitiveValueType, SignedType, Type } from './types'
 
 // TODO: Validate the correctness of this
-export const TypeParser = <T extends Constructable>(BaseClass: T): typeof DerivedClass => {
-  const DerivedClass = class extends BaseClass {
-    visitPrimType(ctx: PrimitiveTypeContext): Type {
-      return {
-        kind: 'primitive',
-        name: 'string',
-        value: ctx.PRIMITIVETYPE().text
-      }
+export class typeParser implements ClangVisitor<Type> {
+  expressionParser = new ExpressionParser()
+  protected defaultResult(): Type {
+    return {
+      type: 'PrimitiveType',
+      signed: undefined,
+      valueType: 'void'
     }
   }
-  return DerivedClass
+
+  visit(ctx: ParseTree): Type {
+    return ctx.accept(this)
+  }
+
+  // no children to visit?
+  visitChildren(node: RuleNode): Type {
+    return this.defaultResult()
+  }
+
+  visitTerminal(node: TerminalNode): Type {
+    return node.accept(this)
+  }
+
+  visitErrorNode(node: ErrorNode): Type {
+    throw new FatalSyntaxError(
+      {
+        start: {
+          line: node.symbol.line,
+          column: node.symbol.charPositionInLine
+        },
+        end: {
+          line: node.symbol.line,
+          column: node.symbol.charPositionInLine + 1
+        }
+      },
+      `invalid syntax ${node.text}`
+    )
+  }
+
+  visitIdentifierWithType(ctx: IdentifierWithTypeContext): Type {
+    const idType = ctx._idType
+    return {
+      type: 'PrimitiveType',
+      signed: idType._signed.text as SignedType,
+      valueType: idType._primType.text as PrimitiveValueType
+    }
+  }
 }
