@@ -163,7 +163,7 @@ export type UpdateOperator = '++' | '--'
 
 export type Type = PrimitiveType | FunctionType
 
-export type PrimitiveValueType = 'int' | 'float' | 'char' | 'bool' | 'void'
+export type PrimitiveValueType = 'int' | 'float' | 'char' | 'void'
 
 export type SignedType = 'signed' | 'unsigned'
 
