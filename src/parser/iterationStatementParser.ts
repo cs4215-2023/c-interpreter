@@ -14,6 +14,8 @@ import { FatalSyntaxError } from './errors'
 import { StatementParser } from './statementParser'
 
 // TODO: validate if extending statement parser will lead to errors.
+
+// Extending statement parser here because we don't want to constantly invocate expression parser when handling the expressions for the statements.
 export class IterationStatementParser extends StatementParser {
   visit(tree: ParseTree): es.Statement {
     return tree.accept(this)
