@@ -7,19 +7,18 @@ import * as es from 'estree'
 import {
   ConditionalStatementContext,
   ExpressionStatementContext,
-  IterationStatementContext,
   StartContext,
   StatementContext
 } from '../lang/ClangParser'
 import { ClangVisitor } from '../lang/ClangVisitor'
 import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
-import { IterationStatementParser } from './iterationStatementParser'
+// import { IterationStatementParser } from './iterationStatementParser'
 
 export class StatementParser implements ClangVisitor<es.Statement> {
   visitStart?: ((ctx: StartContext) => es.Statement) | undefined
   protected expressionParser = new ExpressionParser()
-  private iterationParser = new IterationStatementParser()
+  // private iterationParser = new IterationStatementParser()
 
   protected defaultResponse(): es.Statement {
     return {
@@ -76,9 +75,10 @@ export class StatementParser implements ClangVisitor<es.Statement> {
     const iter = ctx.iterationStatement()
     if (exp != undefined) {
       return this.visitExpression(exp)
-    } else if (iter != undefined) {
-      return this.visitIterative(iter)
     }
+    // } else if (iter != undefined) {
+    //   // return this.visitIterative(iter)
+    // }
     return this.defaultResponse()
   }
 
@@ -86,9 +86,9 @@ export class StatementParser implements ClangVisitor<es.Statement> {
     return this.wrapAsExpressionStatement(this.expressionParser.visit(ctx))
   }
 
-  visitIterative(ctx: IterationStatementContext): es.Statement {
-    return this.iterationParser.visit(ctx)
-  }
+  // visitIterative(ctx: IterationStatementContext): es.Statement {
+  //   return this.iterationParser.visit(ctx)
+  // }
 
   visitConditionalStatement(ctx: ConditionalStatementContext): es.Statement {
     return {

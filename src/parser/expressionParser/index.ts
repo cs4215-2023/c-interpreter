@@ -1,11 +1,10 @@
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
-import { ParseTree } from 'antlr4ts/tree/ParseTree'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
-import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import * as es from 'estree'
 import { flow } from 'lodash'
 
 import { NumberExpressionContext, ParenthesesExpressionContext } from '../../lang/ClangParser'
+import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor';
 import { ClangVisitor } from '../../lang/ClangVisitor'
 import { FatalSyntaxError } from '../errors'
 import { contextToLocation } from '../util'
@@ -15,7 +14,13 @@ import { parserLogicalOpExpression } from './logicalOpParser'
 import { parserPostFixExpression } from './postFixParser'
 import { parserUnaryOpExpression } from './unaryOpParser'
 
-class BaseParser implements ClangVisitor<es.Expression> {
+//TODO: integrate types.ts into expression parser
+class BaseParser
+  extends AbstractParseTreeVisitor<es.Expression>
+  implements ClangVisitor<es.Expression> {
+  protected defaultResult(): es.Expression {
+    throw new Error('Method not implemented.')
+  }
   visitNumber(ctx: NumberExpressionContext): es.Expression {
     return {
       type: 'Literal',
@@ -29,10 +34,8 @@ class BaseParser implements ClangVisitor<es.Expression> {
     return this.visit(ctx.expression())
   }
 
-  visit(tree: ParseTree): es.Expression {
-    return tree.accept(this)
-  }
   visitChildren(node: RuleNode): es.Expression {
+    console.log("visit children")
     const expressions: es.Expression[] = []
     for (let i = 0; i < node.childCount; i++) {
       expressions.push(node.getChild(i).accept(this))
@@ -42,10 +45,6 @@ class BaseParser implements ClangVisitor<es.Expression> {
       expressions
     }
   }
-  visitTerminal(node: TerminalNode): es.Expression {
-    return node.accept(this)
-  }
-
   visitErrorNode(node: ErrorNode): es.Expression {
     throw new FatalSyntaxError(
       {
@@ -71,4 +70,4 @@ const ParsingBehaviors = flow(
   parserPostFixExpression
 )(BaseParser)
 
-export default class ExpressionParser extends ParsingBehaviors {}
+export default class ExpressionParser extends ParsingBehaviors { }
