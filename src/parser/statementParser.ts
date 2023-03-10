@@ -1,3 +1,4 @@
+import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
 import { ParseTree } from 'antlr4ts/tree/ParseTree'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
@@ -15,16 +16,17 @@ import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
 // import { IterationStatementParser } from './iterationStatementParser'
 
-export class StatementParser implements ClangVisitor<es.Statement> {
-  visitStart?: ((ctx: StartContext) => es.Statement) | undefined
-  protected expressionParser = new ExpressionParser()
-  // private iterationParser = new IterationStatementParser()
-
-  protected defaultResponse(): es.Statement {
+export class StatementParser 
+extends AbstractParseTreeVisitor<es.Statement>
+implements ClangVisitor<es.Statement> {
+  protected defaultResult(): es.Statement {
     return {
       type: 'EmptyStatement'
     }
   }
+  visitStart?: ((ctx: StartContext) => es.Statement) | undefined
+  protected expressionParser = new ExpressionParser()
+  // private iterationParser = new IterationStatementParser()
 
   private wrapAsExpressionStatement(e: es.Expression): es.Statement {
     return {
@@ -79,10 +81,12 @@ export class StatementParser implements ClangVisitor<es.Statement> {
     // } else if (iter != undefined) {
     //   // return this.visitIterative(iter)
     // }
-    return this.defaultResponse()
+    return this.defaultResult()
   }
 
   visitExpression(ctx: ExpressionStatementContext): es.Statement {
+    console.log(ctx.ruleContext)
+    console.log("visiting expr")
     return this.wrapAsExpressionStatement(this.expressionParser.visit(ctx))
   }
 

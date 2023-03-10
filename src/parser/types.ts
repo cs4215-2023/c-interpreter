@@ -21,9 +21,23 @@ interface BaseFunction extends BaseNode {
   body: BlockStatement
 }
 
+type BaseStatement = BaseNode;
+
+export interface ExpressionStatement extends BaseStatement {
+  type: 'ExpressionStatement';
+  expression: Expression;
+}
+
+export interface EmptyStatement extends BaseStatement {
+  type: 'EmptyStatement';
+}
+
 export type Function = FunctionDeclaration
 
-export type Statement = Declaration
+export type Statement =
+  | Declaration
+  | ExpressionStatement
+  | EmptyStatement;
 
 export type Declaration = FunctionDeclaration | VariableDeclaration
 
@@ -46,26 +60,42 @@ export interface VariableDeclarator extends BaseNode {
   init?: Expression | null | undefined
 }
 
-export interface ExpressionMap {
-  ArrayExpression: ArrayExpression
-  AssignmentExpression: AssignmentExpression
-  BinaryExpression: BinaryExpression
-  ConditionalExpression: ConditionalExpression
-  Identifier: Identifier
-  Literal: Literal
-  LogicalExpression: LogicalExpression
-  UnaryExpression: UnaryExpression
-  UpdateExpression: UpdateExpression
-}
+
+// export interface ExpressionMap {
+//   ArrayExpression: ArrayExpression
+//   AssignmentExpression: AssignmentExpression
+//   BinaryExpression: BinaryExpression
+//   ConditionalExpression: ConditionalExpression
+//   Identifier: Identifier
+//   Literal: Literal
+//   LogicalExpression: LogicalExpression
+//   UnaryExpression: UnaryExpression
+//   UpdateExpression: UpdateExpression
+// }
+
+
+export type Expression =
+  | ArrayExpression
+  | Literal
+  | Identifier
+  | UnaryExpression
+  | BinaryExpression
+  | LogicalExpression
+  | ConditionalExpression
+  | UpdateExpression
+  | EmptyExpression;
 
 // TODO: add type of expression
-type Expression = ExpressionMap[keyof ExpressionMap]
 
 export type BaseExpression = BaseNode
 
 export interface ArrayExpression extends BaseExpression {
   type: 'ArrayExpression'
   elements: Array<Expression | null>
+}
+
+export interface EmptyExpression extends BaseExpression {
+  type: 'EmptyExpression';
 }
 
 export interface UnaryExpression extends BaseExpression {
@@ -115,26 +145,34 @@ export interface Identifier extends BaseNode, BaseExpression, BasePattern {
   typeDeclaration?: Type
 }
 
-export type Literal = Integer | Float | Character
+/**
+ * PRIMITIVE LITERAL TYPES
+ */
 
-export interface Integer extends BaseNode, BaseExpression {
-  type: 'Integer'
-  value: number
+interface BaseLiteral extends BaseNode{
+  type: 'Literal';
+  valueType: string;
 }
 
-export interface Float extends BaseNode, BaseExpression {
-  type: 'Float'
-  value: number
+export interface Integer extends BaseLiteral {
+  valueType: 'int';
+  value: number;
 }
 
-export interface Character extends BaseNode, BaseExpression {
-  valueType: 'char'
-  value: string
+export interface Character extends BaseLiteral {
+  valueType: 'char';
+  value: string;
 }
 
-export interface Void extends BaseNode, BaseExpression {
+export interface Float extends BaseLiteral {
+  valueType: 'float';
+  value: number;
+}
+
+export interface Void extends BaseLiteral {
   valueType: 'void'
 }
+export type Literal = Integer | Float | Character | Void;
 
 export type UnaryOperator = '-' | '+' | '!' | '&' | '*'
 

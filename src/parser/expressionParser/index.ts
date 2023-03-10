@@ -1,33 +1,27 @@
+import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
 import * as es from 'estree'
 import { flow } from 'lodash'
 
 import { NumberExpressionContext, ParenthesesExpressionContext } from '../../lang/ClangParser'
-import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor';
 import { ClangVisitor } from '../../lang/ClangVisitor'
 import { FatalSyntaxError } from '../errors'
 import { contextToLocation } from '../util'
 import { parserComparatorExpression } from './comparatorParser'
 import { parserBinaryExpression } from './intBinaryOpParser'
 import { parserLogicalOpExpression } from './logicalOpParser'
+import { parserNumberExpression } from './numberParser'
 import { parserPostFixExpression } from './postFixParser'
 import { parserUnaryOpExpression } from './unaryOpParser'
 
 //TODO: integrate types.ts into expression parser
 class BaseParser
   extends AbstractParseTreeVisitor<es.Expression>
-  implements ClangVisitor<es.Expression> {
+  implements ClangVisitor<es.Expression>
+{
   protected defaultResult(): es.Expression {
     throw new Error('Method not implemented.')
-  }
-  visitNumber(ctx: NumberExpressionContext): es.Expression {
-    return {
-      type: 'Literal',
-      value: parseInt(ctx.text),
-      raw: ctx.text,
-      loc: contextToLocation(ctx)
-    }
   }
 
   visitParentheses(ctx: ParenthesesExpressionContext): es.Expression {
@@ -35,9 +29,10 @@ class BaseParser
   }
 
   visitChildren(node: RuleNode): es.Expression {
-    console.log("visit children")
+    console.log('visit children')
     const expressions: es.Expression[] = []
     for (let i = 0; i < node.childCount; i++) {
+      console.log(node.text)
       expressions.push(node.getChild(i).accept(this))
     }
     return {
@@ -63,11 +58,13 @@ class BaseParser
 }
 
 const ParsingBehaviors = flow(
+
   parserComparatorExpression,
   parserBinaryExpression,
   parserLogicalOpExpression,
   parserUnaryOpExpression,
-  parserPostFixExpression
+  parserPostFixExpression,
+  parserNumberExpression
 )(BaseParser)
 
-export default class ExpressionParser extends ParsingBehaviors { }
+export default class ExpressionParser extends ParsingBehaviors {}
