@@ -74,4 +74,4 @@ const ParsingBehaviors = flow(
   parserIdentifierExpression
 )(BaseParser)
 
-export default class ExpressionParser extends ParsingBehaviors { }
+export default class ExpressionParser extends ParsingBehaviors {}
