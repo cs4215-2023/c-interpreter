@@ -8,13 +8,14 @@ import { NumberExpressionContext, ParenthesesExpressionContext } from '../../lan
 import { ClangVisitor } from '../../lang/ClangVisitor'
 import { FatalSyntaxError } from '../errors'
 import { contextToLocation } from '../util'
+import { parserBitwiseOpExpression } from './bitwiseOpParser'
 import { parserComparatorExpression } from './comparatorParser'
+import { parserIdentifierExpression } from './identifierParser'
 import { parserBinaryExpression } from './intBinaryOpParser'
 import { parserLogicalOpExpression } from './logicalOpParser'
-import { parserPrimitiveExpression } from './primitiveParser'
 import { parserPostFixExpression } from './postFixParser'
+import { parserPrimitiveExpression } from './primitiveParser'
 import { parserUnaryOpExpression } from './unaryOpParser'
-import { parserBitwiseOpExpression } from './bitwiseOpParser'
 
 //TODO: integrate types.ts into expression parser
 class BaseParser
@@ -24,7 +25,7 @@ class BaseParser
   protected defaultResult(): es.Expression {
     // throw new Error('Method not implemented.')
     return {
-      type: "SequenceExpression",
+      type: 'SequenceExpression',
       expressions: []
     }
   }
@@ -63,14 +64,14 @@ class BaseParser
 }
 
 const ParsingBehaviors = flow(
-
   parserComparatorExpression,
   parserBinaryExpression,
   parserLogicalOpExpression,
   parserUnaryOpExpression,
   parserPostFixExpression,
   parserPrimitiveExpression,
-  parserBitwiseOpExpression
+  parserBitwiseOpExpression,
+  parserIdentifierExpression
 )(BaseParser)
 
 export default class ExpressionParser extends ParsingBehaviors { }

@@ -1,17 +1,38 @@
 import * as es from 'estree'
 
-import { TypedIdentifierExpressionContext } from '../../lang/ClangParser'
+import { IdentifierWithTypeContext, TypeContext, TypedIdentifierExpressionContext } from '../../lang/ClangParser'
 import { Constructable } from '../util'
+import { Type, PrimitiveValueType } from '../types'
 
-export const parserBinaryExpression = <T extends Constructable>(
+export const parserIdentifierExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
     // TODO: update return type
-    visitIdentifierWithType(ctx: TypedIdentifierExpressionContext): es.Expression {
+    visitTypedIdentifierExpression(ctx: TypedIdentifierExpressionContext): es.Expression {
+      console.log("visitTypedIdentifierExpression")
+      const typedIdentifier = this.visitIdentifierWithType(ctx.identifierWithType())
+      return {
+        type: 'Identifier',
+        name: '',
+      }
+    }
+    visitIdentifierWithType(ctx: IdentifierWithTypeContext): es.Expression {
+      console.log("visitIdentifierWithType")
+      const primitiveType = this.visitType(ctx.type())
+      console.log(ctx.IDENTIFIER().text)
       return {
         type: 'Identifier',
         name: ''
+      }
+    }
+    visitType(ctx: TypeContext): Type {
+      console.log("visitType")
+      console.log(ctx.text)
+      return {
+        type: 'PrimitiveType',
+        signed: undefined,
+        valueType: ctx.text as PrimitiveValueType
       }
     }
   }

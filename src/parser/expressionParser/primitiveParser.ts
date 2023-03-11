@@ -1,6 +1,10 @@
 import * as es from 'estree'
 
-import { NumberExpressionContext, FloatExpressionContext, CharExpressionContext, } from '../../lang/ClangParser'
+import {
+  CharExpressionContext,
+  FloatExpressionContext,
+  NumberExpressionContext
+} from '../../lang/ClangParser'
 import { Constructable, contextToLocation } from '../util'
 
 export const parserPrimitiveExpression = <T extends Constructable>(
@@ -16,7 +20,7 @@ export const parserPrimitiveExpression = <T extends Constructable>(
       }
     }
     visitFloatExpression(ctx: FloatExpressionContext): es.Expression {
-      console.log("float")
+      console.log('float')
       return {
         type: 'Literal',
         value: parseFloat(ctx.text),
@@ -25,7 +29,7 @@ export const parserPrimitiveExpression = <T extends Constructable>(
       }
     }
     visitCharExpression(ctx: CharExpressionContext): es.Expression {
-      console.log("char")
+      console.log('char')
       return {
         type: 'Literal',
         value: ctx.text.trim().charAt(1),

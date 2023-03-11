@@ -1,14 +1,21 @@
 import { BaseDeclaration, BasePattern, BlockStatement } from 'estree'
 
-interface BaseNode {
-  type: string
-}
-
 export interface Position {
   /** >= 1 */
-  line: number
+  line: number;
   /** >= 0 */
-  column: number
+  column: number;
+}
+
+export interface SourceLocation {
+  source?: string | null;
+  start: Position;
+  end: Position;
+}
+
+interface BaseNode {
+  type: string;
+  loc?: SourceLocation;
 }
 
 export interface Program extends BaseNode {
@@ -41,7 +48,7 @@ export type Statement =
 
 export type Declaration = FunctionDeclaration | VariableDeclaration
 
-export interface FunctionDeclaration extends BaseFunction, BaseDeclaration {
+export interface FunctionDeclaration extends BaseFunction, BaseExpression {
   type: 'FunctionDeclaration'
   id: Identifier
   body: BlockStatement
@@ -139,7 +146,7 @@ export interface ConditionalExpression extends BaseExpression {
 }
 
 export type Pattern = Identifier
-export interface Identifier extends BaseNode, BaseExpression, BasePattern {
+export interface Identifier extends BaseExpression {
   type: 'Identifier'
   name: string
   typeDeclaration?: Type
@@ -149,7 +156,7 @@ export interface Identifier extends BaseNode, BaseExpression, BasePattern {
  * PRIMITIVE LITERAL TYPES
  */
 
-interface BaseLiteral extends BaseNode{
+interface BaseLiteral extends BaseNode {
   type: 'Literal';
   valueType: string;
 }
