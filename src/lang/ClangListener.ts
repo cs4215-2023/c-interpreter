@@ -5,6 +5,8 @@ import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 
 import { TypedIdentifierExpressionContext } from "./ClangParser";
 import { NumberExpressionContext } from "./ClangParser";
+import { CharExpressionContext } from "./ClangParser";
+import { FloatExpressionContext } from "./ClangParser";
 import { StringLiteralExpressionContext } from "./ClangParser";
 import { IdentifierExpressionContext } from "./ClangParser";
 import { PostFixNotationExpressionContext } from "./ClangParser";
@@ -101,6 +103,32 @@ export interface ClangListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitNumberExpression?: (ctx: NumberExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `CharExpression`
+	 * labeled alternative in `ClangParser.expression`.
+	 * @param ctx the parse tree
+	 */
+	enterCharExpression?: (ctx: CharExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `CharExpression`
+	 * labeled alternative in `ClangParser.expression`.
+	 * @param ctx the parse tree
+	 */
+	exitCharExpression?: (ctx: CharExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `FloatExpression`
+	 * labeled alternative in `ClangParser.expression`.
+	 * @param ctx the parse tree
+	 */
+	enterFloatExpression?: (ctx: FloatExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `FloatExpression`
+	 * labeled alternative in `ClangParser.expression`.
+	 * @param ctx the parse tree
+	 */
+	exitFloatExpression?: (ctx: FloatExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `StringLiteralExpression`

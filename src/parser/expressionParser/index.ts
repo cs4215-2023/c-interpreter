@@ -11,9 +11,10 @@ import { contextToLocation } from '../util'
 import { parserComparatorExpression } from './comparatorParser'
 import { parserBinaryExpression } from './intBinaryOpParser'
 import { parserLogicalOpExpression } from './logicalOpParser'
-import { parserNumberExpression } from './numberParser'
+import { parserPrimitiveExpression } from './primitiveParser'
 import { parserPostFixExpression } from './postFixParser'
 import { parserUnaryOpExpression } from './unaryOpParser'
+import { parserBitwiseOpExpression } from './bitwiseOpParser'
 
 //TODO: integrate types.ts into expression parser
 class BaseParser
@@ -21,7 +22,11 @@ class BaseParser
   implements ClangVisitor<es.Expression>
 {
   protected defaultResult(): es.Expression {
-    throw new Error('Method not implemented.')
+    // throw new Error('Method not implemented.')
+    return {
+      type: "SequenceExpression",
+      expressions: []
+    }
   }
 
   visitParentheses(ctx: ParenthesesExpressionContext): es.Expression {
@@ -64,7 +69,8 @@ const ParsingBehaviors = flow(
   parserLogicalOpExpression,
   parserUnaryOpExpression,
   parserPostFixExpression,
-  parserNumberExpression
+  parserPrimitiveExpression,
+  parserBitwiseOpExpression
 )(BaseParser)
 
-export default class ExpressionParser extends ParsingBehaviors {}
+export default class ExpressionParser extends ParsingBehaviors { }

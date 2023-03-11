@@ -5,6 +5,8 @@ import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
 
 import { TypedIdentifierExpressionContext } from "./ClangParser";
 import { NumberExpressionContext } from "./ClangParser";
+import { CharExpressionContext } from "./ClangParser";
+import { FloatExpressionContext } from "./ClangParser";
 import { StringLiteralExpressionContext } from "./ClangParser";
 import { IdentifierExpressionContext } from "./ClangParser";
 import { PostFixNotationExpressionContext } from "./ClangParser";
@@ -94,6 +96,22 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitNumberExpression?: (ctx: NumberExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `CharExpression`
+	 * labeled alternative in `ClangParser.expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitCharExpression?: (ctx: CharExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `FloatExpression`
+	 * labeled alternative in `ClangParser.expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitFloatExpression?: (ctx: FloatExpressionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `StringLiteralExpression`

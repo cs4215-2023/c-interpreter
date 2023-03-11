@@ -42,7 +42,7 @@ FORMATSPECIFIERS:
 	| '"' '%p' '"';
 
 NUMBER: [0-9_]+;
-// CHAR: '\'' ~[\])] '\'';
+CHAR: '\'' ~[\])] '\'';
 FLOAT: ('0' ..'9')+ '.' ('0' ..'9')*;
 
 PLUSPLUS: '++';
@@ -75,6 +75,8 @@ statement:
 expression:
 	identifierWithType														# TypedIdentifierExpression
 	| NUMBER																# NumberExpression
+	| CHAR																	# CharExpression
+	| FLOAT																# FloatExpression
 	| stringLiteral															# StringLiteralExpression
 	| IDENTIFIER															# IdentifierExpression
 	| postFix																# PostFixNotationExpression
