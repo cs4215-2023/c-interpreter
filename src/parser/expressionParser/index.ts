@@ -22,6 +22,16 @@ class BaseParser
   extends AbstractParseTreeVisitor<es.Expression>
   implements ClangVisitor<es.Expression>
 {
+  private static instance: BaseParser
+
+  // singleton
+  static getInstance(): BaseParser {
+    if (!this.instance) {
+      this.instance = new BaseParser()
+    }
+    return this.instance
+  }
+
   protected defaultResult(): es.Expression {
     // throw new Error('Method not implemented.')
     return {

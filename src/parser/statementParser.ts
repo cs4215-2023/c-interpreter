@@ -20,6 +20,16 @@ export class StatementParser
   extends AbstractParseTreeVisitor<es.Statement>
   implements ClangVisitor<es.Statement>
 {
+  private static instance: StatementParser
+
+  // singleton
+  static getInstance(): StatementParser {
+    if (!this.instance) {
+      this.instance = new StatementParser()
+    }
+    return this.instance
+  }
+
   protected defaultResult(): es.Statement {
     return {
       type: 'EmptyStatement'
