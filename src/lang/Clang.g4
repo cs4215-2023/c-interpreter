@@ -165,7 +165,7 @@ function:
 	) '{' body = statement* '}';
 
 functionCall:
-	IDENTIFIER params = '(' functionCallParameters ')';
+	func = IDENTIFIER '(' args = functionCallParameters ')';
 
 functionCallParameters: (
 		stringLiteralList
