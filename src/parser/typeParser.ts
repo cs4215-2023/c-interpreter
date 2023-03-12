@@ -64,8 +64,8 @@ export class typeParser extends AbstractParseTreeVisitor<Type> implements ClangV
   visitPrimitiveType(ctx: TypeContext): Type {
     return {
       type: 'PrimitiveType',
-      signed: ctx._signed.text as SignedType,
-      valueType: ctx._primType.text as PrimitiveValueType
+      signed: undefined,
+      valueType: ctx.text as PrimitiveValueType
     }
   }
 
