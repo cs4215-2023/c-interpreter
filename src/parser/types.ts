@@ -84,7 +84,7 @@ export type BaseExpression = BaseNode
 export interface IdentifierWithTypeExpression extends BaseExpression {
   type: 'IdentifierWithTypeExpression'
   identifier: Identifier
-  identifierType?: PrimitiveType
+  identifierType?: Type
 }
 
 export interface ArrayExpression extends BaseExpression {
