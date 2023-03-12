@@ -198,7 +198,7 @@ export type AssignmentOperator = '=' | '+=' | '-='
 
 export type UpdateOperator = '++' | '--'
 
-export type Type = PrimitiveType | FunctionType
+export type Type = PrimitiveType
 
 export type PrimitiveValueType = 'int' | 'float' | 'char' | 'void'
 
@@ -213,6 +213,6 @@ export interface PrimitiveType {
 export interface FunctionType {
   type: 'FunctionType'
   signed: SignedType | undefined
-  parameterType: Type[]
-  returnType: Type
+  parameterType: PrimitiveValueType[]
+  returnType: PrimitiveValueType
 }
