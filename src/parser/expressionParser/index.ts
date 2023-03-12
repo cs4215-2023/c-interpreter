@@ -24,7 +24,6 @@ class BaseParser
   implements ClangVisitor<es.Expression>
 {
   protected defaultResult(): es.Expression {
-    // throw new Error('Method not implemented.')
     return {
       type: 'SequenceExpression',
       expressions: []
@@ -76,14 +75,4 @@ const ParsingBehaviors = flow(
   parserPointerExpression
 )(BaseParser)
 
-export default class ExpressionParser extends ParsingBehaviors {
-  private static instance: ExpressionParser
-
-  // singleton
-  static getInstance(): ExpressionParser {
-    if (!this.instance) {
-      this.instance = new ExpressionParser()
-    }
-    return this.instance
-  }
-}
+export default class ExpressionParser extends ParsingBehaviors {}

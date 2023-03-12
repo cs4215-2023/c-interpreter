@@ -17,7 +17,7 @@ export function parse(source: string, context: Context): es.Program | undefined 
     const tokenStream = new CommonTokenStream(lexer)
     const parser = new ClangParser(tokenStream)
     parser.buildParseTree = true
-    const statementParser = StatementParser.getInstance()
+    const statementParser = new StatementParser()
     try {
       const tree = parser.start()
       content = tree.accept(statementParser)

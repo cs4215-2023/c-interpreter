@@ -21,24 +21,12 @@ export class StatementParser
   extends AbstractParseTreeVisitor<es.Statement>
   implements ClangVisitor<es.Statement>
 {
-  private static instance: StatementParser
-
-  // singleton
-  static getInstance(): StatementParser {
-    if (!this.instance) {
-      this.instance = new StatementParser()
-    }
-    return this.instance
-  }
-
   protected defaultResult(): es.Statement {
     return {
       type: 'EmptyStatement'
     }
   }
   visitStart?: ((ctx: StartContext) => es.Statement) | undefined
-  private expressionParser = new ExpressionParser()
-  // private iterationParser = new IterationStatementParser()
 
   private wrapAsExpressionStatement(e: es.Expression): es.Statement {
     return {
@@ -88,28 +76,29 @@ export class StatementParser
     const exp = ctx.expressionStatement()
     // const iter = ctx.iterationStatement()
     if (exp != undefined) {
-      return this.visitExpression(exp)}
+      return this.visitExpression(exp)
+    }
     // } else if (iter != undefined) {
-      // return this.visitIterative(iter)
+    // return this.visitIterative(iter)
     // }
     return this.defaultResult()
   }
 
   visitExpression(ctx: ExpressionStatementContext): es.Statement {
     console.log('visiting expr')
-    return this.wrapAsExpressionStatement(this.expressionParser.visit(ctx))
+    return this.wrapAsExpressionStatement(new ExpressionParser().visit(ctx))
   }
 
-  // visitIterative(ctx: IterationStatementContext): es.Statement {
-  //   return this.iterationParser.visit(ctx)
-  // }
+  visitIterative(ctx: IterationStatementContext): es.Statement {
+    return new IterationStatementParser().visit(ctx)
+  }
 
   visitConditionalStatement(ctx: ConditionalStatementContext): es.Statement {
     return {
       type: 'IfStatement',
-      test: this.expressionParser.visit(ctx._test),
-      alternate: this.visitStatement(ctx._alternateStatement),
-      consequent: this.visitStatement(ctx._consequentStatement)
+      test: new ExpressionParser().visit(ctx._test),
+      alternate: this.visit(ctx._alternateStatement),
+      consequent: this.visit(ctx._consequentStatement)
     }
   }
 }

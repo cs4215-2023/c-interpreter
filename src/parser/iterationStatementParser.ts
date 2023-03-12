@@ -9,6 +9,7 @@ import {
   DoWhileLoopContext,
   ForLoopContext,
   IterationStatementContext,
+  StatementContext,
   WhileLoopContext
 } from '../lang/ClangParser'
 import { ClangVisitor } from '../lang/ClangVisitor'
@@ -20,13 +21,15 @@ export class IterationStatementParser
   extends AbstractParseTreeVisitor<es.Statement>
   implements ClangVisitor<es.Statement>
 {
-  private expressionParser = ExpressionParser.getInstance()
-  private statementParser = StatementParser.getInstance()
+  private expressionParser = new ExpressionParser()
+  //   private statementParser = new StatementParser()
+
   protected defaultResult(): es.Statement {
     return {
       type: 'EmptyStatement'
     }
   }
+
   visit(tree: ParseTree): es.Statement {
     return tree.accept(this)
   }
@@ -67,11 +70,11 @@ export class IterationStatementParser
     const doWhileLoop = ctx.doWhileLoop()
     const whileLoop = ctx.whileLoop()
     if (forLoop != undefined) {
-      return this.visitForStatement(forLoop)
+      return this.visit(forLoop)
     } else if (doWhileLoop != undefined) {
-      return this.visitDoWhileStatement(doWhileLoop)
+      return this.visit(doWhileLoop)
     } else if (whileLoop != undefined) {
-      return this.visitWhileStatement(whileLoop)
+      return this.visit(whileLoop)
     }
     return this.defaultResult()
   }
@@ -83,7 +86,7 @@ export class IterationStatementParser
       init: this.expressionParser.visit(forCondition._initialise),
       test: this.expressionParser.visit(forCondition._test),
       update: this.expressionParser.visit(forCondition._update),
-      body: this.statementParser.visitStatement(ctx._body)
+      body: new StatementParser().visit(ctx._body)
     }
   }
 
@@ -91,7 +94,7 @@ export class IterationStatementParser
     return {
       type: 'WhileStatement',
       test: this.expressionParser.visit(ctx._condition),
-      body: this.statementParser.visitStatement(ctx._body)
+      body: new StatementParser().visit(ctx._body)
     }
   }
 
@@ -99,7 +102,7 @@ export class IterationStatementParser
     return {
       type: 'DoWhileStatement',
       test: this.expressionParser.visit(ctx._condition),
-      body: this.statementParser.visitStatement(ctx._body)
+      body: new StatementParser().visit(ctx._body)
     }
   }
 }
