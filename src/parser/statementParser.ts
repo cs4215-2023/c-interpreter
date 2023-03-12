@@ -8,13 +8,16 @@ import * as es from 'estree'
 import {
   ConditionalStatementContext,
   ExpressionStatementContext,
+  FunctionContext,
   IterationStatementContext,
+  ReturnStatementContext,
   StartContext,
   StatementContext
 } from '../lang/ClangParser'
 import { ClangVisitor } from '../lang/ClangVisitor'
 import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
+import { FunctionParser } from './functionParser'
 import { IterationStatementParser } from './iterationStatementParser'
 
 export class StatementParser
@@ -26,6 +29,7 @@ export class StatementParser
       type: 'EmptyStatement'
     }
   }
+
   visitStart?: ((ctx: StartContext) => es.Statement) | undefined
 
   private wrapAsExpressionStatement(e: es.Expression): es.Statement {
@@ -74,13 +78,15 @@ export class StatementParser
   visitStatement(ctx: StatementContext): es.Statement {
     // TODO: add other types of statements
     const exp = ctx.expressionStatement()
-    // const iter = ctx.iterationStatement()
+    const iter = ctx.iterationStatement()
+    const func = ctx.function()
     if (exp != undefined) {
       return this.visitExpression(exp)
+    } else if (iter != undefined) {
+      return this.visitIterative(iter)
+    } else if (func != undefined) {
+      return this.visitFunction(func)
     }
-    // } else if (iter != undefined) {
-    // return this.visitIterative(iter)
-    // }
     return this.defaultResult()
   }
 
@@ -93,12 +99,23 @@ export class StatementParser
     return new IterationStatementParser().visit(ctx)
   }
 
+  visitFunction(ctx: FunctionContext): es.Statement {
+    return new FunctionParser().visit(ctx)
+  }
+
   visitConditionalStatement(ctx: ConditionalStatementContext): es.Statement {
     return {
       type: 'IfStatement',
       test: new ExpressionParser().visit(ctx._test),
       alternate: this.visit(ctx._alternateStatement),
       consequent: this.visit(ctx._consequentStatement)
+    }
+  }
+
+  visitReturnStatement(ctx: ReturnStatementContext): es.Statement {
+    return {
+      type: 'ReturnStatement',
+      argument: new ExpressionParser().visit(ctx.expressionStatement)
     }
   }
 }
