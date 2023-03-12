@@ -16,7 +16,8 @@ import { parserLogicalOpExpression } from './logicalOpParser'
 import { parserPostFixExpression } from './postFixParser'
 import { parserPrimitiveExpression } from './primitiveParser'
 import { parserUnaryOpExpression } from './unaryOpParser'
-
+import { parserArrayExpression } from './arrayParser'
+import { parserPointerExpression } from './pointerParser'
 //TODO: integrate types.ts into expression parser
 class BaseParser
   extends AbstractParseTreeVisitor<es.Expression>
@@ -70,7 +71,9 @@ const ParsingBehaviors = flow(
   parserPrimitiveExpression,
   parserBitwiseOpExpression,
   parserIdentifierExpression,
-  parserAssignmentExpression
+  parserAssignmentExpression,
+  parserArrayExpression,
+  parserPointerExpression
 )(BaseParser)
 
 export default class ExpressionParser extends ParsingBehaviors {

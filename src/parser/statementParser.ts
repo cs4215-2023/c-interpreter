@@ -38,7 +38,7 @@ export class StatementParser
   }
   visitStart?: ((ctx: StartContext) => es.Statement) | undefined
   private expressionParser = new ExpressionParser()
-  private iterationParser = new IterationStatementParser()
+  // private iterationParser = new IterationStatementParser()
 
   private wrapAsExpressionStatement(e: es.Expression): es.Statement {
     return {
@@ -86,24 +86,23 @@ export class StatementParser
   visitStatement(ctx: StatementContext): es.Statement {
     // TODO: add other types of statements
     const exp = ctx.expressionStatement()
-    const iter = ctx.iterationStatement()
+    // const iter = ctx.iterationStatement()
     if (exp != undefined) {
-      return this.visitExpression(exp)
-    } else if (iter != undefined) {
-      return this.visitIterative(iter)
-    }
+      return this.visitExpression(exp)}
+    // } else if (iter != undefined) {
+      // return this.visitIterative(iter)
+    // }
     return this.defaultResult()
   }
 
   visitExpression(ctx: ExpressionStatementContext): es.Statement {
-    console.log(ctx.ruleContext)
     console.log('visiting expr')
     return this.wrapAsExpressionStatement(this.expressionParser.visit(ctx))
   }
 
-  visitIterative(ctx: IterationStatementContext): es.Statement {
-    return this.iterationParser.visit(ctx)
-  }
+  // visitIterative(ctx: IterationStatementContext): es.Statement {
+  //   return this.iterationParser.visit(ctx)
+  // }
 
   visitConditionalStatement(ctx: ConditionalStatementContext): es.Statement {
     return {

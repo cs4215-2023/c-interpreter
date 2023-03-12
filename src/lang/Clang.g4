@@ -66,6 +66,7 @@ identifierList: IDENTIFIER (',' IDENTIFIER)*;
 
 numberList: NUMBER (',' NUMBER)*;
 
+pointerList: pointer (',' pointer)*;
 statement:
 	expressionStatement
 	| conditionalStatement
@@ -141,9 +142,9 @@ forCondition:
 	initialise = expression ';' test = expression? ';' update = expression;
 
 arrayIdentifierWithType:
-	idType = PRIMITIVETYPE id = IDENTIFIER '[' size = NUMBER? ']';
+	idType = type id = IDENTIFIER '[' size = NUMBER? ']';
 
-arrayContent: '{' (identifierList | numberList) '}';
+arrayContent: '{' (pointerList | numberList | identifierList) '}';
 
 arrayInitialisation:
 	arrayIdentifierWithType (
