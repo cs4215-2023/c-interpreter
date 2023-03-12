@@ -1,0 +1,1 @@
+node ../dist/repl/repl.js < $1;
