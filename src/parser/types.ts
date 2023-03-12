@@ -64,18 +64,6 @@ export interface VariableDeclarator extends BaseNode {
   init?: Expression | null | undefined
 }
 
-// export interface ExpressionMap {
-//   ArrayExpression: ArrayExpression
-//   AssignmentExpression: AssignmentExpression
-//   BinaryExpression: BinaryExpression
-//   ConditionalExpression: ConditionalExpression
-//   Identifier: Identifier
-//   Literal: Literal
-//   LogicalExpression: LogicalExpression
-//   UnaryExpression: UnaryExpression
-//   UpdateExpression: UpdateExpression
-// }
-
 export type Expression =
   | ArrayExpression
   | Literal

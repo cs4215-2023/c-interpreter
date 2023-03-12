@@ -1,8 +1,12 @@
 import * as es from 'estree'
 
-import { IdentifierWithTypeContext, TypeContext, TypedIdentifierExpressionContext } from '../../lang/ClangParser'
+import {
+  IdentifierWithTypeContext,
+  TypeContext,
+  TypedIdentifierExpressionContext
+} from '../../lang/ClangParser'
+import { PrimitiveValueType, Type } from '../types'
 import { Constructable } from '../util'
-import { Type, PrimitiveValueType } from '../types'
 
 export const parserIdentifierExpression = <T extends Constructable>(
   BaseClass: T
@@ -10,15 +14,15 @@ export const parserIdentifierExpression = <T extends Constructable>(
   const DerivedClass = class extends BaseClass {
     // TODO: update return type
     visitTypedIdentifierExpression(ctx: TypedIdentifierExpressionContext): es.Expression {
-      console.log("visitTypedIdentifierExpression")
+      console.log('visitTypedIdentifierExpression')
       const typedIdentifier = this.visitIdentifierWithType(ctx.identifierWithType())
       return {
         type: 'Identifier',
-        name: '',
+        name: ''
       }
     }
     visitIdentifierWithType(ctx: IdentifierWithTypeContext): es.Expression {
-      console.log("visitIdentifierWithType")
+      console.log('visitIdentifierWithType')
       const primitiveType = this.visitType(ctx.type())
       console.log(ctx.IDENTIFIER().text)
       return {
@@ -27,7 +31,7 @@ export const parserIdentifierExpression = <T extends Constructable>(
       }
     }
     visitType(ctx: TypeContext): Type {
-      console.log("visitType")
+      console.log('visitType')
       console.log(ctx.text)
       return {
         type: 'PrimitiveType',

@@ -16,9 +16,10 @@ import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
 // import { IterationStatementParser } from './iterationStatementParser'
 
-export class StatementParser 
-extends AbstractParseTreeVisitor<es.Statement>
-implements ClangVisitor<es.Statement> {
+export class StatementParser
+  extends AbstractParseTreeVisitor<es.Statement>
+  implements ClangVisitor<es.Statement>
+{
   protected defaultResult(): es.Statement {
     return {
       type: 'EmptyStatement'
@@ -86,7 +87,7 @@ implements ClangVisitor<es.Statement> {
 
   visitExpression(ctx: ExpressionStatementContext): es.Statement {
     console.log(ctx.ruleContext)
-    console.log("visiting expr")
+    console.log('visiting expr')
     return this.wrapAsExpressionStatement(this.expressionParser.visit(ctx))
   }
 
