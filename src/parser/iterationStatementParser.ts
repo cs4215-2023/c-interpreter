@@ -9,7 +9,6 @@ import {
   DoWhileLoopContext,
   ForLoopContext,
   IterationStatementContext,
-  StatementContext,
   WhileLoopContext
 } from '../lang/ClangParser'
 import { ClangVisitor } from '../lang/ClangVisitor'

@@ -7,8 +7,7 @@ import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import { TypeContext } from '../lang/ClangParser'
 import { ClangVisitor } from '../lang/ClangVisitor'
 import { FatalSyntaxError } from './errors'
-import ExpressionParser from './expressionParser'
-import { PrimitiveValueType, SignedType, Type } from './types'
+import { PrimitiveValueType, Type } from './types'
 
 // TODO: Validate the correctness of this
 export class typeParser extends AbstractParseTreeVisitor<Type> implements ClangVisitor<Type> {
