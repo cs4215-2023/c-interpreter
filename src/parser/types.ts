@@ -1,21 +1,21 @@
-import { BaseDeclaration, BasePattern, BlockStatement } from 'estree'
+import { BaseDeclaration, BlockStatement } from 'estree'
 
 export interface Position {
   /** >= 1 */
-  line: number;
+  line: number
   /** >= 0 */
-  column: number;
+  column: number
 }
 
 export interface SourceLocation {
-  source?: string | null;
-  start: Position;
-  end: Position;
+  source?: string | null
+  start: Position
+  end: Position
 }
 
 interface BaseNode {
-  type: string;
-  loc?: SourceLocation;
+  type: string
+  loc?: SourceLocation
 }
 
 export interface Program extends BaseNode {
@@ -28,23 +28,20 @@ interface BaseFunction extends BaseNode {
   body: BlockStatement
 }
 
-type BaseStatement = BaseNode;
+type BaseStatement = BaseNode
 
 export interface ExpressionStatement extends BaseStatement {
-  type: 'ExpressionStatement';
-  expression: Expression;
+  type: 'ExpressionStatement'
+  expression: Expression
 }
 
 export interface EmptyStatement extends BaseStatement {
-  type: 'EmptyStatement';
+  type: 'EmptyStatement'
 }
 
 export type Function = FunctionDeclaration
 
-export type Statement =
-  | Declaration
-  | ExpressionStatement
-  | EmptyStatement;
+export type Statement = Declaration | ExpressionStatement | EmptyStatement
 
 export type Declaration = FunctionDeclaration | VariableDeclaration
 
@@ -67,7 +64,6 @@ export interface VariableDeclarator extends BaseNode {
   init?: Expression | null | undefined
 }
 
-
 // export interface ExpressionMap {
 //   ArrayExpression: ArrayExpression
 //   AssignmentExpression: AssignmentExpression
@@ -80,7 +76,6 @@ export interface VariableDeclarator extends BaseNode {
 //   UpdateExpression: UpdateExpression
 // }
 
-
 export type Expression =
   | ArrayExpression
   | Literal
@@ -90,7 +85,7 @@ export type Expression =
   | LogicalExpression
   | ConditionalExpression
   | UpdateExpression
-  | EmptyExpression;
+  | EmptyExpression
 
 // TODO: add type of expression
 
@@ -102,7 +97,7 @@ export interface ArrayExpression extends BaseExpression {
 }
 
 export interface EmptyExpression extends BaseExpression {
-  type: 'EmptyExpression';
+  type: 'EmptyExpression'
 }
 
 export interface UnaryExpression extends BaseExpression {
@@ -157,29 +152,29 @@ export interface Identifier extends BaseExpression {
  */
 
 interface BaseLiteral extends BaseNode {
-  type: 'Literal';
-  valueType: string;
+  type: 'Literal'
+  valueType: string
 }
 
 export interface Integer extends BaseLiteral {
-  valueType: 'int';
-  value: number;
+  valueType: 'int'
+  value: number
 }
 
 export interface Character extends BaseLiteral {
-  valueType: 'char';
-  value: string;
+  valueType: 'char'
+  value: string
 }
 
 export interface Float extends BaseLiteral {
-  valueType: 'float';
-  value: number;
+  valueType: 'float'
+  value: number
 }
 
 export interface Void extends BaseLiteral {
   valueType: 'void'
 }
-export type Literal = Integer | Float | Character | Void;
+export type Literal = Integer | Float | Character | Void
 
 export type UnaryOperator = '-' | '+' | '!' | '&' | '*'
 
