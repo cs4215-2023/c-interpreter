@@ -22,16 +22,6 @@ class BaseParser
   extends AbstractParseTreeVisitor<es.Expression>
   implements ClangVisitor<es.Expression>
 {
-  private static instance: BaseParser
-
-  // singleton
-  static getInstance(): BaseParser {
-    if (!this.instance) {
-      this.instance = new BaseParser()
-    }
-    return this.instance
-  }
-
   protected defaultResult(): es.Expression {
     // throw new Error('Method not implemented.')
     return {
@@ -83,4 +73,14 @@ const ParsingBehaviors = flow(
   parserAssignmentExpression
 )(BaseParser)
 
-export default class ExpressionParser extends ParsingBehaviors {}
+export default class ExpressionParser extends ParsingBehaviors {
+  private static instance: ExpressionParser
+
+  // singleton
+  static getInstance(): ExpressionParser {
+    if (!this.instance) {
+      this.instance = new ExpressionParser()
+    }
+    return this.instance
+  }
+}
