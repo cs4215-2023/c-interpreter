@@ -144,7 +144,8 @@ forCondition:
 arrayIdentifierWithType:
 	idType = type id = IDENTIFIER '[' size = NUMBER? ']';
 
-arrayContent: '{' (pointerList | numberList | identifierList) '}';
+arrayContent:
+	'{' (pointerList | numberList | identifierList) '}';
 
 arrayInitialisation:
 	arrayIdentifierWithType (
