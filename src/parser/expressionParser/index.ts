@@ -7,6 +7,7 @@ import { flow } from 'lodash'
 import { ParenthesesExpressionContext } from '../../lang/ClangParser'
 import { ClangVisitor } from '../../lang/ClangVisitor'
 import { FatalSyntaxError } from '../errors'
+import { parserAssignmentExpression } from './assignmentParser'
 import { parserBitwiseOpExpression } from './bitwiseOpParser'
 import { parserComparatorExpression } from './comparatorParser'
 import { parserIdentifierExpression } from './identifierParser'
@@ -15,7 +16,6 @@ import { parserLogicalOpExpression } from './logicalOpParser'
 import { parserPostFixExpression } from './postFixParser'
 import { parserPrimitiveExpression } from './primitiveParser'
 import { parserUnaryOpExpression } from './unaryOpParser'
-import { parserAssignmentExpression } from './assignmentParser'
 
 //TODO: integrate types.ts into expression parser
 class BaseParser
