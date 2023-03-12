@@ -1,3 +1,4 @@
+import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
 import { ParseTree } from 'antlr4ts/tree/ParseTree'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
@@ -10,8 +11,19 @@ import ExpressionParser from './expressionParser'
 import { PrimitiveValueType, SignedType, Type } from './types'
 
 // TODO: Validate the correctness of this
-export class typeParser implements ClangVisitor<Type> {
+export class typeParser extends AbstractParseTreeVisitor<Type> implements ClangVisitor<Type> {
   expressionParser = new ExpressionParser()
+
+  private static instance: typeParser
+
+  // singleton
+  static getInstance(): typeParser {
+    if (!this.instance) {
+      this.instance = new typeParser()
+    }
+    return this.instance
+  }
+
   protected defaultResult(): Type {
     return {
       type: 'PrimitiveType',
