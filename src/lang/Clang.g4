@@ -76,7 +76,7 @@ expression:
 	identifierWithType														# TypedIdentifierExpression
 	| NUMBER																# NumberExpression
 	| CHAR																	# CharExpression
-	| FLOAT																# FloatExpression
+	| FLOAT																	# FloatExpression
 	| stringLiteral															# StringLiteralExpression
 	| IDENTIFIER															# IdentifierExpression
 	| postFix																# PostFixNotationExpression
@@ -135,7 +135,7 @@ doWhileLoop:
 	'do' '{' body = statement* '}' 'while' '(' condition = expression ')' ';';
 
 forLoop:
-	'for' '(' innerForCondition = forCondition ')' '{' body = statement '}';
+	'for' '(' innerForCondition = forCondition ')' '{' body = statement* '}';
 
 forCondition:
 	initialise = expression ';' test = expression? ';' update = expression;
