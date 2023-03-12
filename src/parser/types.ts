@@ -65,6 +65,7 @@ export interface VariableDeclarator extends BaseNode {
 }
 
 export type Expression =
+  | IdentifierWithTypeExpression
   | ArrayExpression
   | Literal
   | Identifier
@@ -78,6 +79,13 @@ export type Expression =
 // TODO: add type of expression
 
 export type BaseExpression = BaseNode
+
+// Example is int a;
+export interface IdentifierWithTypeExpression extends BaseExpression {
+  type: 'IdentifierWithTypeExpression'
+  identifier: Identifier
+  identifierType?: PrimitiveType
+}
 
 export interface ArrayExpression extends BaseExpression {
   type: 'ArrayExpression'
@@ -129,10 +137,10 @@ export interface ConditionalExpression extends BaseExpression {
 }
 
 export type Pattern = Identifier
+
 export interface Identifier extends BaseExpression {
   type: 'Identifier'
   name: string
-  typeDeclaration?: Type
 }
 
 /**
