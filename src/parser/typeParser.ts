@@ -4,7 +4,7 @@ import { ParseTree } from 'antlr4ts/tree/ParseTree'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 
-import { IdentifierWithTypeContext } from '../lang/ClangParser'
+import { TypeContext } from '../lang/ClangParser'
 import { ClangVisitor } from '../lang/ClangVisitor'
 import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
@@ -61,12 +61,16 @@ export class typeParser extends AbstractParseTreeVisitor<Type> implements ClangV
     )
   }
 
-  visitIdentifierWithType(ctx: IdentifierWithTypeContext): Type {
-    const idType = ctx._idType
+  visitPrimitiveType(ctx: TypeContext): Type {
     return {
       type: 'PrimitiveType',
-      signed: idType._signed.text as SignedType,
-      valueType: idType._primType.text as PrimitiveValueType
+      signed: ctx._signed.text as SignedType,
+      valueType: ctx._primType.text as PrimitiveValueType
     }
+  }
+
+  visitFunctionType(ctx: TypeContext): Type {
+    // TODO: discuss what should be returned here.
+    return this.defaultResult()
   }
 }

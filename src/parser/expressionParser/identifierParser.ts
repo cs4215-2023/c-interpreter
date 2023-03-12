@@ -3,10 +3,10 @@ import { Token } from 'antlr4ts/Token'
 import {
   IdentifierExpressionContext,
   IdentifierWithTypeContext,
-  TypeContext,
   TypedIdentifierExpressionContext
 } from '../../lang/ClangParser'
-import { Identifier, PrimitiveValueType, Type } from '../types'
+import { typeParser } from '../typeParser'
+import { Identifier } from '../types'
 import { Expression } from '../types'
 import { Constructable } from '../util'
 
@@ -34,7 +34,7 @@ export const parserIdentifierExpression = <T extends Constructable>(
 
     visitIdentifierWithType(ctx: IdentifierWithTypeContext): Expression {
       console.log('visitIdentifierWithType')
-      const type = this.visitType(ctx.type())
+      const type = typeParser.getInstance().visitPrimitiveType(ctx._idType)
       const identifier = this.tokenToIdentifierWrapper(ctx._id)
       console.log(ctx.IDENTIFIER().text)
       return {
@@ -48,16 +48,6 @@ export const parserIdentifierExpression = <T extends Constructable>(
       return {
         type: 'Identifier',
         name: ctx.IDENTIFIER().text
-      }
-    }
-
-    visitType(ctx: TypeContext): Type {
-      console.log('visitType')
-      console.log(ctx.text)
-      return {
-        type: 'PrimitiveType',
-        signed: undefined,
-        valueType: ctx.text as PrimitiveValueType
       }
     }
   }
