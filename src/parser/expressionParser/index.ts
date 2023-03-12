@@ -11,6 +11,7 @@ import { parserArrayExpression } from './arrayParser'
 import { parserAssignmentExpression } from './assignmentParser'
 import { parserBitwiseOpExpression } from './bitwiseOpParser'
 import { parserComparatorExpression } from './comparatorParser'
+import { parserFunctionCallExpression } from './functionCallParser'
 import { parserIdentifierExpression } from './identifierParser'
 import { parserBinaryExpression } from './intBinaryOpParser'
 import { parserLogicalOpExpression } from './logicalOpParser'
@@ -72,7 +73,8 @@ const ParsingBehaviors = flow(
   parserIdentifierExpression,
   parserAssignmentExpression,
   parserArrayExpression,
-  parserPointerExpression
+  parserPointerExpression,
+  parserFunctionCallExpression
 )(BaseParser)
 
 export default class ExpressionParser extends ParsingBehaviors {}
