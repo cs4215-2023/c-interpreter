@@ -34,10 +34,8 @@ class BaseParser
   }
 
   visitChildren(node: RuleNode): es.Expression {
-    console.log('visit children')
     const expressions: es.Expression[] = []
     for (let i = 0; i < node.childCount; i++) {
-      console.log(node.text)
       expressions.push(node.getChild(i).accept(this))
     }
     return {
