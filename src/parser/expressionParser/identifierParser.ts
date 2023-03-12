@@ -6,7 +6,7 @@ import {
   IdentifierWithTypeContext,
   TypedIdentifierExpressionContext
 } from '../../lang/ClangParser'
-import { typeParser } from '../typeParser'
+import { TypeParser } from '../typeParser'
 import { Identifier } from '../types'
 import { Constructable } from '../util'
 
@@ -35,7 +35,7 @@ export const parserIdentifierExpression = <T extends Constructable>(
     // Returns an Identifier with the name in the format <name>#<type>
     visitIdentifierWithType(ctx: IdentifierWithTypeContext): es.Expression {
       console.log('visitIdentifierWithType')
-      const type = new typeParser().visit(ctx._idType)
+      const type = new TypeParser().visit(ctx._idType)
       const identifier = this.tokenToIdentifierWrapper(ctx._id)
       console.log(ctx.IDENTIFIER().text)
       return {

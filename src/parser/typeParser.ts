@@ -10,7 +10,7 @@ import { FatalSyntaxError } from './errors'
 import { PrimitiveValueType, Type } from './types'
 
 // TODO: Validate the correctness of this
-export class typeParser extends AbstractParseTreeVisitor<Type> implements ClangVisitor<Type> {
+export class TypeParser extends AbstractParseTreeVisitor<Type> implements ClangVisitor<Type> {
   protected defaultResult(): Type {
     return {
       type: 'PrimitiveType',
