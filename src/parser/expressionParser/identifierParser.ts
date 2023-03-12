@@ -1,5 +1,5 @@
 import { Token } from 'antlr4ts/Token'
-
+import * as es from 'estree'
 import {
   IdentifierExpressionContext,
   IdentifierWithTypeContext,
@@ -27,24 +27,23 @@ export const parserIdentifierExpression = <T extends Constructable>(
       }
     }
     // TODO: update return type
-    visitTypedIdentifierExpression(ctx: TypedIdentifierExpressionContext): Expression {
+    visitTypedIdentifierExpression(ctx: TypedIdentifierExpressionContext): es.Expression {
       console.log('visitTypedIdentifierExpression')
       return this.visitIdentifierWithType(ctx.identifierWithType())
     }
 
-    visitIdentifierWithType(ctx: IdentifierWithTypeContext): Expression {
+    visitIdentifierWithType(ctx: IdentifierWithTypeContext): es.Expression {
       console.log('visitIdentifierWithType')
       const type = typeParser.getInstance().visitPrimitiveType(ctx._idType)
       const identifier = this.tokenToIdentifierWrapper(ctx._id)
       console.log(ctx.IDENTIFIER().text)
       return {
-        type: 'IdentifierWithTypeExpression',
-        identifier: identifier,
-        identifierType: type
+        type: 'Identifier',
+        name: identifier.name + "#" + type.valueType //for now, might need to include signed/unsigned later
       }
     }
 
-    visitIdentifier(ctx: IdentifierExpressionContext): Expression {
+    visitIdentifier(ctx: IdentifierExpressionContext): es.Expression {
       return {
         type: 'Identifier',
         name: ctx.IDENTIFIER().text

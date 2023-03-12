@@ -15,6 +15,7 @@ import { parserLogicalOpExpression } from './logicalOpParser'
 import { parserPostFixExpression } from './postFixParser'
 import { parserPrimitiveExpression } from './primitiveParser'
 import { parserUnaryOpExpression } from './unaryOpParser'
+import { parserAssignmentExpression } from './assignmentParser'
 
 //TODO: integrate types.ts into expression parser
 class BaseParser
@@ -68,7 +69,8 @@ const ParsingBehaviors = flow(
   parserPostFixExpression,
   parserPrimitiveExpression,
   parserBitwiseOpExpression,
-  parserIdentifierExpression
+  parserIdentifierExpression,
+  parserAssignmentExpression
 )(BaseParser)
 
 export default class ExpressionParser extends ParsingBehaviors {}
