@@ -1,8 +1,6 @@
 import * as es from 'estree'
 
-import {
-  AssignmentContext
-} from '../../lang/ClangParser'
+import { AssignmentContext } from '../../lang/ClangParser'
 import { Constructable, contextToLocation } from '../util'
 
 export const parserAssignmentExpression = <T extends Constructable>(
@@ -10,7 +8,7 @@ export const parserAssignmentExpression = <T extends Constructable>(
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
     visitAssignment(ctx: AssignmentContext): es.Expression {
-        console.log("assignmentexpression")
+      console.log('assignmentexpression')
       return {
         type: 'AssignmentExpression',
         operator: '=',
@@ -19,8 +17,8 @@ export const parserAssignmentExpression = <T extends Constructable>(
         loc: contextToLocation(ctx)
       }
     }
-//c = 5;
-//int c = 5;
+    //c = 5;
+    //int c = 5;
   }
   return DerivedClass
 }
