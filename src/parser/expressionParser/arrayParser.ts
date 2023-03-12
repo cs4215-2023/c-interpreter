@@ -1,4 +1,3 @@
-import { Token } from 'antlr4ts/Token'
 import * as es from 'estree'
 
 import {
@@ -10,25 +9,12 @@ import {
   NumberListContext
 } from '../../lang/ClangParser'
 import { TypeParser } from '../typeParser'
-import { Identifier } from '../types'
 import { Constructable } from '../util'
 
 export const parserArrayExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    tokenToIdentifierWrapper(token: Token): Identifier {
-      if (token.text) {
-        return {
-          type: 'Identifier',
-          name: token.text
-        }
-      }
-      return {
-        type: 'Identifier',
-        name: ''
-      }
-    }
     visitArrayInitialisationExpression(ctx: ArrayInitialisationExpressionContext): es.Expression {
       const arr = this.visitArrayInitialisation(ctx.arrayInitialisation())
       return arr
