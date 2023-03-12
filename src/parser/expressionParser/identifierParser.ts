@@ -22,11 +22,10 @@ export const parserIdentifierExpression = <T extends Constructable>(
     visitIdentifierWithType(ctx: IdentifierWithTypeContext): es.Expression {
       console.log('visitIdentifierWithType')
       const type = new TypeParser().visit(ctx._idType)
-      const identifier = this.tokenToIdentifierWrapper(ctx._id)
       console.log(ctx.IDENTIFIER().text)
       return {
         type: 'Identifier',
-        name: identifier.name + '#' + type.valueType
+        name: ctx.IDENTIFIER().text + '#' + type.valueType
       }
     }
 
