@@ -26,8 +26,9 @@ export const parserLogicalOpExpression = <T extends Constructable>(
         loc: contextToLocation(ctx)
       }
     }
+
+    // use a binary expression here because ^ is not listed as a logical operator
     visitXor(ctx: XorContext): es.Expression {
-      // use a binary expression here because ^ is not listed as a logical operator
       return {
         type: 'BinaryExpression',
         operator: '^',

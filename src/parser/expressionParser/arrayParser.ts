@@ -16,8 +16,7 @@ export const parserArrayExpression = <T extends Constructable>(
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
     visitArrayInitialisationExpression(ctx: ArrayInitialisationExpressionContext): es.Expression {
-      const arr = this.visitArrayInitialisation(ctx.arrayInitialisation())
-      return arr
+      return this.visitArrayInitialisation(ctx.arrayInitialisation())
     }
     visitArrayInitialisation(ctx: ArrayInitialisationContext): es.Expression {
       console.log('visitArrayInitialisation')

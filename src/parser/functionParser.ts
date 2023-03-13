@@ -1,7 +1,5 @@
 import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
-import { ParseTree } from 'antlr4ts/tree/ParseTree'
-import { RuleNode } from 'antlr4ts/tree/RuleNode'
 import * as es from 'estree'
 
 import { FunctionContext, FunctionDeclarationContext } from '../lang/ClangParser'
@@ -42,6 +40,7 @@ export class FunctionParser
     const params = ctx._params
     const expressionParser = new ExpressionParser()
     const patterns: es.Pattern[] = []
+
     for (let i = 0; i < params.childCount; i++) {
       const child = params.getChild(i)
       // brute force comma work around

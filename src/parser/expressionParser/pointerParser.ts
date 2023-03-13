@@ -22,10 +22,10 @@ export const parserPointerExpression = <T extends Constructable>(
       }
     }
     visitPointerExpression(ctx: PointerExpressionContext): es.Expression {
-      return this.visitPointer(ctx.pointer())
+      return this.visit(ctx.pointer())
     }
     visitPointerDereferenceExpression(ctx: PointerDereferenceExpressionContext): es.Expression {
-      return this.visitPointerDerefernce(ctx.pointerDerefernce())
+      return this.visit(ctx.pointerDerefernce())
     }
     visitPointerDerefernce(ctx: PointerDerefernceContext): es.Expression {
       console.log('pointerdereferencecontext')
@@ -35,9 +35,10 @@ export const parserPointerExpression = <T extends Constructable>(
       }
     }
     visitPointerReferenceExpression(ctx: PointerReferenceExpressionContext): es.Expression {
-      return this.visitPointerReference(ctx.pointerReference())
+      return this.visit(ctx.pointerReference())
     }
     visitPointerReference(ctx: PointerReferenceContext): es.Expression {
+      console.log('pointerreferencecontext')
       return {
         type: 'Identifier',
         name: ctx.BITWISEAND().text + '#' + ctx.IDENTIFIER().text

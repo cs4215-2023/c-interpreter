@@ -1,8 +1,5 @@
 import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
-import { ParseTree } from 'antlr4ts/tree/ParseTree'
-import { RuleNode } from 'antlr4ts/tree/RuleNode'
-import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import * as es from 'estree'
 
 import {
@@ -25,21 +22,6 @@ export class IterationStatementParser
   protected defaultResult(): es.Statement {
     return {
       type: 'EmptyStatement'
-    }
-  }
-
-  visit(tree: ParseTree): es.Statement {
-    return tree.accept(this)
-  }
-
-  visitChildren(node: RuleNode): es.Statement {
-    const statements: es.Statement[] = []
-    for (let i = 0; i < node.childCount; i++) {
-      statements.push(node.getChild(i).accept(this))
-    }
-    return {
-      type: 'BlockStatement',
-      body: statements
     }
   }
 
