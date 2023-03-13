@@ -55,7 +55,10 @@ export class TypeParser extends AbstractParseTreeVisitor<Type> implements ClangV
   }
 
   visitFunctionType(ctx: TypeContext): Type {
-    // TODO: discuss what should be returned here.
-    return this.defaultResult()
+    return {
+      type: 'PrimitiveType',
+      signed: undefined,
+      valueType: ctx.text as PrimitiveValueType
+    }
   }
 }

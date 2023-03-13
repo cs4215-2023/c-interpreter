@@ -163,7 +163,7 @@ pointerDerefernce: operator = MUL argument = IDENTIFIER;
 pointerReference: operator = BITWISEAND argument = IDENTIFIER;
 
 function:
-	funcType = PRIMITIVETYPE (funcName = IDENTIFIER) (
+	funcType = type (funcName = IDENTIFIER) (
 		'(' params = identifierWithTypeList ')'
 	) '{' body = statement* '}';
 

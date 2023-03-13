@@ -9,6 +9,7 @@ import { ClangVisitor } from '../lang/ClangVisitor'
 import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
 import { StatementParser } from './statementParser'
+import { TypeParser } from './typeParser'
 import { tokenToIdentifierWrapper } from './util'
 
 export class FunctionParser
@@ -65,6 +66,7 @@ export class FunctionParser
   }
 
   visitFunctionDeclaration(ctx: FunctionContext): es.Statement {
+    const type = new TypeParser().visit(ctx._funcType)
     return {
       type: 'FunctionDeclaration',
       id: tokenToIdentifierWrapper(ctx._funcName),
