@@ -12,6 +12,7 @@ export const parserPrimitiveExpression = <T extends Constructable>(
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
     visitNumberExpression(ctx: NumberExpressionContext): es.Expression {
+      console.log("literal")
       return {
         type: 'Literal',
         value: parseInt(ctx.text),

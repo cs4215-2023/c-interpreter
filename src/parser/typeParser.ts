@@ -19,6 +19,7 @@ export class TypeParser extends AbstractParseTreeVisitor<Type> implements ClangV
   }
 
   visit(ctx: ParseTree): Type {
+    console.log(ctx.text)
     return ctx.accept(this)
   }
 
