@@ -76,11 +76,8 @@ export type Expression =
   | UpdateExpression
   | EmptyExpression
 
-// TODO: add type of expression
-
 export type BaseExpression = BaseNode
 
-// Example is int a;
 export interface IdentifierWithTypeExpression extends BaseExpression {
   type: 'IdentifierWithTypeExpression'
   identifier: Identifier

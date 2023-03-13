@@ -21,7 +21,6 @@ export class IterationStatementParser
   implements ClangVisitor<es.Statement>
 {
   private expressionParser = new ExpressionParser()
-  //   private statementParser = new StatementParser()
 
   protected defaultResult(): es.Statement {
     return {

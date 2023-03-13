@@ -19,7 +19,7 @@ import { parserPointerExpression } from './pointerParser'
 import { parserPostFixExpression } from './postFixParser'
 import { parserPrimitiveExpression } from './primitiveParser'
 import { parserUnaryOpExpression } from './unaryOpParser'
-//TODO: integrate types.ts into expression parser
+
 class BaseParser
   extends AbstractParseTreeVisitor<es.Expression>
   implements ClangVisitor<es.Expression>

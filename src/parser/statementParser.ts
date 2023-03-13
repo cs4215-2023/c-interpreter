@@ -76,7 +76,6 @@ export class StatementParser
   }
 
   visitStatement(ctx: StatementContext): es.Statement {
-    // TODO: add other types of statements
     const exp = ctx.expressionStatement()
     const iter = ctx.iterationStatement()
     const func = ctx.function()

@@ -9,7 +9,6 @@ import { ClangVisitor } from '../lang/ClangVisitor'
 import { FatalSyntaxError } from './errors'
 import { PrimitiveValueType, Type } from './types'
 
-// TODO: Validate the correctness of this
 export class TypeParser extends AbstractParseTreeVisitor<Type> implements ClangVisitor<Type> {
   protected defaultResult(): Type {
     return {
@@ -23,7 +22,6 @@ export class TypeParser extends AbstractParseTreeVisitor<Type> implements ClangV
     return ctx.accept(this)
   }
 
-  // no children to visit?
   visitChildren(node: RuleNode): Type {
     return this.defaultResult()
   }

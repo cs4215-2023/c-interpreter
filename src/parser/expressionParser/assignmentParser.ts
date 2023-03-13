@@ -17,8 +17,6 @@ export const parserAssignmentExpression = <T extends Constructable>(
         loc: contextToLocation(ctx)
       }
     }
-    //c = 5;
-    //int c = 5;
   }
   return DerivedClass
 }

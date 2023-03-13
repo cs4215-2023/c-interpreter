@@ -12,7 +12,6 @@ export const parserIdentifierExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    // TODO: update return type
     visitTypedIdentifierExpression(ctx: TypedIdentifierExpressionContext): es.Expression {
       console.log('visitTypedIdentifierExpression')
       return this.visitIdentifierWithType(ctx.identifierWithType())
