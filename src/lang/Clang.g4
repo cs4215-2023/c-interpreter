@@ -127,7 +127,10 @@ expressionStatement: expression ';';
 
 conditionalStatement:
 	'if' '(' test = expression ')' '{' consequentStatement = statement* '}' (
-		'else' '{' alternateStatement = statement* '}'
+		'else' (
+			'{' alternateStatement = statement* '}'
+			| conditionalStatement
+		)
 	)?;
 
 iterationStatement: whileLoop | doWhileLoop | forLoop;
