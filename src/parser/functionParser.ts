@@ -2,7 +2,6 @@ import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
 import { ParseTree } from 'antlr4ts/tree/ParseTree'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
-import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import * as es from 'estree'
 
 import { FunctionContext } from '../lang/ClangParser'
@@ -47,10 +46,6 @@ export class FunctionParser
       type: 'BlockStatement',
       body: statements
     }
-  }
-
-  visitTerminal(node: TerminalNode): es.Statement {
-    return node.accept(this)
   }
 
   visitErrorNode(node: ErrorNode): es.Statement {
