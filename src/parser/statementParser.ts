@@ -79,12 +79,15 @@ export class StatementParser
     const exp = ctx.expressionStatement()
     const iter = ctx.iterationStatement()
     const func = ctx.functionDeclaration()
+    const returnStatement = ctx.returnStatement()
     if (exp != undefined) {
       return this.visitExpression(exp)
     } else if (iter != undefined) {
       return this.visitIterative(iter)
     } else if (func != undefined) {
       return this.visitFunctionDeclaration(func)
+    } else if (returnStatement != undefined) {
+      return this.visitReturnStatement(returnStatement)
     }
     return this.defaultResult()
   }
@@ -113,9 +116,10 @@ export class StatementParser
   }
 
   visitReturnStatement(ctx: ReturnStatementContext): es.Statement {
+    console.log('return statement')
     return {
       type: 'ReturnStatement',
-      argument: new ExpressionParser().visit(ctx.expressionStatement)
+      argument: new ExpressionParser().visit(ctx.expressionStatement().expression())
     }
   }
 }

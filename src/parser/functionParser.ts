@@ -23,6 +23,7 @@ export class FunctionParser
   bodyWrapper(ctx: FunctionContext): es.Statement[] {
     console.log('body wapper')
     const statements = new StatementParser().visit(ctx._body)
+    console.log(ctx._body)
     if (statements.type == 'BlockStatement') {
       return statements.body
     } else {
