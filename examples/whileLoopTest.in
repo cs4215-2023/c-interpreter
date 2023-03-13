@@ -1,0 +1,4 @@
+int i = 5;
+while (i--) {
+	int a = 1;
+}

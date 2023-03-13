@@ -4,6 +4,8 @@ import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener'
 
 import { TypedIdentifierExpressionContext } from './ClangParser'
 import { NumberExpressionContext } from './ClangParser'
+import { CharExpressionContext } from './ClangParser'
+import { FloatExpressionContext } from './ClangParser'
 import { StringLiteralExpressionContext } from './ClangParser'
 import { IdentifierExpressionContext } from './ClangParser'
 import { PostFixNotationExpressionContext } from './ClangParser'
@@ -35,22 +37,31 @@ import { XorContext } from './ClangParser'
 import { AssignmentContext } from './ClangParser'
 import { AssignAndMinusOneContext } from './ClangParser'
 import { AssignAndAddOneContext } from './ClangParser'
+import { NegativeContext } from './ClangParser'
+import { PositiveContext } from './ClangParser'
+import { NotContext } from './ClangParser'
 import { StartContext } from './ClangParser'
 import { StringLiteralContext } from './ClangParser'
 import { StringLiteralListContext } from './ClangParser'
 import { IdentifierWithTypeContext } from './ClangParser'
+import { TypeContext } from './ClangParser'
 import { IdentifierWithTypeListContext } from './ClangParser'
 import { IdentifierListContext } from './ClangParser'
 import { NumberListContext } from './ClangParser'
+import { PointerListContext } from './ClangParser'
 import { StatementContext } from './ClangParser'
 import { ExpressionContext } from './ClangParser'
+import { StatementBlockContext } from './ClangParser'
 import { ParenthesesExpressionContext } from './ClangParser'
-import { StatementListContext } from './ClangParser'
 import { PostFixContext } from './ClangParser'
 import { ConditionalExpressionContext } from './ClangParser'
+import { ReturnStatementContext } from './ClangParser'
 import { ExpressionStatementContext } from './ClangParser'
-import { SelectionStatementContext } from './ClangParser'
+import { ConditionalStatementContext } from './ClangParser'
 import { IterationStatementContext } from './ClangParser'
+import { WhileLoopContext } from './ClangParser'
+import { DoWhileLoopContext } from './ClangParser'
+import { ForLoopContext } from './ClangParser'
 import { ForConditionContext } from './ClangParser'
 import { ArrayIdentifierWithTypeContext } from './ClangParser'
 import { ArrayContentContext } from './ClangParser'
@@ -58,6 +69,7 @@ import { ArrayInitialisationContext } from './ClangParser'
 import { PointerContext } from './ClangParser'
 import { PointerDerefernceContext } from './ClangParser'
 import { PointerReferenceContext } from './ClangParser'
+import { FunctionDeclarationContext } from './ClangParser'
 import { FunctionContext } from './ClangParser'
 import { FunctionCallContext } from './ClangParser'
 import { FunctionCallParametersContext } from './ClangParser'
@@ -93,6 +105,32 @@ export interface ClangListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitNumberExpression?: (ctx: NumberExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `CharExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterCharExpression?: (ctx: CharExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `CharExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitCharExpression?: (ctx: CharExpressionContext) => void
+
+  /**
+   * Enter a parse tree produced by the `FloatExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterFloatExpression?: (ctx: FloatExpressionContext) => void
+  /**
+   * Exit a parse tree produced by the `FloatExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitFloatExpression?: (ctx: FloatExpressionContext) => void
 
   /**
    * Enter a parse tree produced by the `StringLiteralExpression`
@@ -498,6 +536,45 @@ export interface ClangListener extends ParseTreeListener {
   exitAssignAndAddOne?: (ctx: AssignAndAddOneContext) => void
 
   /**
+   * Enter a parse tree produced by the `Negative`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterNegative?: (ctx: NegativeContext) => void
+  /**
+   * Exit a parse tree produced by the `Negative`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitNegative?: (ctx: NegativeContext) => void
+
+  /**
+   * Enter a parse tree produced by the `Positive`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterPositive?: (ctx: PositiveContext) => void
+  /**
+   * Exit a parse tree produced by the `Positive`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitPositive?: (ctx: PositiveContext) => void
+
+  /**
+   * Enter a parse tree produced by the `Not`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  enterNot?: (ctx: NotContext) => void
+  /**
+   * Exit a parse tree produced by the `Not`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   */
+  exitNot?: (ctx: NotContext) => void
+
+  /**
    * Enter a parse tree produced by `ClangParser.start`.
    * @param ctx the parse tree
    */
@@ -542,6 +619,17 @@ export interface ClangListener extends ParseTreeListener {
   exitIdentifierWithType?: (ctx: IdentifierWithTypeContext) => void
 
   /**
+   * Enter a parse tree produced by `ClangParser.type`.
+   * @param ctx the parse tree
+   */
+  enterType?: (ctx: TypeContext) => void
+  /**
+   * Exit a parse tree produced by `ClangParser.type`.
+   * @param ctx the parse tree
+   */
+  exitType?: (ctx: TypeContext) => void
+
+  /**
    * Enter a parse tree produced by `ClangParser.identifierWithTypeList`.
    * @param ctx the parse tree
    */
@@ -575,6 +663,17 @@ export interface ClangListener extends ParseTreeListener {
   exitNumberList?: (ctx: NumberListContext) => void
 
   /**
+   * Enter a parse tree produced by `ClangParser.pointerList`.
+   * @param ctx the parse tree
+   */
+  enterPointerList?: (ctx: PointerListContext) => void
+  /**
+   * Exit a parse tree produced by `ClangParser.pointerList`.
+   * @param ctx the parse tree
+   */
+  exitPointerList?: (ctx: PointerListContext) => void
+
+  /**
    * Enter a parse tree produced by `ClangParser.statement`.
    * @param ctx the parse tree
    */
@@ -597,6 +696,17 @@ export interface ClangListener extends ParseTreeListener {
   exitExpression?: (ctx: ExpressionContext) => void
 
   /**
+   * Enter a parse tree produced by `ClangParser.statementBlock`.
+   * @param ctx the parse tree
+   */
+  enterStatementBlock?: (ctx: StatementBlockContext) => void
+  /**
+   * Exit a parse tree produced by `ClangParser.statementBlock`.
+   * @param ctx the parse tree
+   */
+  exitStatementBlock?: (ctx: StatementBlockContext) => void
+
+  /**
    * Enter a parse tree produced by `ClangParser.parenthesesExpression`.
    * @param ctx the parse tree
    */
@@ -606,17 +716,6 @@ export interface ClangListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitParenthesesExpression?: (ctx: ParenthesesExpressionContext) => void
-
-  /**
-   * Enter a parse tree produced by `ClangParser.statementList`.
-   * @param ctx the parse tree
-   */
-  enterStatementList?: (ctx: StatementListContext) => void
-  /**
-   * Exit a parse tree produced by `ClangParser.statementList`.
-   * @param ctx the parse tree
-   */
-  exitStatementList?: (ctx: StatementListContext) => void
 
   /**
    * Enter a parse tree produced by `ClangParser.postFix`.
@@ -641,6 +740,17 @@ export interface ClangListener extends ParseTreeListener {
   exitConditionalExpression?: (ctx: ConditionalExpressionContext) => void
 
   /**
+   * Enter a parse tree produced by `ClangParser.returnStatement`.
+   * @param ctx the parse tree
+   */
+  enterReturnStatement?: (ctx: ReturnStatementContext) => void
+  /**
+   * Exit a parse tree produced by `ClangParser.returnStatement`.
+   * @param ctx the parse tree
+   */
+  exitReturnStatement?: (ctx: ReturnStatementContext) => void
+
+  /**
    * Enter a parse tree produced by `ClangParser.expressionStatement`.
    * @param ctx the parse tree
    */
@@ -652,15 +762,15 @@ export interface ClangListener extends ParseTreeListener {
   exitExpressionStatement?: (ctx: ExpressionStatementContext) => void
 
   /**
-   * Enter a parse tree produced by `ClangParser.selectionStatement`.
+   * Enter a parse tree produced by `ClangParser.conditionalStatement`.
    * @param ctx the parse tree
    */
-  enterSelectionStatement?: (ctx: SelectionStatementContext) => void
+  enterConditionalStatement?: (ctx: ConditionalStatementContext) => void
   /**
-   * Exit a parse tree produced by `ClangParser.selectionStatement`.
+   * Exit a parse tree produced by `ClangParser.conditionalStatement`.
    * @param ctx the parse tree
    */
-  exitSelectionStatement?: (ctx: SelectionStatementContext) => void
+  exitConditionalStatement?: (ctx: ConditionalStatementContext) => void
 
   /**
    * Enter a parse tree produced by `ClangParser.iterationStatement`.
@@ -672,6 +782,39 @@ export interface ClangListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitIterationStatement?: (ctx: IterationStatementContext) => void
+
+  /**
+   * Enter a parse tree produced by `ClangParser.whileLoop`.
+   * @param ctx the parse tree
+   */
+  enterWhileLoop?: (ctx: WhileLoopContext) => void
+  /**
+   * Exit a parse tree produced by `ClangParser.whileLoop`.
+   * @param ctx the parse tree
+   */
+  exitWhileLoop?: (ctx: WhileLoopContext) => void
+
+  /**
+   * Enter a parse tree produced by `ClangParser.doWhileLoop`.
+   * @param ctx the parse tree
+   */
+  enterDoWhileLoop?: (ctx: DoWhileLoopContext) => void
+  /**
+   * Exit a parse tree produced by `ClangParser.doWhileLoop`.
+   * @param ctx the parse tree
+   */
+  exitDoWhileLoop?: (ctx: DoWhileLoopContext) => void
+
+  /**
+   * Enter a parse tree produced by `ClangParser.forLoop`.
+   * @param ctx the parse tree
+   */
+  enterForLoop?: (ctx: ForLoopContext) => void
+  /**
+   * Exit a parse tree produced by `ClangParser.forLoop`.
+   * @param ctx the parse tree
+   */
+  exitForLoop?: (ctx: ForLoopContext) => void
 
   /**
    * Enter a parse tree produced by `ClangParser.forCondition`.
@@ -749,6 +892,17 @@ export interface ClangListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitPointerReference?: (ctx: PointerReferenceContext) => void
+
+  /**
+   * Enter a parse tree produced by `ClangParser.functionDeclaration`.
+   * @param ctx the parse tree
+   */
+  enterFunctionDeclaration?: (ctx: FunctionDeclarationContext) => void
+  /**
+   * Exit a parse tree produced by `ClangParser.functionDeclaration`.
+   * @param ctx the parse tree
+   */
+  exitFunctionDeclaration?: (ctx: FunctionDeclarationContext) => void
 
   /**
    * Enter a parse tree produced by `ClangParser.function`.

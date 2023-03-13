@@ -1,20 +1,40 @@
+import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
-import { ParseTree } from 'antlr4ts/tree/ParseTree'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
-import { TerminalNode } from 'antlr4ts/tree/TerminalNode'
 import * as es from 'estree'
+import { flow } from 'lodash'
 
-import { ExpressionContext, StartContext } from '../../lang/ClangParser'
+import { ParenthesesExpressionContext } from '../../lang/ClangParser'
 import { ClangVisitor } from '../../lang/ClangVisitor'
 import { FatalSyntaxError } from '../errors'
+import { parserArrayExpression } from './arrayParser'
+import { parserAssignmentExpression } from './assignmentParser'
+import { parserBitwiseOpExpression } from './bitwiseOpParser'
+import { parserComparatorExpression } from './comparatorParser'
+import { parserFunctionCallExpression } from './functionCallParser'
+import { parserIdentifierExpression } from './identifierParser'
+import { parserBinaryExpression } from './intBinaryOpParser'
+import { parserLogicalOpExpression } from './logicalOpParser'
+import { parserPointerExpression } from './pointerParser'
+import { parserPostFixExpression } from './postFixParser'
+import { parserPrimitiveExpression } from './primitiveParser'
+import { parserUnaryOpExpression } from './unaryOpParser'
 
-export class ExpressionGenerator implements ClangVisitor<es.Expression> {
-  visitExpression?: ((ctx: ExpressionContext) => es.Expression) | undefined
-  visitStart?: ((ctx: StartContext) => es.Expression) | undefined
-
-  visit(tree: ParseTree): es.Expression {
-    return tree.accept(this)
+class BaseParser
+  extends AbstractParseTreeVisitor<es.Expression>
+  implements ClangVisitor<es.Expression>
+{
+  protected defaultResult(): es.Expression {
+    return {
+      type: 'SequenceExpression',
+      expressions: []
+    }
   }
+
+  visitParentheses(ctx: ParenthesesExpressionContext): es.Expression {
+    return this.visit(ctx.expression())
+  }
+
   visitChildren(node: RuleNode): es.Expression {
     const expressions: es.Expression[] = []
     for (let i = 0; i < node.childCount; i++) {
@@ -25,10 +45,6 @@ export class ExpressionGenerator implements ClangVisitor<es.Expression> {
       expressions
     }
   }
-  visitTerminal(node: TerminalNode): es.Expression {
-    return node.accept(this)
-  }
-
   visitErrorNode(node: ErrorNode): es.Expression {
     throw new FatalSyntaxError(
       {
@@ -46,20 +62,19 @@ export class ExpressionGenerator implements ClangVisitor<es.Expression> {
   }
 }
 
-function convertExpression(expression: ExpressionContext): es.Expression {
-  const generator = new ExpressionGenerator()
-  return expression.accept(generator)
-}
+const ParsingBehaviors = flow(
+  parserComparatorExpression,
+  parserBinaryExpression,
+  parserLogicalOpExpression,
+  parserUnaryOpExpression,
+  parserPostFixExpression,
+  parserPrimitiveExpression,
+  parserBitwiseOpExpression,
+  parserIdentifierExpression,
+  parserAssignmentExpression,
+  parserArrayExpression,
+  parserPointerExpression,
+  parserFunctionCallExpression
+)(BaseParser)
 
-export function convertSource(expression: ExpressionContext): es.Program {
-  return {
-    type: 'Program',
-    sourceType: 'script',
-    body: [
-      {
-        type: 'ExpressionStatement',
-        expression: convertExpression(expression)
-      }
-    ]
-  }
-}
+export default class ExpressionParser extends ParsingBehaviors {}

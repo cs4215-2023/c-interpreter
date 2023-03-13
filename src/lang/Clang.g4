@@ -1,20 +1,37 @@
 grammar Clang;
 
+MUL: '*';
+DIV: '/';
+ADD: '+';
+SUB: '-';
+MOD: '%';
+LESSTHAN: '<';
+LESSTHANOREQUAL: '<=';
+GREATERTHAN: '>';
+GREATERTHANOREQUAL: '>=';
+EQUAL: '=';
+EQUALCHECK: '==';
+NOTEQUALCHECK: '!=';
+XOR: '^';
+AND: '&&';
+OR: '||';
+NOT: '!';
+BITWISEAND: '&';
+BITWISEOR: '|';
+MINUSEQUAL: '-=';
+PLUSEQUAL: '+=';
+BITSHIFTRIGHT: '>>';
+BITSHIFTLEFT: '<<';
+
 WHITESPACE: [ \t]+ -> skip;
 
 NEWLINE: ( '\r' '\n'? | '\n') -> skip;
 
-PRIMITIVETYPE:
-	'void'
-	| 'char'
-	| 'int'
-	| 'float'
-	| 'signed'
-	| 'unsigned';
+PRIMITIVETYPE: 'void' | 'char' | 'int' | 'float';
 
-SIGN: ('-' | '+');
+SIGNEDTYPE: 'signed' | 'unsigned';
 
-IDENTIFIER: SIGN? [a-zA-Z_] [a-zA-Z0-9_]*;
+IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
 FORMATSPECIFIERS:
 	'"' '%d' '"'
@@ -24,7 +41,9 @@ FORMATSPECIFIERS:
 	| '"' '%s' '"'
 	| '"' '%p' '"';
 
-NUMBER: SIGN? [0-9_]+;
+NUMBER: [0-9_]+;
+CHAR: '\'' ~[\])] '\'';
+FLOAT: ('0' ..'9')+ '.' ('0' ..'9')*;
 
 PLUSPLUS: '++';
 MINUSMINUS: '--';
@@ -35,7 +54,10 @@ stringLiteral: '"' IDENTIFIER? '"';
 
 stringLiteralList: stringLiteral (',' stringLiteral)*;
 
-identifierWithType: idType = PRIMITIVETYPE id = IDENTIFIER;
+identifierWithType: idType = type id = IDENTIFIER;
+
+// rename so as not to conflict with built in type
+type: signed = SIGNEDTYPE? primType = PRIMITIVETYPE;
 
 identifierWithTypeList:
 	identifierWithType (',' identifierWithType)*;
@@ -44,75 +66,94 @@ identifierList: IDENTIFIER (',' IDENTIFIER)*;
 
 numberList: NUMBER (',' NUMBER)*;
 
+pointerList: pointer (',' pointer)*;
 statement:
 	expressionStatement
-	| selectionStatement
+	| conditionalStatement
 	| iterationStatement
-	| function;
+	| returnStatement
+	| functionDeclaration;
 
 expression:
-	identifierWithType										# TypedIdentifierExpression
-	| NUMBER												# NumberExpression
-	| stringLiteral											# StringLiteralExpression
-	| IDENTIFIER											# IdentifierExpression
-	| postFix												# PostFixNotationExpression
-	| arrayInitialisation									# ArrayInitialisationExpression
-	| '(' inner = expression ')'							# ParenthesisExpression
-	| pointer												# PointerExpression
-	| pointerDerefernce										# PointerDereferenceExpression
-	| pointerReference										# PointerReferenceExpression
-	| functionCall											# FunctionCallExpression
-	| printf												# PrintfExpression
-	| left = expression operator = '*' right = expression	# Multiplication
-	| left = expression operator = '/' right = expression	# Division
-	| left = expression operator = '%' right = expression	# ModulusDivision
-	| left = expression operator = '+' right = expression	# Addition
-	| left = expression operator = '-' right = expression	# Subtraction
-	| left = expression operator = '<<' right = expression	# BitShiftLeft
-	| left = expression operator = '>>' right = expression	# BitShiftRight
-	| left = expression operator = '>' right = expression	# GreaterThan
-	| left = expression operator = '<' right = expression	# LesserThan
-	| left = expression operator = '>=' right = expression	# GreaterThanOrEqual
-	| left = expression operator = '<=' right = expression	# LesserThanOrEqual
-	| left = expression operator = '==' right = expression	# EqualityChecking
-	| left = expression operator = '!=' right = expression	# NotEqual
-	| left = expression operator = '||' right = expression	# Or
-	| left = expression operator = '&&' right = expression	# And
-	| left = expression operator = '&' right = expression	# BitwiseAnd
-	| left = expression operator = '|' right = expression	# BitwiseOr
-	| left = expression operator = '^' right = expression	# Xor
-	| left = expression operator = '=' right = expression	# Assignment
-	| left = expression operator = '-=' right = expression	# AssignAndMinusOne
-	| left = expression operator = '+=' right = expression	# AssignAndAddOne;
+	identifierWithType														# TypedIdentifierExpression
+	| NUMBER																# NumberExpression
+	| CHAR																	# CharExpression
+	| FLOAT																	# FloatExpression
+	| stringLiteral															# StringLiteralExpression
+	| IDENTIFIER															# IdentifierExpression
+	| postFix																# PostFixNotationExpression
+	| arrayInitialisation													# ArrayInitialisationExpression
+	| '(' inner = expression ')'											# ParenthesisExpression
+	| pointer																# PointerExpression
+	| pointerDerefernce														# PointerDereferenceExpression
+	| pointerReference														# PointerReferenceExpression
+	| functionCall															# FunctionCallExpression
+	| printf																# PrintfExpression
+	| left = expression operator = MUL right = expression					# Multiplication
+	| left = expression operator = DIV right = expression					# Division
+	| left = expression operator = MOD right = expression					# ModulusDivision
+	| left = expression operator = ADD right = expression					# Addition
+	| left = expression operator = SUB right = expression					# Subtraction
+	| left = expression operator = BITSHIFTLEFT right = expression			# BitShiftLeft
+	| left = expression operator = BITSHIFTRIGHT right = expression			# BitShiftRight
+	| left = expression operator = GREATERTHAN right = expression			# GreaterThan
+	| left = expression operator = LESSTHAN right = expression				# LesserThan
+	| left = expression operator = GREATERTHANOREQUAL right = expression	# GreaterThanOrEqual
+	| left = expression operator = LESSTHANOREQUAL right = expression		# LesserThanOrEqual
+	| left = expression operator = EQUALCHECK right = expression			# EqualityChecking
+	| left = expression operator = NOTEQUALCHECK right = expression			# NotEqual
+	| left = expression operator = OR right = expression					# Or
+	| left = expression operator = AND right = expression					# And
+	| left = expression operator = BITWISEAND right = expression			# BitwiseAnd
+	| left = expression operator = BITWISEOR right = expression				# BitwiseOr
+	| left = expression operator = XOR right = expression					# Xor
+	| left = expression operator = EQUAL right = expression					# Assignment
+	| left = expression operator = MINUSEQUAL right = expression			# AssignAndMinusOne
+	| left = expression operator = PLUSEQUAL right = expression				# AssignAndAddOne
+	| operators = SUB argument = expression									# Negative
+	| operators = ADD argument = expression									# Positive
+	| operators = NOT argument = expression									# Not;
+
+statementBlock: (statement)*;
 
 parenthesesExpression: '(' inner = expression ')';
 
-statementList: '{' ((statement)+)? '}';
-
-postFix: (IDENTIFIER) (PLUSPLUS | MINUSMINUS);
+postFix: argument = IDENTIFIER (PLUSPLUS | MINUSMINUS);
 
 conditionalExpression:
 	test = expression '?' consequent = expression ':' alternate = expression;
 
+returnStatement: 'return' expressionStatement;
+
 expressionStatement: expression ';';
 
-selectionStatement:
-	'if' '(' test = expression ')' consequentStatement = statement (
-		'else' alternateStatement = statement
+conditionalStatement:
+	'if' '(' test = expression ')' '{' consequentStatement = statementBlock '}' (
+		'else' (
+			'{' alternateStatementBlock = statementBlock '}'
+			| elseIfStatement = conditionalStatement
+		)
 	)?;
 
-iterationStatement:
-	'while' '(' condition = expression ')' body = statementList
-	| 'do' body = statementList 'while' '(' condition = expression ')' ';'
-	| 'for' '(' forCondition ')' body = statementList;
+iterationStatement: whileLoop | doWhileLoop | forLoop;
+
+whileLoop:
+	'while' '(' condition = expression ')' '{' body = statementBlock '}';
+
+doWhileLoop:
+	'do' '{' body = statementBlock '}' 'while' '(' condition = expression ')' ';';
+
+forLoop:
+	'for' '(' innerForCondition = forCondition ')' '{' body = statementBlock '}';
 
 forCondition:
-	initialise = expression ';' endCondition = expression? ';' increment = expression;
+	initialise = expression ';' test = expression? ';' update = expression;
 
 arrayIdentifierWithType:
-	idType = PRIMITIVETYPE id = IDENTIFIER '[' size = NUMBER? ']';
+	idType = type id = IDENTIFIER '[' size = NUMBER? ']';
 
-arrayContent: '{' (identifierList | numberList) '}';
+arrayContent:
+	'{' (pointerList | numberList | identifierList) '}';
 
 arrayInitialisation:
 	arrayIdentifierWithType (
@@ -122,17 +163,19 @@ arrayInitialisation:
 
 pointer: PRIMITIVETYPE '*' IDENTIFIER;
 
-pointerDerefernce: '*' IDENTIFIER;
+pointerDerefernce: operator = MUL argument = IDENTIFIER;
 
-pointerReference: '&' IDENTIFIER;
+pointerReference: operator = BITWISEAND argument = IDENTIFIER;
+
+functionDeclaration: function;
 
 function:
-	funcType = PRIMITIVETYPE (funcName = IDENTIFIER) (
-		params = '(' identifierWithTypeList? ')'
-	) body = statementList;
+	funcType = type (funcName = IDENTIFIER) (
+		'(' params = identifierWithTypeList ')'
+	) '{' body = statementBlock '}';
 
 functionCall:
-	IDENTIFIER params = '(' functionCallParameters ')';
+	func = IDENTIFIER '(' args = functionCallParameters ')';
 
 functionCallParameters: (
 		stringLiteralList
