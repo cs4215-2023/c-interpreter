@@ -52,21 +52,21 @@ start: (statement)*;
 
 stringLiteral: '"' IDENTIFIER? '"';
 
-stringLiteralList: stringLiteral (',' stringLiteral)*;
+stringLiteralList: stringLiteral+;
 
 identifierWithType: idType = type id = IDENTIFIER;
 
 // rename so as not to conflict with built in type
 type: signed = SIGNEDTYPE? primType = PRIMITIVETYPE;
 
-identifierWithTypeList:
-	identifierWithType (',' identifierWithType)*;
+identifierWithTypeList: identifierWithType+;
 
-identifierList: IDENTIFIER (',' IDENTIFIER)*;
+identifierList: IDENTIFIER+;
 
-numberList: NUMBER (',' NUMBER)*;
+numberList: NUMBER+;
 
-pointerList: pointer (',' pointer)*;
+pointerList: pointer+;
+
 statement:
 	expressionStatement
 	| conditionalStatement
