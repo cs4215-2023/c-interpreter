@@ -80,6 +80,7 @@ export class StatementParser
     const iter = ctx.iterationStatement()
     const func = ctx.functionDeclaration()
     const returnStatement = ctx.returnStatement()
+    const conditionalStatement = ctx.conditionalStatement()
     if (exp != undefined) {
       return this.visitExpression(exp)
     } else if (iter != undefined) {
@@ -88,6 +89,8 @@ export class StatementParser
       return this.visitFunctionDeclaration(func)
     } else if (returnStatement != undefined) {
       return this.visitReturnStatement(returnStatement)
+    } else if (conditionalStatement != undefined) {
+      return this.visitConditionalStatement(conditionalStatement)
     }
     return this.defaultResult()
   }
@@ -107,6 +110,7 @@ export class StatementParser
   }
 
   visitConditionalStatement(ctx: ConditionalStatementContext): es.Statement {
+    console.log('if statement')
     return {
       type: 'IfStatement',
       test: new ExpressionParser().visit(ctx._test),
