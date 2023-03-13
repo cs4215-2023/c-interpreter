@@ -43,10 +43,6 @@ export class IterationStatementParser
     }
   }
 
-  visitTerminal(node: TerminalNode): es.Statement {
-    return node.accept(this)
-  }
-
   visitErrorNode(node: ErrorNode): es.Statement {
     throw new FatalSyntaxError(
       {
@@ -68,11 +64,11 @@ export class IterationStatementParser
     const doWhileLoop = ctx.doWhileLoop()
     const whileLoop = ctx.whileLoop()
     if (forLoop != undefined) {
-      return this.visit(forLoop)
+      return this.visitForStatement(forLoop)
     } else if (doWhileLoop != undefined) {
-      return this.visit(doWhileLoop)
+      return this.visitDoWhileStatement(doWhileLoop)
     } else if (whileLoop != undefined) {
-      return this.visit(whileLoop)
+      return this.visitWhileStatement(whileLoop)
     }
     return this.defaultResult()
   }
