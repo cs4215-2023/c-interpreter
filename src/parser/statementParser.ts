@@ -9,6 +9,7 @@ import {
   ConditionalStatementContext,
   ExpressionStatementContext,
   FunctionContext,
+  FunctionDeclarationContext,
   IterationStatementContext,
   ReturnStatementContext,
   StartContext,
@@ -78,13 +79,13 @@ export class StatementParser
   visitStatement(ctx: StatementContext): es.Statement {
     const exp = ctx.expressionStatement()
     const iter = ctx.iterationStatement()
-    const func = ctx.function()
+    const func = ctx.functionDeclaration()
     if (exp != undefined) {
       return this.visitExpression(exp)
     } else if (iter != undefined) {
       return this.visitIterative(iter)
     } else if (func != undefined) {
-      return this.visitFunction(func)
+      return this.visitFunctionDeclaration(func)
     }
     return this.defaultResult()
   }
@@ -95,10 +96,11 @@ export class StatementParser
   }
 
   visitIterative(ctx: IterationStatementContext): es.Statement {
+    console.log('visiting iter')
     return new IterationStatementParser().visit(ctx)
   }
 
-  visitFunction(ctx: FunctionContext): es.Statement {
+  visitFunctionDeclaration(ctx: FunctionDeclarationContext): es.Statement {
     return new FunctionParser().visit(ctx)
   }
 

@@ -4,7 +4,7 @@ import { ParseTree } from 'antlr4ts/tree/ParseTree'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
 import * as es from 'estree'
 
-import { FunctionContext } from '../lang/ClangParser'
+import { FunctionContext, FunctionDeclarationContext } from '../lang/ClangParser'
 import { ClangVisitor } from '../lang/ClangVisitor'
 import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
@@ -21,6 +21,7 @@ export class FunctionParser
   }
 
   bodyWrapper(ctx: FunctionContext): es.Statement[] {
+    console.log('body wapper')
     const statements = new StatementParser().visit(ctx._body)
     if (statements.type == 'BlockStatement') {
       return statements.body
@@ -30,15 +31,19 @@ export class FunctionParser
   }
 
   paramsWrapper(ctx: FunctionContext): es.Pattern[] {
+    console.log('params wrapper')
     const params = new ExpressionParser().visit(ctx._params)
+    console.log(params)
     return params
   }
 
   visit(tree: ParseTree): es.Statement {
+    console.log('in func parser')
     return tree.accept(this)
   }
 
   visitChildren(node: RuleNode): es.Statement {
+    console.log(node.childCount)
     const statements: es.Statement[] = []
     for (let i = 0; i < node.childCount; i++) {
       statements.push(node.getChild(i).accept(this))
@@ -65,7 +70,12 @@ export class FunctionParser
     )
   }
 
-  visitFunctionDeclaration(ctx: FunctionContext): es.Statement {
+  visitFunctionDeclaration(ctx: FunctionDeclarationContext): es.Statement {
+    return this.visitFunctionProperties(ctx.function())
+  }
+
+  visitFunctionProperties(ctx: FunctionContext): es.Statement {
+    console.log('visit function declaration')
     const type = new TypeParser().visit(ctx._funcType)
     return {
       type: 'FunctionDeclaration',

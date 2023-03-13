@@ -72,7 +72,7 @@ statement:
 	| conditionalStatement
 	| iterationStatement
 	| returnStatement
-	| function;
+	| functionDeclaration;
 
 expression:
 	identifierWithType														# TypedIdentifierExpression
@@ -161,6 +161,8 @@ pointer: PRIMITIVETYPE '*' IDENTIFIER;
 pointerDerefernce: operator = MUL argument = IDENTIFIER;
 
 pointerReference: operator = BITWISEAND argument = IDENTIFIER;
+
+functionDeclaration: function;
 
 function:
 	funcType = type (funcName = IDENTIFIER) (
