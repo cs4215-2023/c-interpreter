@@ -128,8 +128,8 @@ expressionStatement: expression ';';
 conditionalStatement:
 	'if' '(' test = expression ')' '{' consequentStatement = statement* '}' (
 		'else' (
-			'{' alternateStatement = statement* '}'
-			| conditionalStatement
+			'{' alternateStatementBlock = statement* '}'
+			| elseIfStatement = conditionalStatement
 		)
 	)?;
 

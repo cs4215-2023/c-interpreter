@@ -111,10 +111,21 @@ export class StatementParser
 
   visitConditionalStatement(ctx: ConditionalStatementContext): es.Statement {
     console.log('if statement')
+
+    let alternate = undefined
+    const alternateStatementBlock = ctx._alternateStatementBlock
+    const elseIfStatement = ctx._elseIfStatement
+
+    if (alternateStatementBlock != undefined) {
+      alternate = alternateStatementBlock
+    } else if (elseIfStatement != undefined) {
+      alternate = elseIfStatement
+    }
+
     return {
       type: 'IfStatement',
       test: new ExpressionParser().visit(ctx._test),
-      alternate: this.visit(ctx._alternateStatement),
+      alternate: alternate == undefined ? this.defaultResult() : this.visit(alternate),
       consequent: this.visit(ctx._consequentStatement)
     }
   }
