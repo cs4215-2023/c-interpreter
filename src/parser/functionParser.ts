@@ -23,9 +23,11 @@ export class FunctionParser
   bodyWrapper(ctx: FunctionContext): es.Statement[] {
     console.log('body wapper')
     const body = ctx._body
+
     if (body == undefined) {
       return [this.defaultResult()]
     }
+
     const statements = new StatementParser().visit(body)
 
     if (statements.type == 'BlockStatement') {

@@ -114,6 +114,8 @@ expression:
 	| operators = ADD argument = expression									# Positive
 	| operators = NOT argument = expression									# Not;
 
+statementBlock: (statement)*;
+
 parenthesesExpression: '(' inner = expression ')';
 
 postFix: argument = IDENTIFIER (PLUSPLUS | MINUSMINUS);
@@ -126,9 +128,9 @@ returnStatement: 'return' expressionStatement;
 expressionStatement: expression ';';
 
 conditionalStatement:
-	'if' '(' test = expression ')' '{' consequentStatement = statement* '}' (
+	'if' '(' test = expression ')' '{' consequentStatement = statementBlock '}' (
 		'else' (
-			'{' alternateStatementBlock = statement* '}'
+			'{' alternateStatementBlock = statementBlock '}'
 			| elseIfStatement = conditionalStatement
 		)
 	)?;
@@ -136,13 +138,13 @@ conditionalStatement:
 iterationStatement: whileLoop | doWhileLoop | forLoop;
 
 whileLoop:
-	'while' '(' condition = expression ')' '{' body = statement* '}';
+	'while' '(' condition = expression ')' '{' body = statementBlock '}';
 
 doWhileLoop:
-	'do' '{' body = statement* '}' 'while' '(' condition = expression ')' ';';
+	'do' '{' body = statementBlock '}' 'while' '(' condition = expression ')' ';';
 
 forLoop:
-	'for' '(' innerForCondition = forCondition ')' '{' body = statement* '}';
+	'for' '(' innerForCondition = forCondition ')' '{' body = statementBlock '}';
 
 forCondition:
 	initialise = expression ';' test = expression? ';' update = expression;
@@ -170,7 +172,7 @@ functionDeclaration: function;
 function:
 	funcType = type (funcName = IDENTIFIER) (
 		'(' params = identifierWithTypeList ')'
-	) '{' body = statement* '}';
+	) '{' body = statementBlock '}';
 
 functionCall:
 	func = IDENTIFIER '(' args = functionCallParameters ')';
