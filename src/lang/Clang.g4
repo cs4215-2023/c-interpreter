@@ -59,7 +59,8 @@ identifierWithType: idType = type id = IDENTIFIER;
 // rename so as not to conflict with built in type
 type: signed = SIGNEDTYPE? primType = PRIMITIVETYPE;
 
-identifierWithTypeList: identifierWithType+;
+identifierWithTypeList:
+	identifierWithType (',' identifierWithType)*;
 
 identifierList: IDENTIFIER (',' IDENTIFIER)*;
 
