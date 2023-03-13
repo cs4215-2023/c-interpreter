@@ -31,27 +31,19 @@ export class FunctionParser
   }
 
   paramsWrapper(ctx: FunctionContext): es.Pattern[] {
-    console.log('params wrapper')
-    const params = new ExpressionParser().visit(ctx._params)
-    console.log(params)
-    return params
-  }
-
-  visit(tree: ParseTree): es.Statement {
-    console.log('in func parser')
-    return tree.accept(this)
-  }
-
-  visitChildren(node: RuleNode): es.Statement {
-    console.log(node.childCount)
-    const statements: es.Statement[] = []
-    for (let i = 0; i < node.childCount; i++) {
-      statements.push(node.getChild(i).accept(this))
+    console.log(ctx._params.text)
+    const params = ctx._params
+    const expressionParser = new ExpressionParser()
+    const patterns: es.Pattern[] = []
+    for (let i = 0; i < params.childCount; i++) {
+      const child = params.getChild(i)
+      // brute force comma work around
+      if (child.text != ',') {
+        patterns.push(expressionParser.visit(child))
+      }
     }
-    return {
-      type: 'BlockStatement',
-      body: statements
-    }
+    console.log(patterns)
+    return patterns
   }
 
   visitErrorNode(node: ErrorNode): es.Statement {
@@ -77,6 +69,7 @@ export class FunctionParser
   visitFunctionProperties(ctx: FunctionContext): es.Statement {
     console.log('visit function declaration')
     const type = new TypeParser().visit(ctx._funcType)
+    console.log('func type is: ', type)
     return {
       type: 'FunctionDeclaration',
       id: tokenToIdentifierWrapper(ctx._funcName),

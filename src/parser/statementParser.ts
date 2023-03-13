@@ -8,7 +8,6 @@ import * as es from 'estree'
 import {
   ConditionalStatementContext,
   ExpressionStatementContext,
-  FunctionContext,
   FunctionDeclarationContext,
   IterationStatementContext,
   ReturnStatementContext,
