@@ -1,5 +1,11 @@
 int foo(int a, int b) {
-	return hello;
+	int c = a+b;
+
+	if (1) {
+		a++;
+	} else {
+		b++;
+	}
 }
 
 foo(1,2);
