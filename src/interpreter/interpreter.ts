@@ -92,9 +92,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     return node.quasis[0].value.cooked
   },
 
-  ThisExpression: function* (node: es.ThisExpression, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
-  },
 
   ArrayExpression: function* (node: es.ArrayExpression, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
@@ -105,19 +102,12 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  ArrowFunctionExpression: function* (node: es.ArrowFunctionExpression, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
-  },
 
   Identifier: function* (node: es.Identifier, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
   CallExpression: function* (node: es.CallExpression, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
-  },
-
-  NewExpression: function* (node: es.NewExpression, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
@@ -153,13 +143,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  ContinueStatement: function* (_node: es.ContinueStatement, _context: Context) {
-    throw new Error(`not supported yet: ${_node.type}`)
-  },
-
-  BreakStatement: function* (_node: es.BreakStatement, _context: Context) {
-    throw new Error(`not supported yet: ${_node.type}`)
-  },
 
   ForStatement: function* (node: es.ForStatement, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
