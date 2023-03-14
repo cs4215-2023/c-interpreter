@@ -25,7 +25,6 @@ class BaseParser
   implements ClangVisitor<es.Expression>
 {
   protected defaultResult(): es.Expression {
-    console.log('defaultResultCalled')
     return {
       type: 'SequenceExpression',
       expressions: []
@@ -78,4 +77,4 @@ const ParsingBehaviors = flow(
   parserFunctionCallExpression
 )(BaseParser)
 
-export default class ExpressionParser extends ParsingBehaviors {}
+export default class ExpressionParser extends ParsingBehaviors { }

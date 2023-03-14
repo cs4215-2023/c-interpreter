@@ -71,6 +71,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   SequenceExpression: function* (node: es.SequenceExpression, context: Context) {
     let result
     for (const expr of node.expressions) {
+      if (expr.type === 'SequenceExpression' && expr.expressions.length === 0) { continue }
       result = yield* evaluate(expr, context)
     }
     return result
