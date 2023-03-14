@@ -7,16 +7,16 @@ export const parserPostFixExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    visitPostFixNotationExpression(ctx: PostFixNotationExpressionContext): es.Expression{
+    visitPostFixNotationExpression(ctx: PostFixNotationExpressionContext): es.Expression {
       return this.visitPostFix(ctx.postFix())
     }
     visitPostFix(ctx: PostFixContext): es.Expression {
-      const updateOp = ctx.PLUSPLUS() ? "++" : "--"
-      console.log("visitPostFix with postfix "+updateOp)
+      const updateOp = ctx.PLUSPLUS() ? '++' : '--'
+      console.log('visitPostFix with postfix ' + updateOp)
       return {
-        type:'UpdateExpression',
+        type: 'UpdateExpression',
         operator: updateOp,
-        argument:{type:'Identifier',name:ctx.IDENTIFIER().text},
+        argument: { type: 'Identifier', name: ctx.IDENTIFIER().text },
         prefix: true
       }
     }

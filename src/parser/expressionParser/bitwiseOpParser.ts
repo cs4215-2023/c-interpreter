@@ -8,7 +8,7 @@ export const parserBitwiseOpExpression = <T extends Constructable>(
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
     visitBitShiftLeft(ctx: BitShiftLeftContext): es.Expression {
-      console.log("visitBitShiftLeft for "+ctx._left.text+" and "+ctx._right.text)
+      console.log('visitBitShiftLeft for ' + ctx._left.text + ' and ' + ctx._right.text)
       return {
         type: 'BinaryExpression',
         operator: '>>',
@@ -19,7 +19,7 @@ export const parserBitwiseOpExpression = <T extends Constructable>(
     }
 
     visitBitShiftRight(ctx: BitShiftRightContext): es.Expression {
-      console.log("visitBitShiftRight for "+ctx._left.text+" and "+ctx._right.text)
+      console.log('visitBitShiftRight for ' + ctx._left.text + ' and ' + ctx._right.text)
       return {
         type: 'BinaryExpression',
         operator: '<<',
