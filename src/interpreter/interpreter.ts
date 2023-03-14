@@ -1,10 +1,11 @@
 /* tslint:disable:max-classes-per-file */
 import * as es from 'estree'
 
-import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import { Context, Environment, Value } from '../types'
 import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
 import * as rttc from '../utils/rttc'
+import { popEnvironment, pushEnvironment } from './environment'
+import { handleRuntimeError } from './errors'
 
 class Thunk {
   public value: Value
@@ -32,31 +33,6 @@ export function* actualValue(exp: es.Node, context: Context): Value {
   const evalResult = yield* evaluate(exp, context)
   const forced = yield* forceIt(evalResult, context)
   return forced
-}
-
-const handleRuntimeError = (context: Context, error: RuntimeSourceError): never => {
-  context.errors.push(error)
-  context.runtime.environments = context.runtime.environments.slice(
-    -context.numberOfOuterEnvironments
-  )
-  throw error
-}
-
-function* visit(context: Context, node: es.Node) {
-  context.runtime.nodes.unshift(node)
-  yield context
-}
-
-function* leave(context: Context) {
-  context.runtime.break = false
-  context.runtime.nodes.shift()
-  yield context
-}
-
-const popEnvironment = (context: Context) => context.runtime.environments.shift()
-export const pushEnvironment = (context: Context, environment: Environment) => {
-  context.runtime.environments.unshift(environment)
-  context.runtime.environmentTree.insert(environment)
 }
 
 export type Evaluator<T extends es.Node> = (node: T, context: Context) => IterableIterator<Value>
@@ -189,4 +165,15 @@ export function* evaluate(node: es.Node, context: Context) {
   const result = yield* evaluators[node.type](node, context)
   yield* leave(context)
   return result
+}
+
+function* visit(context: Context, node: es.Node) {
+  context.runtime.nodes.unshift(node)
+  yield context
+}
+
+function* leave(context: Context) {
+  context.runtime.break = false
+  context.runtime.nodes.shift()
+  yield context
 }
