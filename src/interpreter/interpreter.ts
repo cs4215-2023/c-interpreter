@@ -68,6 +68,13 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     return node.quasis[0].value.cooked
   },
 
+  SequenceExpression: function* (node: es.SequenceExpression, context: Context) {
+    let result
+    for (const expr of node.expressions) {
+      result = yield* evaluate(expr, context)
+    }
+    return result
+  },
 
   ArrayExpression: function* (node: es.ArrayExpression, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
@@ -100,6 +107,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   BinaryExpression: function* (node: es.BinaryExpression, context: Context) {
     const left = yield* actualValue(node.left, context)
     const right = yield* actualValue(node.right, context)
+    console.log("evaluating binaryexpression for " + left + " and " + right)
     const error = rttc.checkBinaryExpression(node, node.operator, left, right)
     if (error) {
       return handleRuntimeError(context, error)
@@ -151,6 +159,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
 
   BlockStatement: function* (node: es.BlockStatement, context: Context) {
+
     throw new Error(`not supported yet: ${node.type}`)
   },
 
