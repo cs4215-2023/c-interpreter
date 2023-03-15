@@ -17,7 +17,7 @@ export const parserPostFixExpression = <T extends Constructable>(
         type: 'UpdateExpression',
         operator: updateOp,
         argument: { type: 'Identifier', name: ctx.IDENTIFIER().text },
-        prefix: true
+        prefix: false
       }
     }
   }
