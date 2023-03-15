@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -20,13 +20,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Check for package-lock.json
-      run: |
-        if [ -e package-lock.json ]; then
-          echo "package-lock.json found; please do not use NPM! This project uses Yarn!"
-          exit 1
-        fi
-        exit 0
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
@@ -38,7 +31,7 @@ jobs:
     - run: yarn test-coverage
       env:
         CI: true
-    - name: Coveralls
-      uses: coverallsapp/github-action@master
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.CODECOV_TOKEN }}
