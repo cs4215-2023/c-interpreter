@@ -14,7 +14,8 @@ export const parserComparatorExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    visitLessThan(ctx: LesserThanContext): es.Expression {
+    visitLesserThan(ctx: LesserThanContext): es.Expression {
+      console.log('visiting less than')
       return {
         type: 'BinaryExpression',
         operator: '<',
