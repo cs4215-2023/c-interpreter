@@ -7,7 +7,7 @@ import { parse } from '../../parser'
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
 
-describe('Statements', () => {
+describe('Unary Operations', () => {
   it('Test positive integer', () => {
     const code = '+1;'
     const prog = parse(code, context)
@@ -90,7 +90,7 @@ describe('Statements', () => {
     }
     expect(prog).toEqual(expectedProg)
   })
-  it('Test negative integer', () => {
+  it('Test not', () => {
     const code = '!(1);'
     const prog = parse(code, context)
     const expectedProg: Program = {
