@@ -5,7 +5,7 @@ import { Context, Environment, Frame, Value } from '../types'
 import { primitive } from '../utils/astCreator'
 import Closure from './closure'
 
-function createEnvironment(
+export function createEnvironment(
   closure: Closure,
   args: Value[],
   callExpression?: es.CallExpression
@@ -45,11 +45,11 @@ export function createBlockEnvironment(
   }
 }
 
-function currentEnvironment(context: Context): Environment {
+export function currentEnvironment(context: Context): Environment {
   return context.runtime.environments[0]
 }
 
-function replaceEnvironment(context: Context, environment: Environment): void {
+export function replaceEnvironment(context: Context, environment: Environment): void {
   context.runtime.environments[0] = environment
   context.runtime.environmentTree.insert(environment)
 }
