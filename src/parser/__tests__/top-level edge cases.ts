@@ -8,7 +8,7 @@ const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
 
 describe('Top-level edge cases', () => {
-  it('returns an empty Program for the empty string', () => {
+  it('Returns an empty Program for the empty string', () => {
     const code = ''
     const prog = parse(code, context)
     const expectedProg: Program = {
