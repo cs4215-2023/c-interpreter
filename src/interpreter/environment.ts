@@ -1,4 +1,49 @@
-import { Context, Environment } from '../types'
+import * as es from 'estree'
+import { uniqueId } from 'lodash'
+
+import { Context, Environment, Frame, Value } from '../types'
+import { primitive } from '../utils/astCreator'
+import Closure from './closure'
+
+function createEnvironment(
+  closure: Closure,
+  args: Value[],
+  callExpression?: es.CallExpression
+): Environment {
+  const environment: Environment = {
+    name: closure.functionName, // TODO: Change this
+    tail: closure.environment,
+    head: {},
+    id: uniqueId()
+  }
+  if (callExpression) {
+    environment.callExpression = {
+      ...callExpression,
+      arguments: args.map(primitive)
+    }
+  }
+  closure.node.params.forEach((param, index) => {
+    if (param.type === 'RestElement') {
+      environment.head[(param.argument as es.Identifier).name] = args.slice(index)
+    } else {
+      environment.head[(param as es.Identifier).name] = args[index]
+    }
+  })
+  return environment
+}
+
+export function createBlockEnvironment(
+  context: Context,
+  name = 'blockEnvironment',
+  head: Frame = {}
+): Environment {
+  return {
+    name,
+    tail: currentEnvironment(context),
+    head,
+    id: uniqueId()
+  }
+}
 
 function currentEnvironment(context: Context): Environment {
   return context.runtime.environments[0]
