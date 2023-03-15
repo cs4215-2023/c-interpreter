@@ -123,7 +123,7 @@ postFix: argument = IDENTIFIER (PLUSPLUS | MINUSMINUS);
 conditionalExpression:
 	test = expression '?' consequent = expression ':' alternate = expression;
 
-returnStatement: 'return' expressionStatement;
+returnStatement: 'return' argument = expression? ';';
 
 expressionStatement: expression ';';
 
