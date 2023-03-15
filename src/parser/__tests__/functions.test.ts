@@ -198,4 +198,67 @@ describe('Function related tests', () => {
     }
     expect(prog).toEqual(expectedProg)
   })
+
+  it('Test function call', () => {
+    const code = 'void foo(int a, int b) {} foo(1,2);'
+    const prog = parse(code, context)
+    const expectedProg: Program = {
+      type: 'Program',
+      sourceType: 'script',
+      body: [
+        {
+          body: {
+            body: [],
+            type: 'BlockStatement'
+          },
+          id: {
+            name: 'foo',
+            type: 'Identifier'
+          },
+          params: [
+            {
+              name: 'a#int',
+              type: 'Identifier'
+            },
+            {
+              name: 'b#int',
+              type: 'Identifier'
+            }
+          ],
+          type: 'FunctionDeclaration'
+        },
+        {
+          expression: {
+            expressions: [
+              {
+                expressions: [
+                  {
+                    arguments: [
+                      { type: 'Literal', value: 1, raw: '1' },
+                      { type: 'Literal', value: 2, raw: '2' }
+                    ],
+                    callee: {
+                      name: 'foo',
+                      type: 'Identifier'
+                    },
+                    optional: false,
+                    type: 'CallExpression'
+                  }
+                ],
+                type: 'SequenceExpression'
+              },
+              {
+                expressions: [],
+                type: 'SequenceExpression'
+              }
+            ],
+            type: 'SequenceExpression'
+          },
+          loc: undefined,
+          type: 'ExpressionStatement'
+        }
+      ]
+    }
+    expect(prog).toEqual(expectedProg)
+  })
 })
