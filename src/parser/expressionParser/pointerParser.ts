@@ -31,7 +31,7 @@ export const parserPointerExpression = <T extends Constructable>(
       console.log('pointerdereferencecontext')
       return {
         type: 'Identifier',
-        name: ctx.MUL().text + ctx.MUL().text + '#' + ctx.IDENTIFIER().text
+        name: ctx.MUL().text + '#' + ctx.IDENTIFIER().text
       }
     }
     visitPointerReferenceExpression(ctx: PointerReferenceExpressionContext): es.Expression {
