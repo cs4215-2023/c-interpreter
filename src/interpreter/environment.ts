@@ -1,8 +1,19 @@
 import { Context, Environment } from '../types'
 
-export const popEnvironment = (context: Context) => context.runtime.environments.shift()
+function currentEnvironment(context: Context): Environment {
+  return context.runtime.environments[0]
+}
 
-export const pushEnvironment = (context: Context, environment: Environment) => {
+function replaceEnvironment(context: Context, environment: Environment): void {
+  context.runtime.environments[0] = environment
+  context.runtime.environmentTree.insert(environment)
+}
+
+export function popEnvironment(context: Context): Environment | undefined {
+  return context.runtime.environments.shift()
+}
+
+export function pushEnvironment(context: Context, environment: Environment): void {
   context.runtime.environments.unshift(environment)
   context.runtime.environmentTree.insert(environment)
 }
