@@ -664,4 +664,61 @@ describe('Binary Operator Tests', () => {
     }
     expect(prog).toEqual(expectedProg)
   })
+  it('Test assignment', () => {
+    const code = 'a = 2;'
+    const prog = parse(code, context)
+    const expectedProg: Program = {
+      type: 'Program',
+      sourceType: 'script',
+      body: [
+        {
+          expression: {
+            expressions: [
+              {
+                left: {
+                  name: 'a',
+                  type: 'Identifier'
+                },
+                loc: {
+                  end: {
+                    column: 4,
+                    line: 1
+                  },
+                  start: {
+                    column: 0,
+                    line: 1
+                  }
+                },
+                operator: '=',
+                right: {
+                  loc: {
+                    end: {
+                      column: 4,
+                      line: 1
+                    },
+                    start: {
+                      column: 4,
+                      line: 1
+                    }
+                  },
+                  raw: '2',
+                  type: 'Literal',
+                  value: 2
+                },
+                type: 'AssignmentExpression'
+              },
+              {
+                expressions: [],
+                type: 'SequenceExpression'
+              }
+            ],
+            type: 'SequenceExpression'
+          },
+          loc: undefined,
+          type: 'ExpressionStatement'
+        }
+      ]
+    }
+    expect(prog).toEqual(expectedProg)
+  })
 })
