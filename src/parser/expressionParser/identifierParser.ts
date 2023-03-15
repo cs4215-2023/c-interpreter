@@ -29,7 +29,7 @@ export const parserIdentifierExpression = <T extends Constructable>(
       }
     }
 
-    visitIdentifier(ctx: IdentifierExpressionContext): es.Expression {
+    visitIdentifierExpression(ctx: IdentifierExpressionContext): es.Expression {
       return {
         type: 'Identifier',
         name: ctx.IDENTIFIER().text
