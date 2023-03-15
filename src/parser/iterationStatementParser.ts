@@ -19,6 +19,23 @@ export class IterationStatementParser
 {
   private expressionParser = new ExpressionParser()
 
+  bodyWrapper(ctx: ForLoopContext | WhileLoopContext | DoWhileLoopContext): es.Statement[] {
+    console.log('body wapper')
+    const body = ctx._body
+
+    if (body == undefined) {
+      return [this.defaultResult()]
+    }
+
+    const statements = new StatementParser().visit(body)
+
+    if (statements.type == 'BlockStatement') {
+      return statements.body
+    } else {
+      return [statements]
+    }
+  }
+
   protected defaultResult(): es.Statement {
     return {
       type: 'EmptyStatement'
@@ -62,7 +79,7 @@ export class IterationStatementParser
       init: this.expressionParser.visit(forCondition._initialise),
       test: this.expressionParser.visit(forCondition._test),
       update: this.expressionParser.visit(forCondition._update),
-      body: new StatementParser().visit(ctx._body)
+      body: { type: 'BlockStatement', body: this.bodyWrapper(ctx) }
     }
   }
 
@@ -70,7 +87,7 @@ export class IterationStatementParser
     return {
       type: 'WhileStatement',
       test: this.expressionParser.visit(ctx._condition),
-      body: new StatementParser().visit(ctx._body)
+      body: { type: 'BlockStatement', body: this.bodyWrapper(ctx) }
     }
   }
 
@@ -78,7 +95,7 @@ export class IterationStatementParser
     return {
       type: 'DoWhileStatement',
       test: this.expressionParser.visit(ctx._condition),
-      body: new StatementParser().visit(ctx._body)
+      body: { type: 'BlockStatement', body: this.bodyWrapper(ctx) }
     }
   }
 }

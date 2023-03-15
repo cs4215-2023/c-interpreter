@@ -28,6 +28,8 @@ export class FunctionParser
 
     const statements = new StatementParser().visit(body)
 
+    console.log(statements)
+
     if (statements.type == 'BlockStatement') {
       return statements.body
     } else {

@@ -1,5 +1,6 @@
 import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
+import { RuleNode } from 'antlr4ts/tree/RuleNode'
 import * as es from 'estree'
 
 import {
@@ -34,6 +35,17 @@ export class StatementParser
       type: 'ExpressionStatement',
       expression: e,
       loc: e.loc
+    }
+  }
+
+  visitChildren(node: RuleNode): es.Statement {
+    const statements: es.Statement[] = []
+    for (let i = 0; i < node.childCount; i++) {
+      statements.push(node.getChild(i).accept(this))
+    }
+    return {
+      type: 'BlockStatement',
+      body: statements
     }
   }
 
