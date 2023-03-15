@@ -11,7 +11,7 @@ export const parserBitwiseOpExpression = <T extends Constructable>(
       console.log('visitBitShiftLeft for ' + ctx._left.text + ' and ' + ctx._right.text)
       return {
         type: 'BinaryExpression',
-        operator: '>>',
+        operator: '<<',
         left: this.visit(ctx._left),
         right: this.visit(ctx._right),
         loc: contextToLocation(ctx)
@@ -22,7 +22,7 @@ export const parserBitwiseOpExpression = <T extends Constructable>(
       console.log('visitBitShiftRight for ' + ctx._left.text + ' and ' + ctx._right.text)
       return {
         type: 'BinaryExpression',
-        operator: '<<',
+        operator: '>>',
         left: this.visit(ctx._left),
         right: this.visit(ctx._right),
         loc: contextToLocation(ctx)
