@@ -24,7 +24,7 @@ export const parserArrayExpression = <T extends Constructable>(
       const expressions = []
       expressions.push(identifier) //first element will always be array metadata
       const content = this.visitArrayContent(ctx.arrayContent()!)
-      expressions.concat(content)
+      expressions.push(...content)
       return {
         type: 'ArrayExpression',
         elements: expressions
