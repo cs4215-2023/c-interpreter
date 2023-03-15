@@ -17,12 +17,10 @@ export const parserFunctionCallExpression = <T extends Constructable>(
       }
     }
 
-    visitFunctionArguments(ctx: FunctionCallParametersContext): es.Expression[] {
+    visitFunctionCallParameters(ctx: FunctionCallParametersContext): es.Expression[] {
       console.log('visitfunctionarguments')
-      const expressions: es.Expression[] = []
-      for (let i = 0; i < ctx.childCount; i++) {
-        expressions.push(this.visit(ctx.getChild(i)))
-      }
+      // only one child
+      const expressions: es.Expression[] = this.visit(ctx.getChild(0))
       return expressions
     }
   }

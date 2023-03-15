@@ -122,9 +122,13 @@ export class StatementParser
 
   visitReturnStatement(ctx: ReturnStatementContext): es.Statement {
     console.log('return statement')
+    let argument = undefined
+    if (ctx._argument != undefined) {
+      argument = new ExpressionParser().visit(ctx._argument)
+    }
     return {
       type: 'ReturnStatement',
-      argument: new ExpressionParser().visit(ctx.expressionStatement().expression())
+      argument: argument
     }
   }
 }
