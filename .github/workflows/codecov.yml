@@ -1,2 +1,7 @@
-- name: Upload coverage reports to Codecov
-  uses: codecov/codecov-action@v3
+on: [push, pull_request]
+
+jobs:
+  build:
+    steps:
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
