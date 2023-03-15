@@ -1,5 +1,12 @@
 /* tslint:disable:max-classes-per-file */
-import { CharStreams, CommonTokenStream } from 'antlr4ts'
+import {
+  CharStreams,
+  CommonTokenStream,
+  ConsoleErrorListener,
+  RecognitionException,
+  Recognizer,
+  Token
+} from 'antlr4ts'
 import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
@@ -8,7 +15,7 @@ import * as es from 'estree'
 import { ClangLexer } from '../lang/ClangLexer'
 import { ClangParser } from '../lang/ClangParser'
 import { ClangVisitor } from '../lang/ClangVisitor'
-import { Context, ErrorSeverity } from '../types'
+import { Context } from '../types'
 import { FatalSyntaxError } from './errors'
 import { StatementParser } from './statementParser'
 
@@ -54,37 +61,54 @@ export class StatementsParser
   }
 }
 
-export function parse(source: string, context: Context): es.Program | undefined {
-  let content: es.Statement[] | undefined
+const syntaxErrorListener = <T extends number | Token>(
+  _recognizer: Recognizer<T, any>,
+  _offendingSymbol: T | undefined,
+  line: number,
+  charPositionInLine: number,
+  _msg: string,
+  _e: RecognitionException | undefined
+): undefined => {
+  throw new FatalSyntaxError(
+    {
+      start: {
+        line: line,
+        column: charPositionInLine
+      },
+      end: {
+        line: line,
+        column: charPositionInLine + 1
+      }
+    },
+    `Syntax error at Line ${line}:${charPositionInLine}`
+  )
+}
 
-  if (context.variant === 'Clang') {
-    const inputStream = CharStreams.fromString(source)
-    const lexer = new ClangLexer(inputStream)
-    const tokenStream = new CommonTokenStream(lexer)
-    const parser = new ClangParser(tokenStream)
-    parser.buildParseTree = true
-    const statementsParser = new StatementsParser()
-    try {
-      const tree = parser.start()
-      content = tree.accept(statementsParser)
-    } catch (error) {
-      if (error instanceof FatalSyntaxError) {
-        context.errors.push(error)
-      } else {
-        throw error
-      }
-    }
-    const hasErrors = context.errors.find(m => m.severity === ErrorSeverity.ERROR)
-    if (content && !hasErrors) {
-      return {
-        type: 'Program',
-        sourceType: 'script',
-        body: content
-      }
-    } else {
-      return undefined
-    }
-  } else {
-    return undefined
+function addCustomErrorListeners(lexer: ClangLexer, parser: ClangParser): void {
+  lexer.removeErrorListener(ConsoleErrorListener.INSTANCE)
+  lexer.addErrorListener({
+    syntaxError: syntaxErrorListener
+  })
+  parser.removeErrorListener(ConsoleErrorListener.INSTANCE)
+  parser.addErrorListener({
+    syntaxError: syntaxErrorListener
+  })
+}
+
+export function parse(source: string, context: Context): es.Program | undefined {
+  const inputStream = CharStreams.fromString(source)
+  const lexer = new ClangLexer(inputStream)
+  const tokenStream = new CommonTokenStream(lexer)
+  const parser = new ClangParser(tokenStream)
+  parser.buildParseTree = true
+  addCustomErrorListeners(lexer, parser)
+  const statementsParser = new StatementsParser()
+  const tree = parser.start()
+  const content = tree.accept(statementsParser)
+
+  return {
+    type: 'Program',
+    sourceType: 'script',
+    body: content
   }
 }
