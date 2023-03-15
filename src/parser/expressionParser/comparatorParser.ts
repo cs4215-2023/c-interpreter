@@ -25,7 +25,7 @@ export const parserComparatorExpression = <T extends Constructable>(
       }
     }
 
-    visitLessThanOrEqual(ctx: LesserThanOrEqualContext): es.Expression {
+    visitLesserThanOrEqual(ctx: LesserThanOrEqualContext): es.Expression {
       return {
         type: 'BinaryExpression',
         operator: '<=',
