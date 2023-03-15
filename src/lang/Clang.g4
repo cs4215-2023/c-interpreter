@@ -112,7 +112,7 @@ expression:
 	| left = expression operator = PLUSEQUAL right = expression				# AssignAndAddOne
 	| operators = SUB argument = expression									# Negative
 	| operators = ADD argument = expression									# Positive
-	| operators = NOT argument = expression									# Not;
+	| operators = NOT argument = parenthesesExpression						# Not;
 
 statementBlock: (statement)*;
 
