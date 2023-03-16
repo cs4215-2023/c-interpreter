@@ -12,6 +12,8 @@ import Closure from './closure'
 import {
   createBlockEnvironment,
   createEnvironment,
+  createLocalEnvironment,
+  currentEnvironment,
   popEnvironment,
   pushEnvironment,
   replaceEnvironment
@@ -20,11 +22,11 @@ import { handleRuntimeError } from './errors'
 import { checkNumberOfArguments } from './utils'
 
 class ReturnValue {
-  constructor(public value: Value) {}
+  constructor(public value: Value) { }
 }
 
 class TailCallReturnValue {
-  constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) {}
+  constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) { }
 }
 
 class Thunk {
@@ -36,10 +38,10 @@ class Thunk {
   }
 }
 
+//not a needed function atm
 function* forceIt(val: any, context: Context): Value {
   if (val instanceof Thunk) {
     if (val.isMemoized) return val.value
-
     pushEnvironment(context, val.env)
     const evalRes = yield* actualValue(val.exp, context)
     popEnvironment(context)
@@ -185,7 +187,12 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   Program: function* (node: es.BlockStatement, context: Context) {
-    const result = yield* forceIt(yield* evaluateBlockStatement(context, node), context);
+    //create new environment in program
+    console.log(currentEnvironment(context)) //this is a null env
+    const environment = createLocalEnvironment(context, 'programEnvironment');
+    pushEnvironment(context, environment);
+    console.log(currentEnvironment(context)) //this is the 'global' env
+    const result = yield* evaluateBlockStatement(context, node)
     return result;
   }
 }
