@@ -12,14 +12,13 @@ import Closure from './closure'
 import {
   createBlockEnvironment,
   createEnvironment,
-  createLocalEnvironment,
   currentEnvironment,
   popEnvironment,
   pushEnvironment,
   replaceEnvironment
 } from './environment'
 import { handleRuntimeError } from './errors'
-import { checkNumberOfArguments } from './utils'
+import { checkNumberOfArguments, scanBlockVariables, scanVariables } from './utils'
 
 class ReturnValue {
   constructor(public value: Value) { }
@@ -59,7 +58,14 @@ export function* actualValue(exp: es.Node, context: Context): Value {
 
 export type Evaluator<T extends es.Node> = (node: T, context: Context) => IterableIterator<Value>
 
+
 function* evaluateBlockStatement(context: Context, node: es.BlockStatement) {
+  //scan block statement here
+  const frame = scanBlockVariables(node.body)
+  const env = createBlockEnvironment(context, 'blockEnvironment', frame)
+  console.log(currentEnvironment(context))
+  pushEnvironment(context, env)
+  console.log(currentEnvironment(context))
   let result
   for (const statement of node.body) {
     result = yield* evaluate(statement, context)
@@ -138,8 +144,25 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     return evaluateBinaryExpression(node.operator, left, right)
   },
 
+  //need to verify this once loops are implemented
   ConditionalExpression: function* (node: es.ConditionalExpression, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+    const result = evaluate(node.test, context)
+    if (result) {
+      const frame = scanVariables(node.consequent)
+      const env = createBlockEnvironment(context, 'blockEnvironment', frame)
+      console.log(currentEnvironment(context))
+      pushEnvironment(context, env)
+      console.log(currentEnvironment(context))
+      return evaluate(node.consequent, context)
+    }
+    else {
+      const frame = scanVariables(node.alternate)
+      const env = createBlockEnvironment(context, 'blockEnvironment', frame)
+      console.log(currentEnvironment(context))
+      pushEnvironment(context, env)
+      console.log(currentEnvironment(context))
+      return evaluate(node.alternate, context)
+    }
   },
 
   LogicalExpression: function* (node: es.LogicalExpression, context: Context) {
@@ -165,7 +188,26 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   IfStatement: function* (node: es.IfStatement | es.ConditionalExpression, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+    const result = evaluate(node.test, context)
+    if (result) {
+      const cons = node.consequent as es.BlockStatement
+      const frame = scanBlockVariables(cons.body)
+      const env = createBlockEnvironment(context, 'ifEnvironment', frame)
+      pushEnvironment(context, env)
+      console.log(currentEnvironment(context))
+      return evaluate(node.consequent, context)
+    }
+    else {
+      if (node.alternate == null || node.alternate == undefined) { return undefined }
+      else {
+        const alt = node.alternate as es.BlockStatement
+        const frame = scanBlockVariables(alt.body)
+        const env = createBlockEnvironment(context, 'elseEnvironment', frame)
+        pushEnvironment(context, env)
+        console.log(currentEnvironment(context))
+        return evaluate(node.alternate, context)
+      }
+    }
   },
 
   ExpressionStatement: function* (node: es.ExpressionStatement, context: Context) {
@@ -189,7 +231,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   Program: function* (node: es.BlockStatement, context: Context) {
     //create new environment in program
     console.log(currentEnvironment(context)) //this is a null env
-    const environment = createLocalEnvironment(context, 'programEnvironment');
+    const environment = createBlockEnvironment(context, 'globalEnvironment');
     pushEnvironment(context, environment);
     console.log(currentEnvironment(context)) //this is the 'global' env
     const result = yield* evaluateBlockStatement(context, node)

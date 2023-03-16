@@ -32,18 +32,6 @@ export function createEnvironment(
   return environment
 }
 
-export function createLocalEnvironment(
-  context: Context,
-  name = 'localEnvironment',
-): Environment {
-  return {
-    name,
-    tail: currentEnvironment(context),
-    head: {},
-    id: uniqueId(),
-  };
-}
-
 export function createBlockEnvironment(
   context: Context,
   name = 'blockEnvironment',
