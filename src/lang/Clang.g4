@@ -161,7 +161,7 @@ arrayInitialisation:
 		| stringLiteral
 	)?;
 
-pointer: PRIMITIVETYPE '*' IDENTIFIER;
+pointer: idType = type '*' id = IDENTIFIER;
 
 pointerDerefernce: operator = MUL argument = IDENTIFIER;
 
