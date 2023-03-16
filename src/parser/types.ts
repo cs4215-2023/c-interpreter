@@ -138,6 +138,14 @@ export type Pattern = Identifier
 export interface Identifier extends BaseExpression {
   type: 'Identifier'
   name: string
+  primitiveType: PrimitiveType | undefined
+}
+
+export interface PointerIdentifier extends BaseExpression {
+  type: 'PointerIdentifier'
+  name: string
+  primitiveType: PrimitiveType
+  pointedAddress: undefined
 }
 
 /**

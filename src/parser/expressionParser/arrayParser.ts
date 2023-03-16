@@ -74,7 +74,7 @@ export const parserArrayExpression = <T extends Constructable>(
     visitArrayIdentifierWithType(ctx: ArrayIdentifierWithTypeContext): es.Expression {
       console.log('visitarrayidentifierwithtypecontext')
       const type = new TypeParser().visit(ctx._idType)
-      const identifier = tokenToIdentifierWrapper(ctx._id)
+      const identifier = tokenToIdentifierWrapper(ctx._id, type)
       return {
         type: 'Identifier',
         name: identifier.name + '#' + type.valueType

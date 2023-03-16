@@ -11,7 +11,7 @@ export const parserFunctionCallExpression = <T extends Constructable>(
       console.log('visitFunctioncall')
       return {
         type: 'CallExpression',
-        callee: tokenToIdentifierWrapper(ctx._func),
+        callee: tokenToIdentifierWrapper(ctx._func, undefined),
         arguments: this.visit(ctx._args),
         optional: false
       }

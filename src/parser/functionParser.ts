@@ -80,7 +80,7 @@ export class FunctionParser
     console.log('func type is: ', type)
     return {
       type: 'FunctionDeclaration',
-      id: tokenToIdentifierWrapper(ctx._funcName),
+      id: tokenToIdentifierWrapper(ctx._funcName, type),
       body: { type: 'BlockStatement', body: this.bodyWrapper(ctx) },
       params: this.paramsWrapper(ctx)
     }
