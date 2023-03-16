@@ -3,9 +3,28 @@ import { Program } from 'estree'
 import createContext from '../../createContext'
 import { Variant } from '../../types'
 import { parse } from '../parser'
+import { Identifier } from '../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
+
+const parameterA: Identifier = {
+  name: 'a',
+  type: 'Identifier',
+  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+}
+
+const idVoidType: Identifier = {
+  name: 'foo',
+  type: 'Identifier',
+  primitiveType: { type: 'PrimitiveType', valueType: 'void', signed: undefined }
+}
+
+const idIntType: Identifier = {
+  name: 'foo',
+  type: 'Identifier',
+  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+}
 
 describe('Return statements', () => {
   it('Returns an empty Program for the empty string', () => {
@@ -25,16 +44,8 @@ describe('Return statements', () => {
             ],
             type: 'BlockStatement'
           },
-          id: {
-            name: 'foo',
-            type: 'Identifier'
-          },
-          params: [
-            {
-              name: 'a#int',
-              type: 'Identifier'
-            }
-          ],
+          id: idVoidType,
+          params: [parameterA],
           type: 'FunctionDeclaration'
         }
       ]
@@ -73,16 +84,8 @@ describe('Return statements', () => {
             ],
             type: 'BlockStatement'
           },
-          id: {
-            name: 'foo',
-            type: 'Identifier'
-          },
-          params: [
-            {
-              name: 'a#int',
-              type: 'Identifier'
-            }
-          ],
+          id: idIntType,
+          params: [parameterA],
           type: 'FunctionDeclaration'
         }
       ]

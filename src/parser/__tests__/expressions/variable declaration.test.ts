@@ -4,6 +4,7 @@ import createContext from '../../../createContext'
 import { Variant } from '../../../types'
 import { FatalSyntaxError } from '../../errors'
 import { parse } from '../../parser'
+import { Identifier } from '../../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
@@ -12,6 +13,17 @@ describe('Variable declarations', () => {
   it('Test 1 declaration', () => {
     const code = 'int a;'
     const prog = parse(code, context)
+
+    const identifier: Identifier = {
+      name: 'a',
+      primitiveType: {
+        signed: undefined,
+        type: 'PrimitiveType',
+        valueType: 'int'
+      },
+      type: 'Identifier'
+    }
+
     const expectedProg: Program = {
       type: 'Program',
       sourceType: 'script',
@@ -19,10 +31,7 @@ describe('Variable declarations', () => {
         {
           expression: {
             expressions: [
-              {
-                name: 'a#int',
-                type: 'Identifier'
-              },
+              identifier,
               {
                 expressions: [],
                 type: 'SequenceExpression'
@@ -41,19 +50,34 @@ describe('Variable declarations', () => {
   it('Test multiple declarations on different lines', () => {
     const code = 'int a; int b;'
     const prog = parse(code, context)
+
+    const identifierA: Identifier = {
+      name: 'a',
+      primitiveType: {
+        signed: undefined,
+        type: 'PrimitiveType',
+        valueType: 'int'
+      },
+      type: 'Identifier'
+    }
+
+    const identifierB: Identifier = {
+      name: 'b',
+      primitiveType: {
+        signed: undefined,
+        type: 'PrimitiveType',
+        valueType: 'int'
+      },
+      type: 'Identifier'
+    }
+
     const expectedProg: Program = {
       type: 'Program',
       sourceType: 'script',
       body: [
         {
           expression: {
-            expressions: [
-              {
-                name: 'a#int',
-                type: 'Identifier'
-              },
-              { expressions: [], type: 'SequenceExpression' }
-            ],
+            expressions: [identifierA, { expressions: [], type: 'SequenceExpression' }],
             type: 'SequenceExpression'
           },
           loc: undefined,
@@ -62,10 +86,7 @@ describe('Variable declarations', () => {
         {
           expression: {
             expressions: [
-              {
-                name: 'b#int',
-                type: 'Identifier'
-              },
+              identifierB,
               {
                 expressions: [],
                 type: 'SequenceExpression'

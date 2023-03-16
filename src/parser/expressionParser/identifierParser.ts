@@ -1,5 +1,3 @@
-import * as es from 'estree'
-
 import {
   IdentifierExpressionContext,
   IdentifierWithTypeContext,

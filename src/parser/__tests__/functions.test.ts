@@ -3,14 +3,34 @@ import { Program } from 'estree'
 import createContext from '../../createContext'
 import { Variant } from '../../types'
 import { parse } from '../parser'
+import { Identifier } from '../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
+
+const parameterA: Identifier = {
+  name: 'a',
+  type: 'Identifier',
+  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+}
+
+const parameterB: Identifier = {
+  name: 'b',
+  type: 'Identifier',
+  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+}
+
+const id: Identifier = {
+  name: 'foo',
+  type: 'Identifier',
+  primitiveType: { type: 'PrimitiveType', valueType: 'void', signed: undefined }
+}
 
 describe('Function related tests', () => {
   it('Test function with no body', () => {
     const code = 'void foo(int a) {}'
     const prog = parse(code, context)
+
     const expectedProg: Program = {
       type: 'Program',
       sourceType: 'script',
@@ -20,16 +40,8 @@ describe('Function related tests', () => {
             body: [],
             type: 'BlockStatement'
           },
-          id: {
-            name: 'foo',
-            type: 'Identifier'
-          },
-          params: [
-            {
-              name: 'a#int',
-              type: 'Identifier'
-            }
-          ],
+          id: id,
+          params: [parameterA],
           type: 'FunctionDeclaration'
         }
       ]
@@ -40,6 +52,19 @@ describe('Function related tests', () => {
   it('Test function with body', () => {
     const code = `void foo(int a) {int b = 1; int c = a + b;}`
     const prog = parse(code, context)
+
+    const bodyB: Identifier = {
+      name: 'b',
+      type: 'Identifier',
+      primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+    }
+
+    const bodyC: Identifier = {
+      name: 'c',
+      type: 'Identifier',
+      primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+    }
+
     const expectedProg: Program = {
       type: 'Program',
       sourceType: 'script',
@@ -51,10 +76,7 @@ describe('Function related tests', () => {
                 expression: {
                   expressions: [
                     {
-                      left: {
-                        name: 'b#int',
-                        type: 'Identifier'
-                      },
+                      left: bodyB,
                       loc: {
                         end: {
                           column: 25,
@@ -97,10 +119,7 @@ describe('Function related tests', () => {
                 expression: {
                   expressions: [
                     {
-                      left: {
-                        name: 'c#int',
-                        type: 'Identifier'
-                      },
+                      left: bodyC,
                       loc: {
                         end: {
                           column: 40,
@@ -149,16 +168,8 @@ describe('Function related tests', () => {
             ],
             type: 'BlockStatement'
           },
-          id: {
-            name: 'foo',
-            type: 'Identifier'
-          },
-          params: [
-            {
-              name: 'a#int',
-              type: 'Identifier'
-            }
-          ],
+          id: id,
+          params: [parameterA],
           type: 'FunctionDeclaration'
         }
       ]
@@ -178,20 +189,8 @@ describe('Function related tests', () => {
             body: [],
             type: 'BlockStatement'
           },
-          id: {
-            name: 'foo',
-            type: 'Identifier'
-          },
-          params: [
-            {
-              name: 'a#int',
-              type: 'Identifier'
-            },
-            {
-              name: 'b#int',
-              type: 'Identifier'
-            }
-          ],
+          id: id,
+          params: [parameterA, parameterB],
           type: 'FunctionDeclaration'
         }
       ]
@@ -211,20 +210,8 @@ describe('Function related tests', () => {
             body: [],
             type: 'BlockStatement'
           },
-          id: {
-            name: 'foo',
-            type: 'Identifier'
-          },
-          params: [
-            {
-              name: 'a#int',
-              type: 'Identifier'
-            },
-            {
-              name: 'b#int',
-              type: 'Identifier'
-            }
-          ],
+          id: id,
+          params: [parameterA, parameterB],
           type: 'FunctionDeclaration'
         },
         {

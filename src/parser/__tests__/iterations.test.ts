@@ -3,9 +3,46 @@ import { Program } from 'estree'
 import createContext from '../../createContext'
 import { Variant } from '../../types'
 import { parse } from '../parser'
+import { Identifier } from '../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
+
+const variableIWithType: Identifier = {
+  name: 'i',
+  type: 'Identifier',
+  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+}
+
+const variableIWithNoType: Identifier = {
+  name: 'i',
+  type: 'Identifier',
+  primitiveType: undefined
+}
+
+const variableBWithType: Identifier = {
+  name: 'b',
+  type: 'Identifier',
+  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+}
+
+const variableBWithNoType: Identifier = {
+  name: 'b',
+  type: 'Identifier',
+  primitiveType: undefined
+}
+
+const variableAWithNoType: Identifier = {
+  name: 'a',
+  type: 'Identifier',
+  primitiveType: undefined
+}
+
+const variableCWithType: Identifier = {
+  name: 'c',
+  type: 'Identifier',
+  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+}
 
 describe('Iterative Statements', () => {
   it('Test for ', () => {
@@ -21,10 +58,7 @@ describe('Iterative Statements', () => {
             type: 'BlockStatement'
           },
           init: {
-            left: {
-              name: 'i#int',
-              type: 'Identifier'
-            },
+            left: variableIWithType,
             loc: {
               end: {
                 column: 13,
@@ -54,10 +88,7 @@ describe('Iterative Statements', () => {
             type: 'AssignmentExpression'
           },
           test: {
-            left: {
-              name: 'i',
-              type: 'Identifier'
-            },
+            left: variableIWithNoType,
             loc: {
               end: {
                 column: 20,
@@ -88,10 +119,7 @@ describe('Iterative Statements', () => {
           },
           type: 'ForStatement',
           update: {
-            argument: {
-              name: 'i',
-              type: 'Identifier'
-            },
+            argument: variableIWithNoType,
             operator: '++',
             prefix: false,
             type: 'UpdateExpression'
@@ -116,10 +144,7 @@ describe('Iterative Statements', () => {
                 expression: {
                   expressions: [
                     {
-                      left: {
-                        name: 'b#int',
-                        type: 'Identifier'
-                      },
+                      left: variableBWithType,
                       loc: {
                         end: {
                           column: 38,
@@ -162,10 +187,7 @@ describe('Iterative Statements', () => {
                 expression: {
                   expressions: [
                     {
-                      left: {
-                        name: 'c#int',
-                        type: 'Identifier'
-                      },
+                      left: variableCWithType,
                       loc: {
                         end: {
                           column: 53,
@@ -178,10 +200,7 @@ describe('Iterative Statements', () => {
                       },
                       operator: '=',
                       right: {
-                        left: {
-                          name: 'a',
-                          type: 'Identifier'
-                        },
+                        left: variableAWithNoType,
                         loc: {
                           end: {
                             column: 53,
@@ -193,10 +212,7 @@ describe('Iterative Statements', () => {
                           }
                         },
                         operator: '+',
-                        right: {
-                          name: 'b',
-                          type: 'Identifier'
-                        },
+                        right: variableBWithNoType,
                         type: 'BinaryExpression'
                       },
                       type: 'AssignmentExpression'
@@ -215,10 +231,7 @@ describe('Iterative Statements', () => {
             type: 'BlockStatement'
           },
           init: {
-            left: {
-              name: 'i#int',
-              type: 'Identifier'
-            },
+            left: variableIWithType,
             loc: {
               end: {
                 column: 13,
@@ -248,10 +261,7 @@ describe('Iterative Statements', () => {
             type: 'AssignmentExpression'
           },
           test: {
-            left: {
-              name: 'i',
-              type: 'Identifier'
-            },
+            left: variableIWithNoType,
             loc: {
               end: {
                 column: 20,
@@ -282,10 +292,7 @@ describe('Iterative Statements', () => {
           },
           type: 'ForStatement',
           update: {
-            argument: {
-              name: 'i',
-              type: 'Identifier'
-            },
+            argument: variableIWithNoType,
             operator: '++',
             prefix: false,
             type: 'UpdateExpression'
@@ -325,7 +332,7 @@ describe('Iterative Statements', () => {
   })
 
   it('Test while with body', () => {
-    const code = 'while (i--) {int a = 2; int b = 3 + a;}'
+    const code = 'while (i--) {int b = 2; int c = 3 + a;}'
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
@@ -338,10 +345,7 @@ describe('Iterative Statements', () => {
                 expression: {
                   expressions: [
                     {
-                      left: {
-                        name: 'a#int',
-                        type: 'Identifier'
-                      },
+                      left: variableBWithType,
                       loc: {
                         end: {
                           column: 21,
@@ -384,10 +388,7 @@ describe('Iterative Statements', () => {
                 expression: {
                   expressions: [
                     {
-                      left: {
-                        name: 'b#int',
-                        type: 'Identifier'
-                      },
+                      left: variableCWithType,
                       loc: {
                         end: {
                           column: 36,
@@ -426,10 +427,7 @@ describe('Iterative Statements', () => {
                           }
                         },
                         operator: '+',
-                        right: {
-                          name: 'a',
-                          type: 'Identifier'
-                        },
+                        right: variableAWithNoType,
                         type: 'BinaryExpression'
                       },
                       type: 'AssignmentExpression'
@@ -448,10 +446,7 @@ describe('Iterative Statements', () => {
             type: 'BlockStatement'
           },
           test: {
-            argument: {
-              name: 'i',
-              type: 'Identifier'
-            },
+            argument: variableIWithNoType,
             operator: '--',
             prefix: false,
             type: 'UpdateExpression'
@@ -492,7 +487,7 @@ describe('Iterative Statements', () => {
   })
 
   it('Test do while with body', () => {
-    const code = 'do {int a = 1; int c = 10 - a;} while (i--);'
+    const code = 'do {int b = 1; int c = 10 - b;} while (i--);'
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
@@ -505,10 +500,7 @@ describe('Iterative Statements', () => {
                 expression: {
                   expressions: [
                     {
-                      left: {
-                        name: 'a#int',
-                        type: 'Identifier'
-                      },
+                      left: variableBWithType,
                       loc: {
                         end: {
                           column: 12,
@@ -551,10 +543,7 @@ describe('Iterative Statements', () => {
                 expression: {
                   expressions: [
                     {
-                      left: {
-                        name: 'c#int',
-                        type: 'Identifier'
-                      },
+                      left: variableCWithType,
                       loc: {
                         end: {
                           column: 28,
@@ -593,10 +582,7 @@ describe('Iterative Statements', () => {
                           }
                         },
                         operator: '-',
-                        right: {
-                          name: 'a',
-                          type: 'Identifier'
-                        },
+                        right: variableBWithNoType,
                         type: 'BinaryExpression'
                       },
                       type: 'AssignmentExpression'
@@ -615,10 +601,7 @@ describe('Iterative Statements', () => {
             type: 'BlockStatement'
           },
           test: {
-            argument: {
-              name: 'i',
-              type: 'Identifier'
-            },
+            argument: variableIWithNoType,
             operator: '--',
             prefix: false,
             type: 'UpdateExpression'
