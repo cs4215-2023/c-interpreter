@@ -133,7 +133,7 @@ export interface ConditionalExpression extends BaseExpression {
   consequent: Expression
 }
 
-export type Pattern = Identifier
+export type Pattern = Identifier | PointerIdentifier
 
 export interface Identifier extends BaseExpression {
   type: 'Identifier'
@@ -141,11 +141,15 @@ export interface Identifier extends BaseExpression {
   primitiveType: PrimitiveType | undefined
 }
 
+// Have to be the same type as Identifier otherwise an error is thrown by acorn
 export interface PointerIdentifier extends BaseExpression {
-  type: 'PointerIdentifier'
+  type: 'Identifier'
   name: string
-  primitiveType: PrimitiveType
-  pointedAddress: undefined
+  primitiveType: PrimitiveType | undefined
+  pointingAddress: undefined
+  pointerAddress: undefined
+  isReferenced: boolean
+  isDereferenced: boolean
 }
 
 /**

@@ -1,5 +1,3 @@
-import * as es from 'estree'
-
 import {
   PointerContext,
   PointerDereferenceExpressionContext,
@@ -8,40 +6,60 @@ import {
   PointerReferenceContext,
   PointerReferenceExpressionContext
 } from '../../lang/ClangParser'
+import { TypeParser } from '../typeParser'
+import { PointerIdentifier } from '../types'
 import { Constructable } from '../util'
 
 export const parserPointerExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    visitPointer(ctx: PointerContext): es.Expression {
+    typeParser = new TypeParser()
+    visitPointer(ctx: PointerContext): PointerIdentifier {
       console.log('pointercontext')
+      const type = this.typeParser.visit(ctx._idType)
       return {
         type: 'Identifier',
-        name: ctx.MUL().text + '#' + ctx.IDENTIFIER().text
+        name: ctx.IDENTIFIER().text,
+        primitiveType: type,
+        pointerAddress: undefined,
+        pointingAddress: undefined,
+        isReferenced: false,
+        isDereferenced: false
       }
     }
-    visitPointerExpression(ctx: PointerExpressionContext): es.Expression {
+    visitPointerExpression(ctx: PointerExpressionContext): PointerIdentifier {
       return this.visit(ctx.pointer())
     }
-    visitPointerDereferenceExpression(ctx: PointerDereferenceExpressionContext): es.Expression {
+    visitPointerDereferenceExpression(ctx: PointerDereferenceExpressionContext): PointerIdentifier {
       return this.visit(ctx.pointerDerefernce())
     }
-    visitPointerDerefernce(ctx: PointerDerefernceContext): es.Expression {
+
+    visitPointerDerefernce(ctx: PointerDerefernceContext): PointerIdentifier {
       console.log('pointerdereferencecontext')
       return {
         type: 'Identifier',
-        name: ctx.MUL().text + ctx.MUL().text + '#' + ctx.IDENTIFIER().text
+        name: ctx.IDENTIFIER().text,
+        primitiveType: undefined,
+        pointerAddress: undefined,
+        pointingAddress: undefined,
+        isReferenced: false,
+        isDereferenced: true
       }
     }
-    visitPointerReferenceExpression(ctx: PointerReferenceExpressionContext): es.Expression {
+    visitPointerReferenceExpression(ctx: PointerReferenceExpressionContext): PointerIdentifier {
       return this.visit(ctx.pointerReference())
     }
-    visitPointerReference(ctx: PointerReferenceContext): es.Expression {
+    visitPointerReference(ctx: PointerReferenceContext): PointerIdentifier {
       console.log('pointerreferencecontext')
       return {
         type: 'Identifier',
-        name: ctx.BITWISEAND().text + '#' + ctx.IDENTIFIER().text
+        name: ctx.IDENTIFIER().text,
+        primitiveType: undefined,
+        pointerAddress: undefined,
+        pointingAddress: undefined,
+        isReferenced: true,
+        isDereferenced: false
       }
     }
   }

@@ -16,7 +16,6 @@ export const parserIdentifierExpression = <T extends Constructable>(
       return this.visitIdentifierWithType(ctx.identifierWithType())
     }
 
-    // Returns an Identifier with the name in the format <name>#<type>
     visitIdentifierWithType(ctx: IdentifierWithTypeContext): Identifier {
       console.log('visitIdentifierWithType')
       const type = new TypeParser().visit(ctx._idType)
