@@ -21,11 +21,11 @@ import { handleRuntimeError } from './errors'
 import { checkNumberOfArguments, scanBlockVariables, scanVariables } from './utils'
 
 class ReturnValue {
-  constructor(public value: Value) { }
+  constructor(public value: Value) {}
 }
 
 class TailCallReturnValue {
-  constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) { }
+  constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) {}
 }
 
 class Thunk {
@@ -57,7 +57,6 @@ export function* actualValue(exp: es.Node, context: Context): Value {
 }
 
 export type Evaluator<T extends es.Node> = (node: T, context: Context) => IterableIterator<Value>
-
 
 function* evaluateBlockStatement(context: Context, node: es.BlockStatement) {
   //scan block statement here
@@ -147,22 +146,13 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   //need to verify this once loops are implemented
   ConditionalExpression: function* (node: es.ConditionalExpression, context: Context) {
     const result = evaluate(node.test, context)
-    if (result) {
-      const frame = scanVariables(node.consequent)
-      const env = createBlockEnvironment(context, 'blockEnvironment', frame)
-      console.log(currentEnvironment(context))
-      pushEnvironment(context, env)
-      console.log(currentEnvironment(context))
-      return evaluate(node.consequent, context)
-    }
-    else {
-      const frame = scanVariables(node.alternate)
-      const env = createBlockEnvironment(context, 'blockEnvironment', frame)
-      console.log(currentEnvironment(context))
-      pushEnvironment(context, env)
-      console.log(currentEnvironment(context))
-      return evaluate(node.alternate, context)
-    }
+	const targetNode = result ? node.consequent : node.alternate
+	const frame = result ? scanVariables(node.consequent) : scanVariables(node.alternate)
+	const env = createBlockEnvironment(context, 'blockEnvironment', frame)
+    console.log(currentEnvironment(context))
+    pushEnvironment(context, env)
+    console.log(currentEnvironment(context))
+    return evaluate(targetNode, context)
   },
 
   LogicalExpression: function* (node: es.LogicalExpression, context: Context) {
