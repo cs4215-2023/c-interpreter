@@ -28,6 +28,8 @@ interface BaseFunction extends BaseNode {
   body: BlockStatement
 }
 
+export type Node = Program | Statement | Expression
+
 type BaseStatement = BaseNode
 
 export interface ExpressionStatement extends BaseStatement {
@@ -39,9 +41,14 @@ export interface EmptyStatement extends BaseStatement {
   type: 'EmptyStatement'
 }
 
+export interface ReturnStatement extends BaseStatement {
+  type: 'ReturnStatement'
+  argument?: Expression | null | undefined
+}
+
 export type Function = FunctionDeclaration
 
-export type Statement = Declaration | ExpressionStatement | EmptyStatement
+export type Statement = Declaration | ExpressionStatement | EmptyStatement | ReturnStatement
 
 export type Declaration = FunctionDeclaration | VariableDeclaration
 
@@ -75,8 +82,19 @@ export type Expression =
   | ConditionalExpression
   | UpdateExpression
   | EmptyExpression
+  | SequenceExpression
+  | CallExpression
 
 export type BaseExpression = BaseNode
+
+interface BaseCallExpression extends BaseExpression {
+  callee: Expression
+  arguments: Array<Expression>
+}
+
+export interface CallExpression extends BaseCallExpression {
+  type: 'CallExpression'
+}
 
 export interface IdentifierWithTypeExpression extends BaseExpression {
   type: 'IdentifierWithTypeExpression'
@@ -133,6 +151,11 @@ export interface ConditionalExpression extends BaseExpression {
   consequent: Expression
 }
 
+export interface SequenceExpression extends BaseExpression {
+  type: 'SequenceExpression'
+  expressions: Array<Expression>
+}
+
 export type Pattern = Identifier | PointerIdentifier
 
 export interface Identifier extends BaseExpression {
@@ -178,6 +201,7 @@ export interface Float extends BaseLiteral {
 
 export interface Void extends BaseLiteral {
   valueType: 'void'
+  value: undefined
 }
 export type Literal = Integer | Float | Character | Void
 

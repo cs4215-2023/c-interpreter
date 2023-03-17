@@ -1,4 +1,4 @@
-import { BinaryOperator, UnaryOperator } from '../parser/types'
+import { BinaryOperator, LogicalOperator, UnaryOperator } from '../parser/types'
 import { Thunk } from '../types'
 
 export function forceIt(val: Thunk | any): any {
@@ -54,6 +54,17 @@ export function evaluateBinaryExpression(operator: BinaryOperator, left: any, ri
       return left > right
     case '>=':
       return left >= right
+    default:
+      return undefined
+  }
+}
+
+export function evaluateLogicalExpression(operator: LogicalOperator, left: any, right: any) {
+  switch (operator) {
+    case '&&':
+      return left && right
+    case '||':
+      return left || right
     default:
       return undefined
   }

@@ -5,10 +5,10 @@
 
 /* tslint:disable:max-classes-per-file */
 
-import { SourceLocation } from 'acorn'
 import * as es from 'estree'
 
 import { EnvTree } from './createContext'
+import { CallExpression, Node, SourceLocation } from './parser/types'
 
 /**
  * Defines functions that act as built-ins, but might rely on
@@ -42,11 +42,11 @@ export interface SourceError {
   elaborate(): string
 }
 
-export interface Rule<T extends es.Node> {
+export interface Rule<T extends Node> {
   name: string
   disableForVariants?: Variant[]
   checkers: {
-    [name: string]: (node: T, ancestors: es.Node[]) => SourceError[]
+    [name: string]: (node: T, ancestors: Node[]) => SourceError[]
   }
 }
 
@@ -100,7 +100,7 @@ export interface Context<T = any> {
     isRunning: boolean
     environmentTree: EnvTree
     environments: Environment[]
-    nodes: es.Node[]
+    nodes: Node[]
   }
 
   numberOfOuterEnvironments: number
@@ -155,7 +155,7 @@ export interface BlockFrame {
   // For certain type of BlockFrames, we also want to take into account
   // the code directly outside the curly braces as there
   // may be variables declared there as well, such as in function definitions or for loops
-  enclosingLoc?: es.SourceLocation | null
+  enclosingLoc?: SourceLocation | null
   children: (DefinitionNode | BlockFrame)[]
 }
 
@@ -178,7 +178,7 @@ export interface Environment {
   id: string
   name: string
   tail: Environment | null
-  callExpression?: es.CallExpression
+  callExpression?: CallExpression
   head: Frame
   thisContext?: Value
 }

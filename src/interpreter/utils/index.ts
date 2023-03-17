@@ -1,12 +1,13 @@
 import * as es from 'estree'
 
 import * as errors from '../../errors/errors'
+import { CallExpression, ConditionalExpression, LogicalExpression } from '../../parser/types'
 import { Context, Frame, Value } from '../../types'
 import { conditionalExpression, literal } from '../../utils/astCreator'
 import * as rttc from '../../utils/rttc'
 import Closure from '../closure'
 import { handleRuntimeError } from '../errors'
-import { actualValue } from '../interpreter'
+import { evaluate } from '../interpreter'
 
 export function checkNumberOfArguments(
   context: Context,
@@ -76,10 +77,10 @@ export function scanVariables(node: es.Statement | es.Expression): string[] {
 }
 
 export function* reduceIf(
-  node: es.IfStatement | es.ConditionalExpression,
+  node: ConditionalExpression,
   context: Context
-): IterableIterator<null | es.Node> {
-  const test = yield* actualValue(node.test, context)
+): IterableIterator<null | Node> {
+  const test = evaluate(node.test, context)
 
   const error = rttc.checkIfStatement(node, test)
   if (error) {
@@ -89,18 +90,10 @@ export function* reduceIf(
   return test ? node.consequent : node.alternate
 }
 
-export function transformLogicalExpression(node: es.LogicalExpression): es.ConditionalExpression {
-  if (node.operator === '&&') {
-    return conditionalExpression(node.left, node.right, literal(false), node.loc!)
-  } else {
-    return conditionalExpression(node.left, literal(true), node.right, node.loc!)
-  }
-}
-
-export function* getArgs(context: Context, call: es.CallExpression) {
+export function* getArgs(context: Context, call: CallExpression) {
   const args = []
   for (const arg of call.arguments) {
-    args.push(yield* actualValue(arg, context))
+    args.push(evaluate(arg, context))
   }
 
   return args
