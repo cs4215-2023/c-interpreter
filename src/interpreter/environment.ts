@@ -1,14 +1,13 @@
-import * as es from 'estree'
 import { isEmpty, uniqueId } from 'lodash'
 
+import { CallExpression } from '../parser/types'
 import { Context, Environment, Frame, Value } from '../types'
-import { primitive } from '../utils/astCreator'
 import Closure from './closure'
 
 export function createEnvironment(
   closure: Closure,
   args: Value[],
-  callExpression?: es.CallExpression
+  callExpression?: CallExpression
 ): Environment {
   const environment: Environment = {
     name: closure.functionName, // TODO: Change this
@@ -16,19 +15,20 @@ export function createEnvironment(
     head: {},
     id: uniqueId()
   }
-  if (callExpression) {
-    environment.callExpression = {
-      ...callExpression,
-      arguments: args.map(primitive)
-    }
-  }
-  closure.node.params.forEach((param, index) => {
-    if (param.type === 'RestElement') {
-      environment.head[(param.argument as es.Identifier).name] = args.slice(index)
-    } else {
-      environment.head[(param as es.Identifier).name] = args[index]
-    }
-  })
+  // TODO: UPDATE THE CALL EXPRESSION
+  //   if (callExpression) {
+  //     environment.callExpression = {
+  //       ...callExpression,
+  //       arguments: args.map(primitive)
+  //     }
+  //   }
+  //   closure.node.params.forEach((param, index) => {
+  //     if (param.type === 'RestElement') {
+  //       environment.head[(param.argument as es.Identifier).name] = args.slice(index)
+  //     } else {
+  //       environment.head[(param as es.Identifier).name] = args[index]
+  //     }
+  //   })
   return environment
 }
 

@@ -3,10 +3,10 @@
 import { baseGenerator, generate } from 'astring'
 import * as es from 'estree'
 
+import { CallExpression, Node, VariableDeclaration } from '../parser/types'
 import { ErrorSeverity, ErrorType, SourceError, Value } from '../types'
 import { stringify } from '../utils/stringify'
 import { RuntimeSourceError } from './runtimeSourceError'
-import { CallExpression, Node, VariableDeclaration } from '../parser/types'
 
 export class InterruptedError extends RuntimeSourceError {
   constructor(node: Node) {

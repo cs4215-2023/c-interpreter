@@ -1,4 +1,4 @@
-import { BaseDeclaration, BlockStatement } from 'estree'
+import { BaseDeclaration } from 'estree'
 
 export interface Position {
   /** >= 1 */
@@ -15,7 +15,7 @@ export interface SourceLocation {
 
 interface BaseNode {
   type: string
-  loc?: SourceLocation
+  loc?: SourceLocation | null
 }
 
 export interface Program extends BaseNode {
@@ -31,6 +31,12 @@ interface BaseFunction extends BaseNode {
 export type Node = Program | Statement | Expression
 
 type BaseStatement = BaseNode
+
+export interface BlockStatement extends BaseStatement {
+  type: 'BlockStatement'
+  body: Array<Statement>
+  innerComments?: Array<Comment> | undefined
+}
 
 export interface ExpressionStatement extends BaseStatement {
   type: 'ExpressionStatement'
@@ -48,7 +54,12 @@ export interface ReturnStatement extends BaseStatement {
 
 export type Function = FunctionDeclaration
 
-export type Statement = Declaration | ExpressionStatement | EmptyStatement | ReturnStatement
+export type Statement =
+  | Declaration
+  | ExpressionStatement
+  | EmptyStatement
+  | ReturnStatement
+  | BlockStatement
 
 export type Declaration = FunctionDeclaration | VariableDeclaration
 
@@ -84,6 +95,7 @@ export type Expression =
   | EmptyExpression
   | SequenceExpression
   | CallExpression
+  | AssignmentExpression
 
 export type BaseExpression = BaseNode
 
@@ -201,8 +213,9 @@ export interface Float extends BaseLiteral {
 
 export interface Void extends BaseLiteral {
   valueType: 'void'
-  value: undefined
+  value: null
 }
+
 export type Literal = Integer | Float | Character | Void
 
 export type UnaryOperator = '-' | '+' | '!' | '&' | '*'
