@@ -2,6 +2,7 @@ import * as es from 'estree'
 
 import * as errors from '../../errors/errors'
 import { Context, Frame, Value } from '../../types'
+import { conditionalExpression, literal } from '../../utils/astCreator'
 import * as rttc from '../../utils/rttc'
 import Closure from '../closure'
 import { handleRuntimeError } from '../errors'
@@ -86,4 +87,21 @@ export function* reduceIf(
   }
 
   return test ? node.consequent : node.alternate
+}
+
+export function transformLogicalExpression(node: es.LogicalExpression): es.ConditionalExpression {
+  if (node.operator === '&&') {
+    return conditionalExpression(node.left, node.right, literal(false), node.loc!)
+  } else {
+    return conditionalExpression(node.left, literal(true), node.right, node.loc!)
+  }
+}
+
+export function* getArgs(context: Context, call: es.CallExpression) {
+  const args = []
+  for (const arg of call.arguments) {
+    args.push(yield* actualValue(arg, context))
+  }
+
+  return args
 }

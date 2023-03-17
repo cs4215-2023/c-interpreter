@@ -18,7 +18,14 @@ import {
   replaceEnvironment
 } from './environment'
 import { handleRuntimeError } from './errors'
-import { checkNumberOfArguments, reduceIf, scanBlockVariables, scanVariables } from './utils'
+import {
+  checkNumberOfArguments,
+  getArgs,
+  reduceIf,
+  scanBlockVariables,
+  scanVariables,
+  transformLogicalExpression
+} from './utils'
 
 class ReturnValue {
   constructor(public value: Value) {}
@@ -183,7 +190,27 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   ReturnStatement: function* (node: es.ReturnStatement, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+	let returnExpression = node.argument!
+
+    // If we have a conditional expression, reduce it until we get something else
+    while (
+      returnExpression.type === 'LogicalExpression' ||
+      returnExpression.type === 'ConditionalExpression'
+    ) {
+      if (returnExpression.type === 'LogicalExpression') {
+        returnExpression = transformLogicalExpression(returnExpression)
+      }
+      returnExpression = yield* reduceIf(returnExpression, context)
+    }
+
+    // If we are now left with a CallExpression, then we use TCO
+    if (returnExpression.type === 'CallExpression') {
+      const callee = yield* actualValue(returnExpression.callee, context)
+      const args = yield* getArgs(context, returnExpression)
+      return new TailCallReturnValue(callee, args, returnExpression)
+    } else {
+      return new ReturnValue(yield* evaluate(returnExpression, context))
+    }
   },
 
   WhileStatement: function* (node: es.WhileStatement, context: Context) {
@@ -193,7 +220,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
   BlockStatement: function* (node: es.BlockStatement, context: Context) {
 
-    throw new Error(`not supported yet: ${node.type}`)
+	const environment = createBlockEnvironment(context, 'blockEnvironment')
+    pushEnvironment(context, environment)
+    const result: Value = yield* evaluateBlockStatement(context, node)
+    popEnvironment(context)
+    return result
   },
 
   Program: function* (node: es.BlockStatement, context: Context) {
