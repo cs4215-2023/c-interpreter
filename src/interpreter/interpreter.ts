@@ -2,8 +2,8 @@ import * as constants from '../constants'
 import { LazyBuiltIn } from '../createContext'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
-import { Node } from '../parser/types'
-import { Context, Result, Value } from '../types'
+import { BlockStatement, CallExpression, Node } from '../parser/types'
+import { Context, Value } from '../types'
 import {
   evaluateBinaryExpression,
   evaluateLogicalExpression,
@@ -20,31 +20,37 @@ import {
   replaceEnvironment
 } from './environment'
 import { handleRuntimeError } from './errors'
-import { checkNumberOfArguments, getArgs, reduceIf, transformLogicalExpression } from './utils'
+import {
+  checkNumberOfArguments,
+  getArgs,
+  reduceIf,
+  scanBlockVariables,
+  transformLogicalExpression
+} from './utils'
 
-// class ReturnValue {
-//   constructor(public value: Value) {}
-// }
+class ReturnValue {
+  constructor(public value: Value) {}
+}
 
-// class TailCallReturnValue {
-//   constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) {}
-// }
+class TailCallReturnValue {
+  constructor(public callee: Closure, public args: Value[], public node: CallExpression) {}
+}
 
 export type Evaluator = (node: Node, context: Context) => IterableIterator<Value>
 
-// function* evaluateBlockStatement(context: Context, node: es.BlockStatement) {
-//   //scan block statement here
-//   const frame = scanBlockVariables(node.body)
-//   const env = createBlockEnvironment(context, 'blockEnvironment', frame)
-//   console.log(currentEnvironment(context))
-//   pushEnvironment(context, env)
-//   console.log(currentEnvironment(context))
-//   let result
-//   for (const statement of node.body) {
-//     result = yield* evaluate(statement, context)
-//   }
-//   return result
-// }
+function* evaluateBlockStatement(context: Context, node: BlockStatement) {
+  //scan block statement here
+  const frame = scanBlockVariables(node.body)
+  const env = createBlockEnvironment(context, 'blockEnvironment', frame)
+  console.log(currentEnvironment(context))
+  pushEnvironment(context, env)
+  console.log(currentEnvironment(context))
+  let result
+  for (const statement of node.body) {
+    result = yield* evaluate(statement, context)
+  }
+  return result
+}
 
 export const evaluators: { [nodeType: string]: Evaluator } = {
   /** Simple Values */
@@ -177,9 +183,9 @@ export const evaluators: { [nodeType: string]: Evaluator } = {
 
       // If we are now left with a CallExpression, then we use TCO
       if (returnExpression.type === 'CallExpression') {
-        const callee = yield* actualValue(returnExpression.callee, context)
+        const callee = evaluate(returnExpression.callee, context)
         const args = yield* getArgs(context, returnExpression)
-        return new TailCallReturnValue(callee, args, returnExpression)
+        return new TailCallReturnValue(callee.next().value, args, returnExpression)
       } else {
         return new ReturnValue(yield* evaluate(returnExpression, context))
       }
@@ -191,14 +197,21 @@ export const evaluators: { [nodeType: string]: Evaluator } = {
   },
 
   BlockStatement: function* (node: Node, context: Context) {
+    if (node.type != 'BlockStatement') {
+      throw new Error('not block statement')
+    }
     const environment = createBlockEnvironment(context, 'blockEnvironment')
     pushEnvironment(context, environment)
+
     const result: Value = yield* evaluateBlockStatement(context, node)
     popEnvironment(context)
     return result
   },
 
   Program: function* (node: Node, context: Context) {
+    if (node.type != 'BlockStatement') {
+      throw new Error('not block statement')
+    }
     //create new environment in program
     console.log(currentEnvironment(context)) //this is a null env
     const environment = createBlockEnvironment(context, 'globalEnvironment')
@@ -233,7 +246,7 @@ export function* apply(
   context: Context,
   fun: Closure | Value,
   args: Value[],
-  node: es.CallExpression,
+  node: CallExpression,
   thisContext?: Value
 ) {
   let result: Value
@@ -252,7 +265,7 @@ export function* apply(
       const bodyEnvironment = createBlockEnvironment(context, 'functionBodyEnvironment')
       bodyEnvironment.thisContext = thisContext
       pushEnvironment(context, bodyEnvironment)
-      result = yield* evaluateBlockStatement(context, fun.node.body as es.BlockStatement)
+      result = yield* evaluateBlockStatement(context, fun.node.body as BlockStatement)
       popEnvironment(context)
       if (result instanceof TailCallReturnValue) {
         fun = result.callee
@@ -268,7 +281,7 @@ export function* apply(
         if (fun.evaluateArgs) {
           finalArgs = []
           for (const arg of args) {
-            finalArgs.push(yield* forceIt(arg, context))
+            finalArgs.push(evaluate(arg, context))
           }
         }
         result = fun.func.apply(thisContext, finalArgs)
@@ -295,7 +308,7 @@ export function* apply(
         const forcedArgs = []
 
         for (const arg of args) {
-          forcedArgs.push(yield* forceIt(arg, context))
+          forcedArgs.push(evaluate(arg, context))
         }
 
         result = fun.apply(thisContext, forcedArgs)
@@ -317,7 +330,8 @@ export function* apply(
         throw e
       }
     } else {
-      return handleRuntimeError(context, new errors.CallingNonFunctionValue(fun, node))
+      throw new Error('calling non  function value')
+      //   return handleRuntimeError(context, new errors.CallingNonFunctionValue(fun, node))
     }
   }
   // Unwraps return value and release stack environment
