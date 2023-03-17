@@ -2,8 +2,10 @@ import * as es from 'estree'
 
 import * as errors from '../../errors/errors'
 import { Context, Frame, Value } from '../../types'
+import * as rttc from '../../utils/rttc'
 import Closure from '../closure'
 import { handleRuntimeError } from '../errors'
+import { actualValue } from '../interpreter'
 
 export function checkNumberOfArguments(
   context: Context,
@@ -70,4 +72,18 @@ export function scanVariables(node: es.Statement | es.Expression): string[] {
     return [node.name]
   }
   return arr
+}
+
+export function* reduceIf(
+  node: es.IfStatement | es.ConditionalExpression,
+  context: Context
+): IterableIterator<null | es.Node> {
+  const test = yield* actualValue(node.test, context)
+
+  const error = rttc.checkIfStatement(node, test)
+  if (error) {
+    return handleRuntimeError(context, error)
+  }
+
+  return test ? node.consequent : node.alternate
 }

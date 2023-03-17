@@ -18,7 +18,7 @@ import {
   replaceEnvironment
 } from './environment'
 import { handleRuntimeError } from './errors'
-import { checkNumberOfArguments, scanBlockVariables, scanVariables } from './utils'
+import { checkNumberOfArguments, reduceIf, scanBlockVariables, scanVariables } from './utils'
 
 class ReturnValue {
   constructor(public value: Value) {}
@@ -145,14 +145,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
   //need to verify this once loops are implemented
   ConditionalExpression: function* (node: es.ConditionalExpression, context: Context) {
-    const result = evaluate(node.test, context)
-	const targetNode = result ? node.consequent : node.alternate
-	const frame = result ? scanVariables(node.consequent) : scanVariables(node.alternate)
-	const env = createBlockEnvironment(context, 'blockEnvironment', frame)
-    console.log(currentEnvironment(context))
-    pushEnvironment(context, env)
-    console.log(currentEnvironment(context))
-    return evaluate(targetNode, context)
+	yield* this.IfStatement(node, context)
   },
 
   LogicalExpression: function* (node: es.LogicalExpression, context: Context) {
@@ -178,26 +171,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   IfStatement: function* (node: es.IfStatement | es.ConditionalExpression, context: Context) {
-    const result = evaluate(node.test, context)
-    if (result) {
-      const cons = node.consequent as es.BlockStatement
-      const frame = scanBlockVariables(cons.body)
-      const env = createBlockEnvironment(context, 'ifEnvironment', frame)
-      pushEnvironment(context, env)
-      console.log(currentEnvironment(context))
-      return evaluate(node.consequent, context)
+    const result = yield* reduceIf(node, context)
+    if (result === null) {
+      return undefined;
     }
-    else {
-      if (node.alternate == null || node.alternate == undefined) { return undefined }
-      else {
-        const alt = node.alternate as es.BlockStatement
-        const frame = scanBlockVariables(alt.body)
-        const env = createBlockEnvironment(context, 'elseEnvironment', frame)
-        pushEnvironment(context, env)
-        console.log(currentEnvironment(context))
-        return evaluate(node.alternate, context)
-      }
-    }
+    return yield* evaluate(result, context)
   },
 
   ExpressionStatement: function* (node: es.ExpressionStatement, context: Context) {
