@@ -43,13 +43,11 @@ export function checkNumberOfArguments(
 }
 
 //should be block statement
-export function scanBlockVariables(
-  nodes: es.Statement[]
-): Frame {
+export function scanBlockVariables(nodes: es.Statement[]): Frame {
   let var_arr: string[] = []
   for (let node of nodes) {
     node = node as es.ExpressionStatement
-    let res = scanVariables(node)
+    const res = scanVariables(node)
     var_arr = [...var_arr, ...res]
   }
   var_arr = var_arr.filter((item, pos) => var_arr.indexOf(item) === pos)
@@ -58,22 +56,18 @@ export function scanBlockVariables(
 
 export function scanVariables(node: es.Statement | es.Expression): string[] {
   let arr: any[] = []
-  if (node.type == "SequenceExpression") {
-    for (let expr of node.expressions) {
-      let res = scanVariables(expr)
+  if (node.type == 'SequenceExpression') {
+    for (const expr of node.expressions) {
+      const res = scanVariables(expr)
       arr = [...arr, ...res]
     }
-  }
-  else if (node.type == "ExpressionStatement") {
+  } else if (node.type == 'ExpressionStatement') {
     return scanVariables(node.expression)
-  }
-  else if (node.type == "AssignmentExpression") {
+  } else if (node.type == 'AssignmentExpression') {
     const left = node.left as es.Identifier
     return [left.name]
-  }
-  else if (node.type == "Identifier") {
+  } else if (node.type == 'Identifier') {
     return [node.name]
   }
   return arr
-
 }
