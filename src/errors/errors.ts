@@ -68,7 +68,7 @@ export class MaximumStackLimitExceeded extends RuntimeSourceError {
 }
 
 export class CallingNonFunctionValue extends RuntimeSourceError {
-  constructor(private callee: Value, private node:es.Node) {
+  constructor(private callee: Value, private node: es.Node) {
     super(node)
   }
 
@@ -197,7 +197,7 @@ export class ConstAssignment extends RuntimeSourceError {
 }
 
 export class GetPropertyError extends RuntimeSourceError {
-  constructor(node:es.Node, private obj: Value, private prop: string) {
+  constructor(node: es.Node, private obj: Value, private prop: string) {
     super(node)
   }
 

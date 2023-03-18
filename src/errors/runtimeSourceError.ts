@@ -1,7 +1,8 @@
+import * as es from 'estree'
+
 import { UNKNOWN_LOCATION } from '../constants'
 import { SourceLocation } from '../parser/types'
 import { Node } from '../parser/types'
-import * as es from 'estree'
 import { ErrorSeverity, ErrorType, SourceError } from '../types'
 
 export class RuntimeSourceError implements SourceError {
