@@ -51,7 +51,7 @@ function forceIt(val: any, context: Context): Value {
 }
 
 export function actualValue(exp: es.Node, context: Context): Value {
-  const evalResult =  evaluate(exp, context)
+  const evalResult = evaluate(exp, context)
   const forced = forceIt(evalResult, context)
   return forced
 }
@@ -67,7 +67,7 @@ function evaluateBlockStatement(context: Context, node: es.BlockStatement) {
   console.log(currentEnvironment(context))
   let result
   for (const statement of node.body) {
-    result =   evaluate(statement, context)
+    result = evaluate(statement, context)
   }
   return result
 }
@@ -240,8 +240,8 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 // tslint:enable:object-literal-shorthand
 
 export function evaluate(node: es.Node, context: Context) {
-  const result =   evaluators[node.type](node, context)
-    leave(context)
+  const result = evaluators[node.type](node, context)
+  leave(context)
   return result
 }
 
@@ -277,7 +277,7 @@ export function apply(
       const bodyEnvironment = createBlockEnvironment(context, 'functionBodyEnvironment')
       bodyEnvironment.thisContext = thisContext
       pushEnvironment(context, bodyEnvironment)
-      result =   evaluateBlockStatement(context, fun.node.body as es.BlockStatement)
+      result = evaluateBlockStatement(context, fun.node.body as es.BlockStatement)
       popEnvironment(context)
       if (result instanceof TailCallReturnValue) {
         fun = result.callee
@@ -293,7 +293,7 @@ export function apply(
         if (fun.evaluateArgs) {
           finalArgs = []
           for (const arg of args) {
-            finalArgs.push(  forceIt(arg, context))
+            finalArgs.push(forceIt(arg, context))
           }
         }
         result = fun.func.apply(thisContext, finalArgs)
@@ -320,7 +320,7 @@ export function apply(
         const forcedArgs = []
 
         for (const arg of args) {
-          forcedArgs.push(  forceIt(arg, context))
+          forcedArgs.push(forceIt(arg, context))
         }
 
         result = fun.apply(thisContext, forcedArgs)
