@@ -5,6 +5,7 @@ import * as constants from '../constants'
 import { LazyBuiltIn } from '../createContext'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
+import { Identifier } from '../parser/types'
 import { Context, Environment, Value } from '../types'
 import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
 import * as rttc from '../utils/rttc'
@@ -18,7 +19,13 @@ import {
   replaceEnvironment
 } from './environment'
 import { handleRuntimeError } from './errors'
-import { checkNumberOfArguments, scanBlockVariables, scanVariables } from './utils'
+import {
+  checkNumberOfArguments,
+  getValueFromIdentifier,
+  scanBlockVariables,
+  scanVariables,
+  setValueToIdentifier
+} from './utils'
 
 class ReturnValue {
   constructor(public value: Value) {}
@@ -61,6 +68,7 @@ export type Evaluator<T extends es.Node> = (node: T, context: Context) => Value
 function evaluateBlockStatement(context: Context, node: es.BlockStatement) {
   //scan block statement here
   const frame = scanBlockVariables(node.body)
+  console.log(frame)
   const env = createBlockEnvironment(context, 'blockEnvironment', frame)
   console.log(currentEnvironment(context))
   pushEnvironment(context, env)
@@ -115,7 +123,8 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
 
   Identifier: function (node: es.Identifier, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+    const identifier =  getValueFromIdentifier(context, node.name)
+    return identifier
   },
 
   CallExpression: function (node: es.CallExpression, context: Context) {
@@ -179,7 +188,14 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
 
   AssignmentExpression: function (node: es.AssignmentExpression, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+    if (node.left.type === 'MemberExpression') {
+     throw new Error('member expression not allowed')
+    }
+    
+    const id = node.left as es.Identifier
+    const value = evaluate(node.right, context)
+    setValueToIdentifier(context, id.name, value)
+    return value;
   },
 
   FunctionDeclaration: function (node: es.FunctionDeclaration, context: Context) {

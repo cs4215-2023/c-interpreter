@@ -1,8 +1,9 @@
 import * as es from 'estree'
 
 import * as errors from '../../errors/errors'
-import { Context, Frame, Value } from '../../types'
+import { Context, Environment, Frame, Value } from '../../types'
 import Closure from '../closure'
+import { currentEnvironment } from '../environment'
 import { handleRuntimeError } from '../errors'
 
 export function checkNumberOfArguments(
@@ -70,4 +71,40 @@ export function scanVariables(node: es.Statement | es.Expression): string[] {
     return [node.name]
   }
   return arr
+}
+
+/* 
+Gets a variable from the environment based on the name.
+*/
+export const getValueFromIdentifier = (context: Context, name: string) => {
+  let environment: Environment | null = currentEnvironment(context)
+  while (environment) {
+    if (environment.head.hasOwnProperty(name)) {
+      console.log(environment.head)
+      return environment.head[name]
+    } else {
+      environment = environment.tail
+    }
+  }
+  return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
+}
+
+export const setValueToIdentifier = (context: Context, name: string, value: any) => {
+  let environment: Environment | null = currentEnvironment(context)
+  while (environment) {
+    if (environment.head.hasOwnProperty(name)) {
+      const descriptors = Object.getOwnPropertyDescriptors(environment.head)
+      if (descriptors[name].writable) {
+        environment.head[name] = value
+        return value
+      }
+      return handleRuntimeError(
+        context,
+        new errors.ConstAssignment(context.runtime.nodes[0]!, name)
+      )
+    } else {
+      environment = environment.tail
+    }
+  }
+  return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
 }
