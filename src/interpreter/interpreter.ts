@@ -1,14 +1,12 @@
+/* tslint:disable:max-classes-per-file */
+import * as es from 'estree'
+
 import * as constants from '../constants'
 import { LazyBuiltIn } from '../createContext'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
-import { BlockStatement, CallExpression, Node } from '../parser/types'
-import { Context, Value } from '../types'
-import {
-  evaluateBinaryExpression,
-  evaluateLogicalExpression,
-  evaluateUnaryExpression
-} from '../utils/operators'
+import { Context, Environment, Value } from '../types'
+import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
 import * as rttc from '../utils/rttc'
 import Closure from './closure'
 import {
@@ -20,25 +18,48 @@ import {
   replaceEnvironment
 } from './environment'
 import { handleRuntimeError } from './errors'
-import {
-  checkNumberOfArguments,
-  getArgs,
-  reduceIf,
-  scanBlockVariables,
-  transformLogicalExpression
-} from './utils'
+import { checkNumberOfArguments, scanBlockVariables, scanVariables } from './utils'
 
 class ReturnValue {
-  constructor(public value: Value) {}
+  constructor(public value: Value) { }
 }
 
 class TailCallReturnValue {
-  constructor(public callee: Closure, public args: Value[], public node: CallExpression) {}
+  constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) { }
 }
 
-export type Evaluator = (node: Node, context: Context) => IterableIterator<Value>
+class Thunk {
+  public value: Value
+  public isMemoized: boolean
+  constructor(public exp: es.Node, public env: Environment) {
+    this.isMemoized = false
+    this.value = null
+  }
+}
 
-function* evaluateBlockStatement(context: Context, node: BlockStatement) {
+//not a needed function atm
+function* forceIt(val: any, context: Context): Value {
+  if (val instanceof Thunk) {
+    if (val.isMemoized) return val.value
+    pushEnvironment(context, val.env)
+    const evalRes = yield* actualValue(val.exp, context)
+    popEnvironment(context)
+    val.value = evalRes
+    val.isMemoized = true
+    return evalRes
+  } else return val
+}
+
+export function* actualValue(exp: es.Node, context: Context): Value {
+  const evalResult = yield* evaluate(exp, context)
+  const forced = yield* forceIt(evalResult, context)
+  return forced
+}
+
+export type Evaluator<T extends es.Node> = (node: T, context: Context) => IterableIterator<Value>
+
+
+function* evaluateBlockStatement(context: Context, node: es.BlockStatement) {
   //scan block statement here
   const frame = scanBlockVariables(node.body)
   const env = createBlockEnvironment(context, 'blockEnvironment', frame)
@@ -52,53 +73,58 @@ function* evaluateBlockStatement(context: Context, node: BlockStatement) {
   return result
 }
 
-export const evaluators: { [nodeType: string]: Evaluator } = {
+/**
+ * WARNING: Do not use object literal shorthands, e.g.
+ *   {
+ *     *Literal(node: es.Literal, ...) {...},
+ *     *ThisExpression(node: es.ThisExpression, ..._ {...},
+ *     ...
+ *   }
+ * They do not minify well, raising uncaught syntax errors in production.
+ * See: https://github.com/webpack/webpack/issues/7566
+ */
+// tslint:disable:object-literal-shorthand
+// prettier-ignore
+export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   /** Simple Values */
-  Literal: function* (node: Node, context: Context) {
-    if (node.type != 'Literal') {
-      throw new Error('Not a literal type')
-    }
-    return {
-      value: node.value,
-      type: node.valueType
-    }
+  Literal: function* (node: es.Literal, _context: Context) {
+    return node.value
   },
 
-  SequenceExpression: function* (node: Node, context: Context) {
-    if (node.type != 'SequenceExpression') {
-      throw new Error('Not a sequence expression')
-    }
+  TemplateLiteral: function* (node: es.TemplateLiteral) {
+    // Expressions like `${1}` are not allowed, so no processing needed
+    return node.quasis[0].value.cooked
+  },
+
+  SequenceExpression: function* (node: es.SequenceExpression, context: Context) {
     let result
     for (const expr of node.expressions) {
-      if (expr.type === 'SequenceExpression' && expr.expressions.length === 0) {
-        continue
-      }
-      result = evaluate(expr, context)
+      if (expr.type === 'SequenceExpression' && expr.expressions.length === 0) { continue }
+      result = yield* evaluate(expr, context)
     }
     return result
   },
 
-  ArrayExpression: function* (node: Node, context: Context) {
+  ArrayExpression: function* (node: es.ArrayExpression, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  FunctionExpression: function* (node: Node, context: Context) {
+
+  FunctionExpression: function* (node: es.FunctionExpression, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  Identifier: function* (node: Node, context: Context) {
+
+  Identifier: function* (node: es.Identifier, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  CallExpression: function* (node: Node, context: Context) {
+  CallExpression: function* (node: es.CallExpression, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  UnaryExpression: function* (node: Node, context: Context) {
-    if (node.type != 'UnaryExpression') {
-      throw new Error('not a unary expression')
-    }
-    const value = evaluate(node.argument, context)
+  UnaryExpression: function* (node: es.UnaryExpression, context: Context) {
+    const value = yield* actualValue(node.argument, context)
 
     const error = rttc.checkUnaryExpression(node, node.operator, value)
     if (error) {
@@ -107,13 +133,10 @@ export const evaluators: { [nodeType: string]: Evaluator } = {
     return evaluateUnaryExpression(node.operator, value)
   },
 
-  BinaryExpression: function* (node: Node, context: Context) {
-    if (node.type != 'BinaryExpression') {
-      throw new Error('not a binary expression')
-    }
-    const left = evaluate(node.left, context)
-    const right = evaluate(node.right, context)
-    console.log('evaluating binaryexpression for ' + left + ' and ' + right)
+  BinaryExpression: function* (node: es.BinaryExpression, context: Context) {
+    const left = yield* actualValue(node.left, context)
+    const right = yield* actualValue(node.right, context)
+    console.log("evaluating binaryexpression for " + left + " and " + right)
     const error = rttc.checkBinaryExpression(node, node.operator, left, right)
     if (error) {
       return handleRuntimeError(context, error)
@@ -122,131 +145,123 @@ export const evaluators: { [nodeType: string]: Evaluator } = {
   },
 
   //need to verify this once loops are implemented
-  ConditionalExpression: function* (node: Node, context: Context) {
-    if (node.type !== 'ConditionalExpression') {
-      return new Error('not conditional exp')
+  ConditionalExpression: function* (node: es.ConditionalExpression, context: Context) {
+    const result = evaluate(node.test, context)
+    if (result) {
+      const frame = scanVariables(node.consequent)
+      const env = createBlockEnvironment(context, 'blockEnvironment', frame)
+      console.log(currentEnvironment(context))
+      pushEnvironment(context, env)
+      console.log(currentEnvironment(context))
+      return evaluate(node.consequent, context)
     }
-    const test = evaluate(node.test, context)
-    return test.next() ? evaluate(node.consequent, context) : evaluate(node.alternate, context)
+    else {
+      const frame = scanVariables(node.alternate)
+      const env = createBlockEnvironment(context, 'blockEnvironment', frame)
+      console.log(currentEnvironment(context))
+      pushEnvironment(context, env)
+      console.log(currentEnvironment(context))
+      return evaluate(node.alternate, context)
+    }
   },
 
-  LogicalExpression: function* (node: Node, context: Context) {
-    if (node.type != 'LogicalExpression') {
-      throw new Error('not a logical expression')
-    }
-
-    const left = evaluate(node.left, context)
-    const right = evaluate(node.right, context)
-    if (rttc.checkIfStatement(node, left) && rttc.checkIfStatement(node, right)) {
-      return evaluateLogicalExpression(node.operator, left, right)
-    }
-    throw new Error('error')
-  },
-
-  VariableDeclaration: function* (node: Node, context: Context) {
+  LogicalExpression: function* (node: es.LogicalExpression, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  ForStatement: function* (node: Node, context: Context) {
+  VariableDeclaration: function* (node: es.VariableDeclaration, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  AssignmentExpression: function* (node: Node, context: Context) {
+
+  ForStatement: function* (node: es.ForStatement, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  FunctionDeclaration: function* (node: Node, context: Context) {
+
+  AssignmentExpression: function* (node: es.AssignmentExpression, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  ExpressionStatement: function* (node: Node, context: Context) {
-    if (node.type == 'ExpressionStatement') {
-      return evaluate(node.expression, context)
+  FunctionDeclaration: function* (node: es.FunctionDeclaration, context: Context) {
+    throw new Error(`not supported yet: ${node.type}`)
+  },
+
+  IfStatement: function* (node: es.IfStatement | es.ConditionalExpression, context: Context) {
+    const result = evaluate(node.test, context)
+    if (result) {
+      const cons = node.consequent as es.BlockStatement
+      const frame = scanBlockVariables(cons.body)
+      const env = createBlockEnvironment(context, 'ifEnvironment', frame)
+      pushEnvironment(context, env)
+      console.log(currentEnvironment(context))
+      return evaluate(node.consequent, context)
     }
-    throw new Error('not an expression statement')
-  },
-
-  ReturnStatement: function* (node: Node, context: Context) {
-    if (node.type == 'ReturnStatement') {
-      let returnExpression = node.argument!
-
-      // If we have a conditional expression, reduce it until we get something else
-      while (
-        returnExpression.type === 'LogicalExpression' ||
-        returnExpression.type === 'ConditionalExpression'
-      ) {
-        if (returnExpression.type === 'LogicalExpression') {
-          returnExpression = transformLogicalExpression(returnExpression)
-        }
-        returnExpression = yield* reduceIf(returnExpression, context)
-      }
-
-      // If we are now left with a CallExpression, then we use TCO
-      if (returnExpression.type === 'CallExpression') {
-        const callee = evaluate(returnExpression.callee, context)
-        const args = yield* getArgs(context, returnExpression)
-        return new TailCallReturnValue(callee.next().value, args, returnExpression)
-      } else {
-        return new ReturnValue(yield* evaluate(returnExpression, context))
+    else {
+      if (node.alternate == null || node.alternate == undefined) { return undefined }
+      else {
+        const alt = node.alternate as es.BlockStatement
+        const frame = scanBlockVariables(alt.body)
+        const env = createBlockEnvironment(context, 'elseEnvironment', frame)
+        pushEnvironment(context, env)
+        console.log(currentEnvironment(context))
+        return evaluate(node.alternate, context)
       }
     }
   },
 
-  WhileStatement: function* (node: Node, context: Context) {
+  ExpressionStatement: function* (node: es.ExpressionStatement, context: Context) {
+    return yield* evaluate(node.expression, context)
+  },
+
+  ReturnStatement: function* (node: es.ReturnStatement, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  BlockStatement: function* (node: Node, context: Context) {
-    if (node.type != 'BlockStatement') {
-      throw new Error('not block statement')
-    }
-    const environment = createBlockEnvironment(context, 'blockEnvironment')
-    pushEnvironment(context, environment)
-
-    const result: Value = yield* evaluateBlockStatement(context, node)
-    popEnvironment(context)
-    return result
+  WhileStatement: function* (node: es.WhileStatement, context: Context) {
+    throw new Error(`not supported yet: ${node.type}`)
   },
 
-  Program: function* (node: Node, context: Context) {
-    if (node.type != 'BlockStatement') {
-      throw new Error('not block statement')
-    }
+
+  BlockStatement: function* (node: es.BlockStatement, context: Context) {
+
+    throw new Error(`not supported yet: ${node.type}`)
+  },
+
+  Program: function* (node: es.BlockStatement, context: Context) {
     //create new environment in program
     console.log(currentEnvironment(context)) //this is a null env
-    const environment = createBlockEnvironment(context, 'globalEnvironment')
-    pushEnvironment(context, environment)
+    const environment = createBlockEnvironment(context, 'globalEnvironment');
+    pushEnvironment(context, environment);
     console.log(currentEnvironment(context)) //this is the 'global' env
     const result = yield* evaluateBlockStatement(context, node)
-    return result
+    return result;
   }
 }
 // tslint:enable:object-literal-shorthand
 
-export function* evaluate(node: Node, context: Context): IterableIterator<Value> {
-  visit(context, node)
-  const evaluator = evaluators[node.type]
-  if (!evaluator) {
-    throw new Error('evaluator error')
-  }
-  const result = evaluator(node, context)
-  leave(context)
+export function* evaluate(node: es.Node, context: Context) {
+  const result = yield* evaluators[node.type](node, context)
+  yield* leave(context)
   return result
 }
 
-function visit(context: Context, node: Node) {
+function* visit(context: Context, node: es.Node) {
   context.runtime.nodes.unshift(node)
+  yield context
 }
 
-function leave(context: Context) {
+function* leave(context: Context) {
+  context.runtime.break = false
   context.runtime.nodes.shift()
+  yield context
 }
 
 export function* apply(
   context: Context,
   fun: Closure | Value,
-  args: Value[],
-  node: CallExpression,
+  args: (Thunk | Value)[],
+  node: es.CallExpression,
   thisContext?: Value
 ) {
   let result: Value
@@ -265,7 +280,7 @@ export function* apply(
       const bodyEnvironment = createBlockEnvironment(context, 'functionBodyEnvironment')
       bodyEnvironment.thisContext = thisContext
       pushEnvironment(context, bodyEnvironment)
-      result = yield* evaluateBlockStatement(context, fun.node.body as BlockStatement)
+      result = yield* evaluateBlockStatement(context, fun.node.body as es.BlockStatement)
       popEnvironment(context)
       if (result instanceof TailCallReturnValue) {
         fun = result.callee
@@ -281,7 +296,7 @@ export function* apply(
         if (fun.evaluateArgs) {
           finalArgs = []
           for (const arg of args) {
-            finalArgs.push(evaluate(arg, context))
+            finalArgs.push(yield* forceIt(arg, context))
           }
         }
         result = fun.func.apply(thisContext, finalArgs)
@@ -308,7 +323,7 @@ export function* apply(
         const forcedArgs = []
 
         for (const arg of args) {
-          forcedArgs.push(evaluate(arg, context))
+          forcedArgs.push(yield* forceIt(arg, context))
         }
 
         result = fun.apply(thisContext, forcedArgs)
@@ -330,8 +345,7 @@ export function* apply(
         throw e
       }
     } else {
-      throw new Error('calling non  function value')
-      //   return handleRuntimeError(context, new errors.CallingNonFunctionValue(fun, node))
+      return handleRuntimeError(context, new errors.CallingNonFunctionValue(fun, node))
     }
   }
   // Unwraps return value and release stack environment

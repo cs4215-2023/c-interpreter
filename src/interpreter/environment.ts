@@ -1,13 +1,14 @@
-import { isEmpty, uniqueId } from 'lodash'
+import * as es from 'estree'
+import { uniqueId } from 'lodash'
 
-import { CallExpression } from '../parser/types'
 import { Context, Environment, Frame, Value } from '../types'
+import { primitive } from '../utils/astCreator'
 import Closure from './closure'
 
 export function createEnvironment(
   closure: Closure,
   args: Value[],
-  callExpression?: CallExpression
+  callExpression?: es.CallExpression
 ): Environment {
   const environment: Environment = {
     name: closure.functionName, // TODO: Change this
@@ -15,20 +16,19 @@ export function createEnvironment(
     head: {},
     id: uniqueId()
   }
-  // TODO: UPDATE THE CALL EXPRESSION
-  //   if (callExpression) {
-  //     environment.callExpression = {
-  //       ...callExpression,
-  //       arguments: args.map(primitive)
-  //     }
-  //   }
-  //   closure.node.params.forEach((param, index) => {
-  //     if (param.type === 'RestElement') {
-  //       environment.head[(param.argument as es.Identifier).name] = args.slice(index)
-  //     } else {
-  //       environment.head[(param as es.Identifier).name] = args[index]
-  //     }
-  //   })
+  if (callExpression) {
+    environment.callExpression = {
+      ...callExpression,
+      arguments: args.map(primitive)
+    }
+  }
+  closure.node.params.forEach((param, index) => {
+    if (param.type === 'RestElement') {
+      environment.head[(param.argument as es.Identifier).name] = args.slice(index)
+    } else {
+      environment.head[(param as es.Identifier).name] = args[index]
+    }
+  })
   return environment
 }
 
@@ -61,24 +61,4 @@ export function popEnvironment(context: Context): Environment | undefined {
 export function pushEnvironment(context: Context, environment: Environment): void {
   context.runtime.environments.unshift(environment)
   context.runtime.environmentTree.insert(environment)
-}
-
-export function isEmptyEnvironment(env: Environment) {
-  return isEmpty(env.head)
-}
-
-/**
- * Extracts the non-empty tail environment from the given environment and
- * returns current environment if tail environment is a null.
- */
-export function getNonEmptyEnv(environment: Environment): Environment {
-  if (isEmptyEnvironment(environment)) {
-    const tailEnvironment = environment.tail
-    if (tailEnvironment === null) {
-      return environment
-    }
-    return getNonEmptyEnv(tailEnvironment)
-  } else {
-    return environment
-  }
 }

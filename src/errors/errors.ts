@@ -3,7 +3,6 @@
 import { baseGenerator, generate } from 'astring'
 import * as es from 'estree'
 
-import { CallExpression, Node, VariableDeclaration } from '../parser/types'
 import { ErrorSeverity, ErrorType, SourceError, Value } from '../types'
 import { stringify } from '../utils/stringify'
 import { RuntimeSourceError } from './runtimeSourceError'
@@ -51,12 +50,12 @@ export class MaximumStackLimitExceeded extends RuntimeSourceError {
     }
   }
 
-  constructor(node: es.Node, private calls: CallExpression[]) {
+  constructor(node: es.Node, private calls: es.CallExpression[]) {
     super(node)
   }
 
   public explain() {
-    const repr = (call: CallExpression) => generate(call, { generator: this.customGenerator })
+    const repr = (call: es.CallExpression) => generate(call, { generator: this.customGenerator })
     return (
       'Maximum call stack size exceeded\n  ' + this.calls.map(call => repr(call) + '..').join('  ')
     )
