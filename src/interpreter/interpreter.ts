@@ -5,6 +5,7 @@ import * as constants from '../constants'
 import { LazyBuiltIn } from '../createContext'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
+import { Identifier } from '../parser/types'
 import { Context, Environment, Value } from '../types'
 import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
 import * as rttc from '../utils/rttc'
@@ -22,16 +23,15 @@ import {
   checkNumberOfArguments,
   getValueFromIdentifier,
   scanBlockVariables,
-  scanVariables,
   setValueToIdentifier
 } from './utils'
 
 class ReturnValue {
-  constructor(public value: Value) {}
+  constructor(public value: Value) { }
 }
 
 class TailCallReturnValue {
-  constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) {}
+  constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) { }
 }
 
 class Thunk {
@@ -69,9 +69,7 @@ function evaluateBlockStatement(context: Context, node: es.BlockStatement) {
   const frame = scanBlockVariables(node.body)
   console.log(frame)
   const env = createBlockEnvironment(context, 'blockEnvironment', frame)
-  console.log(currentEnvironment(context))
   pushEnvironment(context, env)
-  console.log(currentEnvironment(context))
   let result
   for (const statement of node.body) {
     result = evaluate(statement, context)
@@ -180,19 +178,9 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     const result = evaluate(node.test, context)
     //not sure if pushenv is needed here, depending on the definition of conditional expr
     if (result) {
-      const frame = scanVariables(node.consequent)
-      const env = createBlockEnvironment(context, 'blockEnvironment', frame)
-      console.log(currentEnvironment(context))
-      pushEnvironment(context, env)
-      console.log(currentEnvironment(context))
       return evaluate(node.consequent, context)
     }
     else {
-      const frame = scanVariables(node.alternate)
-      const env = createBlockEnvironment(context, 'blockEnvironment', frame)
-      console.log(currentEnvironment(context))
-      pushEnvironment(context, env)
-      console.log(currentEnvironment(context))
       return evaluate(node.alternate, context)
     }
   },
@@ -242,20 +230,12 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     const result = evaluate(node.test, context)
     if (result) {
       const cons = node.consequent as es.BlockStatement
-      const frame = scanBlockVariables(cons.body)
-      const env = createBlockEnvironment(context, 'ifEnvironment', frame)
-      pushEnvironment(context, env)
-      console.log(currentEnvironment(context))
       return evaluate(node.consequent, context)
     }
     else {
       if (node.alternate == null || node.alternate == undefined) { return undefined }
       else {
         const alt = node.alternate as es.BlockStatement
-        const frame = scanBlockVariables(alt.body)
-        const env = createBlockEnvironment(context, 'elseEnvironment', frame)
-        pushEnvironment(context, env)
-        console.log(currentEnvironment(context))
         return evaluate(node.alternate, context)
       }
     }
@@ -278,8 +258,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
 
   BlockStatement: function (node: es.BlockStatement, context: Context) {
+    if (node.type !== 'BlockStatement') {
+      return handleRuntimeError(context, new InterpreterError(node));
+    }
+    return evaluateBlockStatement(context, node)
 
-    throw new Error(`not supported yet: ${node.type}`)
   },
 
   Program: function (node: es.BlockStatement, context: Context) {
