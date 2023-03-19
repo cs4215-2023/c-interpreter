@@ -9,6 +9,11 @@ import { Identifier } from '../parser/types'
 import { Context, Environment, Value } from '../types'
 import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
 import * as rttc from '../utils/rttc'
+import {
+  DivisionByZeroError,
+  handleRuntimeError,
+  InterpreterError,
+} from './errors';
 import Closure from './closure'
 import {
   createBlockEnvironment,
@@ -18,7 +23,6 @@ import {
   pushEnvironment,
   replaceEnvironment
 } from './environment'
-import { handleRuntimeError } from './errors'
 import {
   checkNumberOfArguments,
   getValueFromIdentifier,
@@ -28,11 +32,11 @@ import {
 } from './utils'
 
 class ReturnValue {
-  constructor(public value: Value) {}
+  constructor(public value: Value) { }
 }
 
 class TailCallReturnValue {
-  constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) {}
+  constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) { }
 }
 
 class Thunk {
@@ -95,6 +99,9 @@ function evaluateBlockStatement(context: Context, node: es.BlockStatement) {
 export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   /** Simple Values */
   Literal: function (node: es.Literal, _context: Context) {
+    if (node.type !== 'Literal') {
+      return handleRuntimeError(_context, new InterpreterError(node));
+    }
     return node.value
   },
 
@@ -107,32 +114,44 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     let result
     for (const expr of node.expressions) {
       if (expr.type === 'SequenceExpression' && expr.expressions.length === 0) { continue }
-      result =  evaluate(expr, context)
+      result = evaluate(expr, context)
     }
     return result
   },
 
   ArrayExpression: function (node: es.ArrayExpression, context: Context) {
+    if (node.type !== 'ArrayExpression') {
+      return handleRuntimeError(context, new InterpreterError(node));
+    }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
 
   FunctionExpression: function (node: es.FunctionExpression, context: Context) {
+    if (node.type !== 'FunctionExpression') {
+      return handleRuntimeError(context, new InterpreterError(node));
+    }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
 
   Identifier: function (node: es.Identifier, context: Context) {
-    const identifier =  getValueFromIdentifier(context, node.name)
+    const identifier = getValueFromIdentifier(context, node.name)
     return identifier
   },
 
   CallExpression: function (node: es.CallExpression, context: Context) {
+    if (node.type !== 'CallExpression') {
+      return handleRuntimeError(context, new InterpreterError(node));
+    }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
   UnaryExpression: function (node: es.UnaryExpression, context: Context) {
-    const value =   actualValue(node.argument, context)
+    if (node.type !== 'UnaryExpression') {
+      return handleRuntimeError(context, new InterpreterError(node));
+    }
+    const value = actualValue(node.argument, context)
 
     const error = rttc.checkUnaryExpression(node, node.operator, value)
     if (error) {
@@ -142,19 +161,29 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   BinaryExpression: function (node: es.BinaryExpression, context: Context) {
-    const left =   actualValue(node.left, context)
-    const right =   actualValue(node.right, context)
+    if (node.type !== 'BinaryExpression') {
+      return handleRuntimeError(context, new InterpreterError(node));
+    }
+    const left = actualValue(node.left, context)
+    const right = actualValue(node.right, context)
     console.log("evaluating binaryexpression for " + left + " and " + right)
     const error = rttc.checkBinaryExpression(node, node.operator, left, right)
     if (error) {
       return handleRuntimeError(context, error)
+    }
+    if (node.operator === '/' && right === 0) {
+      return handleRuntimeError(context, new DivisionByZeroError(node));
     }
     return evaluateBinaryExpression(node.operator, left, right)
   },
 
   //need to verify this once loops are implemented
   ConditionalExpression: function (node: es.ConditionalExpression, context: Context) {
+    if (node.type !== 'ConditionalExpression') {
+      return handleRuntimeError(context, new InterpreterError(node));
+    }
     const result = evaluate(node.test, context)
+    //not sure if pushenv is needed here, depending on the definition of conditional expr
     if (result) {
       const frame = scanVariables(node.consequent)
       const env = createBlockEnvironment(context, 'blockEnvironment', frame)
@@ -174,6 +203,9 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   LogicalExpression: function (node: es.LogicalExpression, context: Context) {
+    if (node.type !== 'LogicalExpression') {
+      return handleRuntimeError(context, new InterpreterError(node));
+    }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
@@ -183,15 +215,18 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
 
   ForStatement: function (node: es.ForStatement, context: Context) {
+    if (node.type !== 'ForStatement') {
+      return handleRuntimeError(context, new InterpreterError(node));
+    }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
 
   AssignmentExpression: function (node: es.AssignmentExpression, context: Context) {
     if (node.left.type === 'MemberExpression') {
-     throw new Error('member expression not allowed')
+      throw new Error('member expression not allowed')
     }
-    
+
     const id = node.left as es.Identifier
     const value = evaluate(node.right, context)
     setValueToIdentifier(context, id.name, value)
@@ -199,10 +234,16 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   FunctionDeclaration: function (node: es.FunctionDeclaration, context: Context) {
+    if (node.type !== 'FunctionDeclaration') {
+      return handleRuntimeError(context, new InterpreterError(node));
+    }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
   IfStatement: function (node: es.IfStatement | es.ConditionalExpression, context: Context) {
+    if (node.type !== 'IfStatement') {
+      return handleRuntimeError(context, new InterpreterError(node));
+    }
     const result = evaluate(node.test, context)
     if (result) {
       const cons = node.consequent as es.BlockStatement
@@ -226,7 +267,10 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   ExpressionStatement: function (node: es.ExpressionStatement, context: Context) {
-    return   evaluate(node.expression, context)
+    if (node.type !== 'ExpressionStatement') {
+      return handleRuntimeError(context, new InterpreterError(node));
+    }
+    return evaluate(node.expression, context)
   },
 
   ReturnStatement: function (node: es.ReturnStatement, context: Context) {
@@ -249,7 +293,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     const environment = createBlockEnvironment(context, 'globalEnvironment');
     pushEnvironment(context, environment);
     console.log(currentEnvironment(context)) //this is the 'global' env
-    const result =   evaluateBlockStatement(context, node)
+    const result = evaluateBlockStatement(context, node)
     return result;
   }
 }
