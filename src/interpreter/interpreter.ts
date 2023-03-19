@@ -5,7 +5,6 @@ import * as constants from '../constants'
 import { LazyBuiltIn } from '../createContext'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
-import { Identifier } from '../parser/types'
 import { Context, Environment, Value } from '../types'
 import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
 import * as rttc from '../utils/rttc'
@@ -134,16 +133,10 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   CallExpression: function* (node: es.CallExpression, context: Context) {
-    if (node.type !== 'CallExpression') {
-      return handleRuntimeError(context, new InterpreterError(node));
-    }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
   UnaryExpression: function* (node: es.UnaryExpression, context: Context) {
-    if (node.type !== 'UnaryExpression') {
-      return handleRuntimeError(context, new InterpreterError(node));
-    }
     const value = yield* actualValue(node.argument, context)
 
     const error = rttc.checkUnaryExpression(node, node.operator, value)
@@ -154,9 +147,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   BinaryExpression: function* (node: es.BinaryExpression, context: Context) {
-    if (node.type !== 'BinaryExpression') {
-      return handleRuntimeError(context, new InterpreterError(node));
-    }
     const left =yield* actualValue(node.left, context)
     const right = yield*actualValue(node.right, context)
     console.log("evaluating binaryexpression for " + left + " and " + right)
@@ -172,9 +162,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
   //need to verify this once loops are implemented
   ConditionalExpression: function* (node: es.ConditionalExpression, context: Context) {
-    if (node.type !== 'ConditionalExpression') {
-      return handleRuntimeError(context, new InterpreterError(node));
-    }
     const result = yield*evaluate(node.test, context)
     //not sure if pushenv is needed here, depending on the definition of conditional expr
     if (result) {
@@ -186,9 +173,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   LogicalExpression: function* (node: es.LogicalExpression, context: Context) {
-    if (node.type !== 'LogicalExpression') {
-      return handleRuntimeError(context, new InterpreterError(node));
-    }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
@@ -217,34 +201,25 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   FunctionDeclaration: function* (node: es.FunctionDeclaration, context: Context) {
-    if (node.type !== 'FunctionDeclaration') {
-      return handleRuntimeError(context, new InterpreterError(node));
-    }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
   IfStatement: function* (node: es.IfStatement | es.ConditionalExpression, context: Context) {
-    if (node.type !== 'IfStatement') {
-      return handleRuntimeError(context, new InterpreterError(node));
-    }
     const result =yield* evaluate(node.test, context)
     if (result) {
-      const cons = node.consequent as es.BlockStatement
-      return yield*evaluate(node.consequent, context)
+      const consequent = node.consequent as es.BlockStatement
+      return yield*evaluate(consequent, context)
     }
     else {
       if (node.alternate == null || node.alternate == undefined) { return undefined }
       else {
-        const alt = node.alternate as es.BlockStatement
-        return yield*evaluate(node.alternate, context)
+        const alternate = node.alternate as es.BlockStatement
+        return yield*evaluate(alternate, context)
       }
     }
   },
 
   ExpressionStatement: function* (node: es.ExpressionStatement, context: Context) {
-    if (node.type !== 'ExpressionStatement') {
-      return handleRuntimeError(context, new InterpreterError(node));
-    }
     return yield*evaluate(node.expression, context)
   },
 
@@ -258,9 +233,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
 
   BlockStatement: function* (node: es.BlockStatement, context: Context) {
-    if (node.type !== 'BlockStatement') {
-      return handleRuntimeError(context, new InterpreterError(node));
-    }
     return yield*evaluateBlockStatement(context, node)
 
   },
