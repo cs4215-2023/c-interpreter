@@ -93,15 +93,8 @@ export const setValueToIdentifier = (context: Context, name: string, value: any)
   let environment: Environment | null = currentEnvironment(context)
   while (environment) {
     if (environment.head.hasOwnProperty(name)) {
-      const descriptors = Object.getOwnPropertyDescriptors(environment.head)
-      if (descriptors[name].writable) {
-        environment.head[name] = value
-        return value
-      }
-      return handleRuntimeError(
-        context,
-        new errors.ConstAssignment(context.runtime.nodes[0]!, name)
-      )
+      environment.head[name] = value
+      return value
     } else {
       environment = environment.tail
     }

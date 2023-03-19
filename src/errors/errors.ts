@@ -6,20 +6,6 @@ import { CallExpression, Node, SourceLocation } from '../parser/types'
 import { ErrorSeverity, ErrorType, SourceError, Value } from '../types'
 import { RuntimeSourceError } from './runtimeSourceError'
 
-export class InterruptedError extends RuntimeSourceError {
-  constructor(node: Node) {
-    super(node)
-  }
-
-  public explain() {
-    return 'Execution aborted by user.'
-  }
-
-  public elaborate() {
-    return 'TODO'
-  }
-}
-
 export class ExceptionError implements SourceError {
   public type = ErrorType.RUNTIME
   public severity = ErrorSeverity.ERROR
@@ -101,19 +87,5 @@ export class InvalidNumberOfArguments extends RuntimeSourceError {
     const pluralS = this.expected === 1 ? '' : 's'
 
     return `Try calling function ${calleeStr} again, but with ${this.expected} argument${pluralS} instead. Remember that arguments are separated by a ',' (comma).`
-  }
-}
-
-export class ConstAssignment extends RuntimeSourceError {
-  constructor(node: Node, private name: string) {
-    super(node)
-  }
-
-  public explain() {
-    return `Cannot assign new value to constant ${this.name}.`
-  }
-
-  public elaborate() {
-    return `As ${this.name} was declared as a constant, its value cannot be changed. You will have to declare a new variable.`
   }
 }

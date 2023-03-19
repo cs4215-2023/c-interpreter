@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { sourceLanguages } from '../constants'
 import { createContext, IOptions, parseError } from '../index'
 import { sourceRunner } from '../runner/sourceRunner'
 import { ExecutionMethod, Variant } from '../types'
@@ -21,23 +20,12 @@ function startRepl(
   }
 
   sourceRunner(prelude, context, options).then(preludeResult => {
-    if (preludeResult.status === 'finished' || preludeResult.status === 'suspended-non-det') {
+    if (preludeResult.status === 'finished') {
       console.dir(preludeResult.value, { depth: null })
     } else {
       console.error(parseError(context.errors))
     }
   })
-}
-
-/**
- * Returns true iff the given chapter and variant combination is supported.
- */
-function validChapterVariant(variant: any) {
-  for (const lang of sourceLanguages) {
-    if (lang.variant === variant) return true
-  }
-
-  return false
 }
 
 function main() {
@@ -52,12 +40,6 @@ function main() {
     .parseSystem()
 
   const variant = opt.options.variant
-  const areValidChapterVariant: boolean = validChapterVariant(variant)
-  if (!areValidChapterVariant) {
-    throw new Error(
-      'The chapter and variant combination provided is unsupported. Use the -h option to view valid chapters and variants.'
-    )
-  }
 
   const executionMethod =
     opt.options.variant === 'interpreter' || opt.options.variant === 'non-det'

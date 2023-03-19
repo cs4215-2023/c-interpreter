@@ -1,7 +1,7 @@
 import { SourceMapConsumer } from 'source-map'
 
 import createContext from './createContext'
-import { Context, ExecutionMethod, ModuleContext, Result, SourceError, Variant } from './types'
+import { Context, ExecutionMethod, Result, SourceError, Variant } from './types'
 export { SourceDocumentation } from './editors/ace/docTooltip'
 
 export interface IOptions {
@@ -33,4 +33,4 @@ export function parseError(errors: SourceError[]): string {
   return errorMessagesArr.join('\n')
 }
 
-export { createContext, Context, ModuleContext, Result }
+export { createContext, Context, Result }
