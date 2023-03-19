@@ -1,15 +1,9 @@
 import { BinaryOperator, LogicalOperator, UnaryOperator } from 'estree'
 
 import { LazyBuiltIn } from '../createContext'
-import {
-  CallingNonFunctionValue,
-  ExceptionError,
-  GetInheritedPropertyError,
-  InvalidNumberOfArguments
-} from '../errors/errors'
+import { CallingNonFunctionValue, ExceptionError, InvalidNumberOfArguments } from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import { Thunk } from '../types'
-import { locationDummyNode } from './astCreator'
 import * as create from './astCreator'
 import { makeWrapper } from './makeWrapper'
 import * as rttc from './rttc'
@@ -238,29 +232,5 @@ export function evaluateBinaryExpression(operator: BinaryOperator, left: any, ri
       return left ^ right
     default:
       return undefined
-  }
-}
-
-export const setProp = (obj: any, prop: any, value: any, line: number, column: number) => {
-  const dummy = locationDummyNode(line, column)
-  const error = rttc.checkMemberAccess(dummy, obj, prop)
-  if (error === undefined) {
-    return (obj[prop] = value)
-  } else {
-    throw error
-  }
-}
-
-export const getProp = (obj: any, prop: any, line: number, column: number) => {
-  const dummy = locationDummyNode(line, column)
-  const error = rttc.checkMemberAccess(dummy, obj, prop)
-  if (error === undefined) {
-    if (obj[prop] !== undefined && !obj.hasOwnProperty(prop)) {
-      throw new GetInheritedPropertyError(dummy, obj, prop)
-    } else {
-      return obj[prop]
-    }
-  } else {
-    throw error
   }
 }

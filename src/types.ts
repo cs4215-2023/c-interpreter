@@ -5,9 +5,16 @@
 
 /* tslint:disable:max-classes-per-file */
 
-import { SourceLocation } from 'acorn'
-import * as es from 'estree'
-
+import {
+  ArrayExpression,
+  BaseExpression,
+  CallExpression,
+  ExpressionStatement,
+  Literal,
+  Node,
+  SourceLocation,
+  Statement
+} from '../src/parser/types'
 import { EnvTree } from './createContext'
 
 /**
@@ -37,16 +44,16 @@ export enum ErrorSeverity {
 export interface SourceError {
   type: ErrorType
   severity: ErrorSeverity
-  location: es.SourceLocation
+  location: SourceLocation
   explain(): string
   elaborate(): string
 }
 
-export interface Rule<T extends es.Node> {
+export interface Rule<T extends Node> {
   name: string
   disableForVariants?: Variant[]
   checkers: {
-    [name: string]: (node: T, ancestors: es.Node[]) => SourceError[]
+    [name: string]: (node: T, ancestors: Node[]) => SourceError[]
   }
 }
 
@@ -100,7 +107,7 @@ export interface Context<T = any> {
     isRunning: boolean
     environmentTree: EnvTree
     environments: Environment[]
-    nodes: es.Node[]
+    nodes: Node[]
   }
 
   numberOfOuterEnvironments: number
@@ -108,7 +115,7 @@ export interface Context<T = any> {
   prelude: string | null
 
   /**
-   * Used for storing external properties.
+   * Used for storing external properti
    * For e.g, this can be used to store some application-related
    * context for use in your own built-in functions (like `display(a)`)
    */
@@ -151,18 +158,18 @@ export type ModuleContext = {
 export interface BlockFrame {
   type: string
   // loc refers to the block defined by every pair of curly braces
-  loc?: es.SourceLocation | null
+  loc?: SourceLocation | null
   // For certain type of BlockFrames, we also want to take into account
   // the code directly outside the curly braces as there
   // may be variables declared there as well, such as in function definitions or for loops
-  enclosingLoc?: es.SourceLocation | null
+  enclosingLoc?: SourceLocation | null
   children: (DefinitionNode | BlockFrame)[]
 }
 
 export interface DefinitionNode {
   name: string
   type: string
-  loc?: es.SourceLocation | null
+  loc?: SourceLocation | null
 }
 
 // tslint:disable:no-any
@@ -178,7 +185,7 @@ export interface Environment {
   id: string
   name: string
   tail: Environment | null
-  callExpression?: es.CallExpression
+  callExpression?: CallExpression
   head: Frame
   thisContext?: Value
 }
@@ -220,18 +227,10 @@ export interface Scheduler {
 	Although the ESTree specifications supposedly provide a Directive interface, the index file does not seem to export it.
 	As such this interface was created here to fulfil the same purpose.
  */
-export interface Directive extends es.ExpressionStatement {
+export interface Directive extends ExpressionStatement {
   type: 'ExpressionStatement'
-  expression: es.Literal
+  expression: Literal
   directive: string
-}
-
-/** For use in the substituter, to differentiate between a function declaration in the expression position,
- * which has an id, as opposed to function expressions.
- */
-export interface FunctionDeclarationExpression extends es.FunctionExpression {
-  id: es.Identifier
-  body: es.BlockStatement
 }
 
 /**
@@ -239,14 +238,14 @@ export interface FunctionDeclarationExpression extends es.FunctionExpression {
  * only contains a single return statement; or a block, but has to be in the expression position.
  * This is NOT compliant with the ES specifications, just as an intermediate step during substitutions.
  */
-export interface BlockExpression extends es.BaseExpression {
+export interface BlockExpression extends BaseExpression {
   type: 'BlockExpression'
-  body: es.Statement[]
+  body: Statement[]
 }
 
-export type substituterNodes = es.Node | BlockExpression
+export type substituterNodes = Node | BlockExpression
 
-export type ContiguousArrayElementExpression = Exclude<es.ArrayExpression['elements'][0], null>
+export type ContiguousArrayElementExpression = Exclude<ArrayExpression['elements'][0], null>
 
 export type ContiguousArrayElements = ContiguousArrayElementExpression[]
 
@@ -266,10 +265,9 @@ export type TSDisallowedTypes = typeof disallowedTypes[number]
 export type TSBasicType = PrimitiveType | TSAllowedTypes | TSDisallowedTypes
 
 // Types for nodes used in type inference
-export type NodeWithInferredType<T extends es.Node> = InferredType & T
+export type NodeWithInferredType<T extends Node> = InferredType & T
 
-export type FuncDeclWithInferredTypeAnnotation = NodeWithInferredType<es.FunctionDeclaration> &
-  TypedFuncDecl
+export type FuncDeclWithInferredTypeAnnotation = TypedFuncDecl
 
 export type InferredType = Untypable | Typed | NotYetTyped
 
@@ -363,12 +361,6 @@ export interface ForAll {
 export interface PredicateType {
   kind: 'predicate'
   ifTrueType: Type | ForAll
-}
-
-export type PredicateTest = {
-  node: NodeWithInferredType<es.CallExpression>
-  ifTrueType: Type | ForAll
-  argVarName: string
 }
 
 /**

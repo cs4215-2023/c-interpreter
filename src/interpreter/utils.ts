@@ -1,7 +1,11 @@
-import * as es from 'estree'
-import { forEach } from 'lodash'
-
 import * as errors from '../errors/errors'
+import {
+  CallExpression,
+  Expression,
+  ExpressionStatement,
+  Identifier,
+  Statement
+} from '../parser/types'
 import { Context, Environment, Frame, Value } from '../types'
 import Closure from './closure'
 import { currentEnvironment } from './environment'
@@ -11,7 +15,7 @@ export function checkNumberOfArguments(
   context: Context,
   callee: Closure | Value,
   args: Value[],
-  exp: es.CallExpression
+  exp: CallExpression
 ) {
   if (callee instanceof Closure) {
     const params = callee.node.params
@@ -45,10 +49,10 @@ export function checkNumberOfArguments(
 }
 
 //should be block statement
-export function scanBlockVariables(nodes: es.Statement[]): Frame {
+export function scanBlockVariables(nodes: Statement[]): Frame {
   let var_arr = {}
   for (let node of nodes) {
-    node = node as es.ExpressionStatement
+    node = node as ExpressionStatement
     const res = scanVariables(node)
     var_arr = { ...var_arr, ...res }
   }
@@ -57,7 +61,7 @@ export function scanBlockVariables(nodes: es.Statement[]): Frame {
   return var_arr
 }
 
-export function scanVariables(node: es.Statement | es.Expression): Frame {
+export function scanVariables(node: Statement | Expression): Frame {
   let arr = {}
   if (node.type == 'SequenceExpression') {
     for (const expr of node.expressions) {
@@ -67,7 +71,7 @@ export function scanVariables(node: es.Statement | es.Expression): Frame {
   } else if (node.type == 'ExpressionStatement') {
     return scanVariables(node.expression)
   } else if (node.type == 'AssignmentExpression') {
-    const left = node.left as es.Identifier
+    const left = node.left as Identifier
     arr[left.name] = undefined
   } else if (node.type == 'Identifier') {
     arr[node.name] = undefined

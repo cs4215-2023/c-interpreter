@@ -1,14 +1,20 @@
 /* tslint:disable: max-classes-per-file */
 /* tslint:disable:max-line-length */
 import { baseGenerator, generate } from 'astring'
-import * as es from 'estree'
 
+import {
+  CallExpression,
+  FunctionDeclaration,
+  Node,
+  SourceLocation,
+  VariableDeclaration
+} from '../parser/types'
 import { ErrorSeverity, ErrorType, SourceError, Value } from '../types'
 import { stringify } from '../utils/stringify'
 import { RuntimeSourceError } from './runtimeSourceError'
 
 export class InterruptedError extends RuntimeSourceError {
-  constructor(node: es.Node) {
+  constructor(node: Node) {
     super(node)
   }
 
@@ -25,7 +31,7 @@ export class ExceptionError implements SourceError {
   public type = ErrorType.RUNTIME
   public severity = ErrorSeverity.ERROR
 
-  constructor(public error: Error, public location: es.SourceLocation) {}
+  constructor(public error: Error, public location: SourceLocation) {}
 
   public explain() {
     return this.error.toString()
@@ -50,12 +56,12 @@ export class MaximumStackLimitExceeded extends RuntimeSourceError {
     }
   }
 
-  constructor(node: es.Node, private calls: es.CallExpression[]) {
+  constructor(node: Node, private calls: CallExpression[]) {
     super(node)
   }
 
   public explain() {
-    const repr = (call: es.CallExpression) => generate(call, { generator: this.customGenerator })
+    const repr = (call: CallExpression) => generate(call, { generator: this.customGenerator })
     return (
       'Maximum call stack size exceeded\n  ' + this.calls.map(call => repr(call) + '..').join('  ')
     )
@@ -67,7 +73,7 @@ export class MaximumStackLimitExceeded extends RuntimeSourceError {
 }
 
 export class CallingNonFunctionValue extends RuntimeSourceError {
-  constructor(private callee: Value, private node: es.Node) {
+  constructor(private callee: Value, private node: Node) {
     super(node)
   }
 
@@ -80,7 +86,7 @@ export class CallingNonFunctionValue extends RuntimeSourceError {
     const calleeStr = stringify(calleeVal)
     let argStr = ''
 
-    const callArgs = (this.node as es.CallExpression).arguments
+    const callArgs = (this.node as CallExpression).arguments
 
     argStr = callArgs.map(generate).join(', ')
 
@@ -96,7 +102,7 @@ export class CallingNonFunctionValue extends RuntimeSourceError {
 }
 
 export class UndefinedVariable extends RuntimeSourceError {
-  constructor(public name: string, node: es.Node) {
+  constructor(public name: string, node: Node) {
     super(node)
   }
 
@@ -110,7 +116,7 @@ export class UndefinedVariable extends RuntimeSourceError {
 }
 
 export class UnassignedVariable extends RuntimeSourceError {
-  constructor(public name: string, node: es.Node) {
+  constructor(public name: string, node: Node) {
     super(node)
   }
 
@@ -127,13 +133,13 @@ export class InvalidNumberOfArguments extends RuntimeSourceError {
   private calleeStr: string
 
   constructor(
-    node: es.Node,
+    node: Node,
     private expected: number,
     private got: number,
     private hasVarArgs = false
   ) {
     super(node)
-    this.calleeStr = generate((node as es.CallExpression).callee)
+    this.calleeStr = generate((node as CallExpression).callee)
   }
 
   public explain() {
@@ -151,7 +157,7 @@ export class InvalidNumberOfArguments extends RuntimeSourceError {
 }
 
 export class VariableRedeclaration extends RuntimeSourceError {
-  constructor(private node: es.Node, private name: string, private writable?: boolean) {
+  constructor(private node: Node, private name: string, private writable?: boolean) {
     super(node)
   }
 
@@ -167,9 +173,9 @@ export class VariableRedeclaration extends RuntimeSourceError {
 
       if (this.node.type === 'FunctionDeclaration') {
         initStr =
-          '(' + (this.node as es.FunctionDeclaration).params.map(generate).join(',') + ') => {...'
+          '(' + (this.node as FunctionDeclaration).params.map(generate).join(',') + ') => {...'
       } else if (this.node.type === 'VariableDeclaration') {
-        initStr = generate((this.node as es.VariableDeclaration).declarations[0].init)
+        initStr = generate((this.node as VariableDeclaration).declarations[0].init)
       }
 
       return `${elabStr} As such, you can just do\n\n\t${this.name} = ${initStr};\n`
@@ -182,7 +188,7 @@ export class VariableRedeclaration extends RuntimeSourceError {
 }
 
 export class ConstAssignment extends RuntimeSourceError {
-  constructor(node: es.Node, private name: string) {
+  constructor(node: Node, private name: string) {
     super(node)
   }
 
@@ -196,7 +202,7 @@ export class ConstAssignment extends RuntimeSourceError {
 }
 
 export class GetPropertyError extends RuntimeSourceError {
-  constructor(node: es.Node, private obj: Value, private prop: string) {
+  constructor(node: Node, private obj: Value, private prop: string) {
     super(node)
   }
 
@@ -212,9 +218,9 @@ export class GetPropertyError extends RuntimeSourceError {
 export class GetInheritedPropertyError extends RuntimeSourceError {
   public type = ErrorType.RUNTIME
   public severity = ErrorSeverity.ERROR
-  public location: es.SourceLocation
+  public location: SourceLocation
 
-  constructor(node: es.Node, private obj: Value, private prop: string) {
+  constructor(node: Node, private obj: Value, private prop: string) {
     super(node)
     this.location = node.loc!
   }
@@ -229,7 +235,7 @@ export class GetInheritedPropertyError extends RuntimeSourceError {
 }
 
 export class SetPropertyError extends RuntimeSourceError {
-  constructor(node: es.Node, private obj: Value, private prop: string) {
+  constructor(node: Node, private obj: Value, private prop: string) {
     super(node)
   }
 

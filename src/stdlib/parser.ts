@@ -234,12 +234,6 @@ const transformers: ASTTransformers = new Map([
           transform(node.left as es.Identifier),
           transform(node.right)
         ])
-      } else if (node.left.type === 'MemberExpression') {
-        return vector_to_list([
-          'object_assignment',
-          transform(node.left as es.Expression),
-          transform(node.right)
-        ])
       } else {
         unreachable()
         throw new ParseError('Invalid assignment')
@@ -278,46 +272,6 @@ const transformers: ASTTransformers = new Map([
     'ContinueStatement',
     (_node: es.ContinueStatement) => {
       return vector_to_list(['continue_statement'])
-    }
-  ],
-
-  [
-    'ObjectExpression',
-    (node: es.ObjectExpression) => {
-      return vector_to_list(['object_expression', vector_to_list(node.properties.map(transform))])
-    }
-  ],
-
-  [
-    'MemberExpression',
-    (node: es.MemberExpression) => {
-      // "computed" property of MemberExpression distinguishes
-      // between dot access (not computed) and
-      // a[...] (computed)
-      // the key in dot access is meant as string, and
-      // represented by a "property" node in parse result
-      return vector_to_list([
-        'object_access',
-        transform(node.object),
-        !node.computed && node.property.type === 'Identifier'
-          ? vector_to_list(['property', node.property.name])
-          : transform(node.property)
-      ])
-    }
-  ],
-
-  [
-    'Property',
-    (node: es.Property) => {
-      // identifiers before the ":" in literal objects are meant
-      // as string, and represented by a "property" node in parse result
-      return vector_to_list([
-        'key_value_pair',
-        node.key.type === 'Identifier'
-          ? vector_to_list(['property', node.key.name])
-          : transform(node.key),
-        transform(node.value)
-      ])
     }
   ],
 

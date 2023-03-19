@@ -3,12 +3,7 @@ import { generate } from 'astring'
 import * as es from 'estree'
 
 import { Context, Environment, Value } from '../types'
-import {
-  blockArrowFunction,
-  callExpression,
-  identifier,
-  returnStatement
-} from '../utils/astCreator'
+import { callExpression, identifier } from '../utils/astCreator'
 import { apply } from './interpreter'
 
 const closureToJS = (value: Closure, context: Context, klass: string) => {
@@ -49,29 +44,6 @@ class Callable extends Function {
  * Models function value in the interpreter environment.
  */
 export default class Closure extends Callable {
-  public static makeFromArrowFunction(
-    node: es.ArrowFunctionExpression,
-    environment: Environment,
-    context: Context
-  ) {
-    function isExpressionBody(body: es.BlockStatement | es.Expression): body is es.Expression {
-      return body.type !== 'BlockStatement'
-    }
-    const functionBody = isExpressionBody(node.body)
-      ? [returnStatement(node.body, node.body.loc!)]
-      : node.body
-    const closure = new Closure(
-      blockArrowFunction(node.params as es.Identifier[], functionBody, node.loc!),
-      environment,
-      context
-    )
-
-    // Set the closure's node to point back at the original one
-    closure.originalNode = node
-
-    return closure
-  }
-
   /** Unique ID defined for anonymous closure */
   public functionName: string
 

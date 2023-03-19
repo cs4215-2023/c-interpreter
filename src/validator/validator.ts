@@ -2,6 +2,16 @@ import * as es from 'estree'
 
 import { ConstAssignment } from '../errors/errors'
 import { NoAssignmentToForVariable } from '../errors/validityErrors'
+import {
+  BlockStatement,
+  CallExpression,
+  ForStatement,
+  FunctionDeclaration,
+  Identifier,
+  Program,
+  VariableDeclaration,
+  VariableDeclarator
+} from '../parser/types'
 import { Context, NodeWithInferredType } from '../types'
 import { getVariableDecarationName } from '../utils/astCreator'
 import { ancestor, base, FullWalkerCallback } from '../utils/walkers'
@@ -12,12 +22,12 @@ class Declaration {
 }
 
 export function validateAndAnnotate(
-  program: es.Program,
+  program: Program,
   context: Context
-): NodeWithInferredType<es.Program> {
-  const accessedBeforeDeclarationMap = new Map<es.Node, Map<string, Declaration>>()
-  const scopeHasCallExpressionMap = new Map<es.Node, boolean>()
-  function processBlock(node: es.Program | es.BlockStatement) {
+): NodeWithInferredType<Program> {
+  const accessedBeforeDeclarationMap = new Map<Node, Map<string, Declaration>>()
+  const scopeHasCallExpressionMap = new Map<Node, boolean>()
+  function processBlock(node: Program | BlockStatement) {
     const initialisedIdentifiers = new Map<string, Declaration>()
     for (const statement of node.body) {
       if (statement.type === 'VariableDeclaration') {
@@ -37,21 +47,21 @@ export function validateAndAnnotate(
     scopeHasCallExpressionMap.set(node, false)
     accessedBeforeDeclarationMap.set(node, initialisedIdentifiers)
   }
-  function processFunction(node: es.FunctionDeclaration | es.ArrowFunctionExpression) {
+  function processFunction(node: FunctionDeclaration) {
     accessedBeforeDeclarationMap.set(
       node,
-      new Map((node.params as es.Identifier[]).map(id => [id.name, new Declaration(false)]))
+      new Map((node.params as Identifier[]).map(id => [id.name, new Declaration(false)]))
     )
     scopeHasCallExpressionMap.set(node, false)
   }
 
   // initialise scope of variables
-  ancestor(program as es.Node, {
+  ancestor(program as Node, {
     Program: processBlock,
     BlockStatement: processBlock,
     FunctionDeclaration: processFunction,
     ArrowFunctionExpression: processFunction,
-    ForStatement(forStatement: es.ForStatement, _ancestors: es.Node[]) {
+    ForStatement(forStatement: ForStatement, _ancestors: Node[]) {
       const init = forStatement.init!
       if (init.type === 'VariableDeclaration') {
         accessedBeforeDeclarationMap.set(
@@ -63,9 +73,9 @@ export function validateAndAnnotate(
     }
   })
 
-  function validateIdentifier(id: es.Identifier, ancestors: es.Node[]) {
+  function validateIdentifier(id: Identifier, ancestors: Node[]) {
     const name = id.name
-    const lastAncestor: es.Node = ancestors[ancestors.length - 2]
+    const lastAncestor: Node = ancestors[ancestors.length - 2]
     for (let i = ancestors.length - 1; i >= 0; i--) {
       const a = ancestors[i]
       const map = accessedBeforeDeclarationMap.get(a)
@@ -85,7 +95,7 @@ export function validateAndAnnotate(
   }
   const customWalker = {
     ...base,
-    VariableDeclarator(node: es.VariableDeclarator, st: never, c: FullWalkerCallback<never>) {
+    VariableDeclarator(node: VariableDeclarator, st: never, c: FullWalkerCallback<never>) {
       // don't visit the id
       if (node.init) {
         c(node.init, st, 'Expression')
@@ -95,10 +105,7 @@ export function validateAndAnnotate(
   ancestor(
     program,
     {
-      VariableDeclaration(
-        node: NodeWithInferredType<es.VariableDeclaration>,
-        ancestors: es.Node[]
-      ) {
+      VariableDeclaration(node: NodeWithInferredType<VariableDeclaration>, ancestors: Node[]) {
         const lastAncestor = ancestors[ancestors.length - 2]
         const name = getVariableDecarationName(node)
         const accessedBeforeDeclaration = accessedBeforeDeclarationMap
@@ -107,24 +114,17 @@ export function validateAndAnnotate(
         node.typability = accessedBeforeDeclaration ? 'Untypable' : 'NotYetTyped'
       },
       Identifier: validateIdentifier,
-      FunctionDeclaration(
-        node: NodeWithInferredType<es.FunctionDeclaration>,
-        ancestors: es.Node[]
-      ) {
+      FunctionDeclaration(node: NodeWithInferredType<FunctionDeclaration>, ancestors: Node[]) {
         // a function declaration can be typed if there are no function calls in the same scope before it
         const lastAncestor = ancestors[ancestors.length - 2]
         node.typability = scopeHasCallExpressionMap.get(lastAncestor) ? 'Untypable' : 'NotYetTyped'
       },
-      Pattern(node: es.Pattern, ancestors: es.Node[]) {
+      Pattern(node: Pattern, ancestors: Node[]) {
         if (node.type === 'Identifier') {
           validateIdentifier(node, ancestors)
-        } else if (node.type === 'MemberExpression') {
-          if (node.object.type === 'Identifier') {
-            validateIdentifier(node.object, ancestors)
-          }
         }
       },
-      CallExpression(call: es.CallExpression, ancestors: es.Node[]) {
+      CallExpression(call: CallExpression, ancestors: Node[]) {
         for (let i = ancestors.length - 1; i >= 0; i--) {
           const a = ancestors[i]
           if (scopeHasCallExpressionMap.has(a)) {
@@ -139,10 +139,10 @@ export function validateAndAnnotate(
 
   /*
   simple(program, {
-    VariableDeclaration(node: TypeAnnotatedNode<es.VariableDeclaration>) {
+    VariableDeclaration(node: TypeAnnotatedNode< VariableDeclaration>) {
       console.log(getVariableDecarationName(node) + " " + node.typability);
     },
-    FunctionDeclaration(node: TypeAnnotatedNode<es.FunctionDeclaration>) {
+    FunctionDeclaration(node: TypeAnnotatedNode< FunctionDeclaration>) {
       console.log(node.id!.name + " " + node.typability);
     }
   })
