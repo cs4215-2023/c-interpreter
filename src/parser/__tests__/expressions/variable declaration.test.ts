@@ -1,9 +1,8 @@
-import { Program } from 'estree'
-
 import createContext from '../../../createContext'
 import { Variant } from '../../../types'
 import { FatalSyntaxError } from '../../errors'
 import { parse } from '../../parser'
+import { Program } from '../../types'
 import { Identifier } from '../../types'
 
 const variant = Variant.DEFAULT
@@ -26,7 +25,6 @@ describe('Variable declarations', () => {
 
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           expression: {
@@ -73,7 +71,6 @@ describe('Variable declarations', () => {
 
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           expression: {
