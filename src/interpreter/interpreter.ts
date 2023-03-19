@@ -27,11 +27,11 @@ import {
 } from './utils'
 
 class ReturnValue {
-  constructor(public value: Value) { }
+  constructor(public value: Value) {}
 }
 
 class TailCallReturnValue {
-  constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) { }
+  constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) {}
 }
 
 class Thunk {
@@ -44,11 +44,11 @@ class Thunk {
 }
 
 //not a needed function atm
-function forceIt(val: any, context: Context): Value {
+function* forceIt(val: any, context: Context): Value {
   if (val instanceof Thunk) {
     if (val.isMemoized) return val.value
     pushEnvironment(context, val.env)
-    const evalRes = actualValue(val.exp, context)
+    const evalRes = yield* actualValue(val.exp, context)
     popEnvironment(context)
     val.value = evalRes
     val.isMemoized = true
@@ -56,15 +56,15 @@ function forceIt(val: any, context: Context): Value {
   } else return val
 }
 
-export function actualValue(exp: es.Node, context: Context): Value {
-  const evalResult = evaluate(exp, context)
-  const forced = forceIt(evalResult, context)
+export function* actualValue(exp: es.Node, context: Context): Value {
+  const evalResult = yield* evaluate(exp, context)
+  const forced = yield* forceIt(evalResult, context)
   return forced
 }
 
-export type Evaluator<T extends es.Node> = (node: T, context: Context) => Value
+export type Evaluator<T extends es.Node> = (node: T, context: Context) => IterableIterator<Value>
 
-function evaluateBlockStatement(context: Context, node: es.BlockStatement) {
+function* evaluateBlockStatement(context: Context, node: es.BlockStatement) {
   //scan block statement here
   const frame = scanBlockVariables(node.body)
   console.log(frame)
@@ -72,7 +72,7 @@ function evaluateBlockStatement(context: Context, node: es.BlockStatement) {
   pushEnvironment(context, env)
   let result
   for (const statement of node.body) {
-    result = evaluate(statement, context)
+    result = yield* evaluate(statement, context)
   }
   return result
 }
@@ -91,28 +91,28 @@ function evaluateBlockStatement(context: Context, node: es.BlockStatement) {
 // prettier-ignore
 export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   /** Simple Values */
-  Literal: function (node: es.Literal, _context: Context) {
+  Literal: function* (node: es.Literal, _context: Context) {
     if (node.type !== 'Literal') {
       return handleRuntimeError(_context, new InterpreterError(node));
     }
     return node.value
   },
 
-  TemplateLiteral: function (node: es.TemplateLiteral) {
+  TemplateLiteral: function* (node: es.TemplateLiteral) {
     // Expressions like `${1}` are not allowed, so no processing needed
     return node.quasis[0].value.cooked
   },
 
-  SequenceExpression: function (node: es.SequenceExpression, context: Context) {
+  SequenceExpression: function* (node: es.SequenceExpression, context: Context) {
     let result
     for (const expr of node.expressions) {
       if (expr.type === 'SequenceExpression' && expr.expressions.length === 0) { continue }
-      result = evaluate(expr, context)
+      result = yield* evaluate(expr, context)
     }
     return result
   },
 
-  ArrayExpression: function (node: es.ArrayExpression, context: Context) {
+  ArrayExpression: function* (node: es.ArrayExpression, context: Context) {
     if (node.type !== 'ArrayExpression') {
       return handleRuntimeError(context, new InterpreterError(node));
     }
@@ -120,7 +120,7 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
 
-  FunctionExpression: function (node: es.FunctionExpression, context: Context) {
+  FunctionExpression: function* (node: es.FunctionExpression, context: Context) {
     if (node.type !== 'FunctionExpression') {
       return handleRuntimeError(context, new InterpreterError(node));
     }
@@ -128,23 +128,23 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
 
-  Identifier: function (node: es.Identifier, context: Context) {
+  Identifier: function* (node: es.Identifier, context: Context) {
     const identifier = getValueFromIdentifier(context, node.name)
     return identifier
   },
 
-  CallExpression: function (node: es.CallExpression, context: Context) {
+  CallExpression: function* (node: es.CallExpression, context: Context) {
     if (node.type !== 'CallExpression') {
       return handleRuntimeError(context, new InterpreterError(node));
     }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  UnaryExpression: function (node: es.UnaryExpression, context: Context) {
+  UnaryExpression: function* (node: es.UnaryExpression, context: Context) {
     if (node.type !== 'UnaryExpression') {
       return handleRuntimeError(context, new InterpreterError(node));
     }
-    const value = actualValue(node.argument, context)
+    const value = yield* actualValue(node.argument, context)
 
     const error = rttc.checkUnaryExpression(node, node.operator, value)
     if (error) {
@@ -153,12 +153,12 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
     return evaluateUnaryExpression(node.operator, value)
   },
 
-  BinaryExpression: function (node: es.BinaryExpression, context: Context) {
+  BinaryExpression: function* (node: es.BinaryExpression, context: Context) {
     if (node.type !== 'BinaryExpression') {
       return handleRuntimeError(context, new InterpreterError(node));
     }
-    const left = actualValue(node.left, context)
-    const right = actualValue(node.right, context)
+    const left =yield* actualValue(node.left, context)
+    const right = yield*actualValue(node.right, context)
     console.log("evaluating binaryexpression for " + left + " and " + right)
     const error = rttc.checkBinaryExpression(node, node.operator, left, right)
     if (error) {
@@ -171,33 +171,33 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   //need to verify this once loops are implemented
-  ConditionalExpression: function (node: es.ConditionalExpression, context: Context) {
+  ConditionalExpression: function* (node: es.ConditionalExpression, context: Context) {
     if (node.type !== 'ConditionalExpression') {
       return handleRuntimeError(context, new InterpreterError(node));
     }
-    const result = evaluate(node.test, context)
+    const result = yield*evaluate(node.test, context)
     //not sure if pushenv is needed here, depending on the definition of conditional expr
     if (result) {
-      return evaluate(node.consequent, context)
+      return yield*evaluate(node.consequent, context)
     }
     else {
-      return evaluate(node.alternate, context)
+      return yield*evaluate(node.alternate, context)
     }
   },
 
-  LogicalExpression: function (node: es.LogicalExpression, context: Context) {
+  LogicalExpression: function* (node: es.LogicalExpression, context: Context) {
     if (node.type !== 'LogicalExpression') {
       return handleRuntimeError(context, new InterpreterError(node));
     }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  VariableDeclaration: function (node: es.VariableDeclaration, context: Context) {
+  VariableDeclaration: function* (node: es.VariableDeclaration, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
 
-  ForStatement: function (node: es.ForStatement, context: Context) {
+  ForStatement: function* (node: es.ForStatement, context: Context) {
     if (node.type !== 'ForStatement') {
       return handleRuntimeError(context, new InterpreterError(node));
     }
@@ -205,91 +205,93 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
 
-  AssignmentExpression: function (node: es.AssignmentExpression, context: Context) {
+  AssignmentExpression: function* (node: es.AssignmentExpression, context: Context) {
     if (node.left.type === 'MemberExpression') {
       throw new Error('member expression not allowed')
     }
 
     const id = node.left as es.Identifier
-    const value = evaluate(node.right, context)
+    const value = yield*evaluate(node.right, context)
     setValueToIdentifier(context, id.name, value)
     return value;
   },
 
-  FunctionDeclaration: function (node: es.FunctionDeclaration, context: Context) {
+  FunctionDeclaration: function* (node: es.FunctionDeclaration, context: Context) {
     if (node.type !== 'FunctionDeclaration') {
       return handleRuntimeError(context, new InterpreterError(node));
     }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  IfStatement: function (node: es.IfStatement | es.ConditionalExpression, context: Context) {
+  IfStatement: function* (node: es.IfStatement | es.ConditionalExpression, context: Context) {
     if (node.type !== 'IfStatement') {
       return handleRuntimeError(context, new InterpreterError(node));
     }
-    const result = evaluate(node.test, context)
+    const result =yield* evaluate(node.test, context)
     if (result) {
       const cons = node.consequent as es.BlockStatement
-      return evaluate(node.consequent, context)
+      return yield*evaluate(node.consequent, context)
     }
     else {
       if (node.alternate == null || node.alternate == undefined) { return undefined }
       else {
         const alt = node.alternate as es.BlockStatement
-        return evaluate(node.alternate, context)
+        return yield*evaluate(node.alternate, context)
       }
     }
   },
 
-  ExpressionStatement: function (node: es.ExpressionStatement, context: Context) {
+  ExpressionStatement: function* (node: es.ExpressionStatement, context: Context) {
     if (node.type !== 'ExpressionStatement') {
       return handleRuntimeError(context, new InterpreterError(node));
     }
-    return evaluate(node.expression, context)
+    return yield*evaluate(node.expression, context)
   },
 
-  ReturnStatement: function (node: es.ReturnStatement, context: Context) {
+  ReturnStatement: function* (node: es.ReturnStatement, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  WhileStatement: function (node: es.WhileStatement, context: Context) {
+  WhileStatement: function* (node: es.WhileStatement, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
 
-  BlockStatement: function (node: es.BlockStatement, context: Context) {
+  BlockStatement: function* (node: es.BlockStatement, context: Context) {
     if (node.type !== 'BlockStatement') {
       return handleRuntimeError(context, new InterpreterError(node));
     }
-    return evaluateBlockStatement(context, node)
+    return yield*evaluateBlockStatement(context, node)
 
   },
 
-  Program: function (node: es.BlockStatement, context: Context) {
+  Program: function* (node: es.BlockStatement, context: Context) {
     //create new environment in program
     console.log(currentEnvironment(context)) //this is a null env
     const environment = createBlockEnvironment(context, 'globalEnvironment');
     pushEnvironment(context, environment);
     console.log(currentEnvironment(context)) //this is the 'global' env
-    const result = evaluateBlockStatement(context, node)
+    const result = yield*evaluateBlockStatement(context, node)
     return result;
   }
 }
 // tslint:enable:object-literal-shorthand
 
-export function evaluate(node: es.Node, context: Context) {
-  const result = evaluators[node.type](node, context)
-  leave(context)
+export function* evaluate(node: es.Node, context: Context) {
+  const result = yield* evaluators[node.type](node, context)
+  yield* leave(context)
   return result
 }
 
-function visit(context: Context, node: es.Node) {
+function* visit(context: Context, node: es.Node) {
   context.runtime.nodes.unshift(node)
+  yield context
 }
 
-function leave(context: Context) {
+function* leave(context: Context) {
   context.runtime.break = false
   context.runtime.nodes.shift()
+  yield context
 }
 
 export function apply(

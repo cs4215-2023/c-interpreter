@@ -5,47 +5,46 @@ import { Context, Result, Scheduler, Value } from './types'
 export class PreemptiveScheduler implements Scheduler {
   constructor(public steps: number) {}
 
-  public run(it: Value, context: Context): Promise<Result> {
+  public run(it: IterableIterator<Value>, context: Context): Promise<Result> {
     return new Promise((resolve, _reject) => {
       context.runtime.isRunning = true
       // This is used in the evaluation of the REPL during a paused state.
       // The debugger is turned off while the code evaluates just above the debugger statement.
-      const actuallyBreak: boolean = false
-      const itValue = it
-      resolve({ status: 'finished', context, value: itValue })
-      // const interval = setInterval(() => {
-      //   let step = 0
-      //   try {
-      //     while (!itValue.done && step < this.steps) {
-      //       step++
-      //       itValue = it.next()
+      let actuallyBreak: boolean = false
+      let itValue = it.next()
+      const interval = setInterval(() => {
+        let step = 0
+        try {
+          while (!itValue.done && step < this.steps) {
+            step++
+            itValue = it.next()
 
-      //       actuallyBreak = context.runtime.break && context.runtime.debuggerOn
-      //       if (actuallyBreak) {
-      //         itValue.done = true
-      //       }
-      //     }
-      //   } catch (e) {
-      //     checkForStackOverflow(e, context)
-      //     context.runtime.isRunning = false
-      //     clearInterval(interval)
-      //     resolve({ status: 'error' })
-      //   }
-      //   if (itValue.done) {
-      //     context.runtime.isRunning = false
-      //     clearInterval(interval)
-      //     if (actuallyBreak) {
-      //       resolve({
-      //         status: 'suspended',
-      //         it,
-      //         scheduler: this,
-      //         context
-      //       })
-      //     } else {
-      //       resolve({ status: 'finished', context, value: itValue })
-      //     }
-      //   }
-      // })
+            actuallyBreak = context.runtime.break && context.runtime.debuggerOn
+            if (actuallyBreak) {
+              itValue.done = true
+            }
+          }
+        } catch (e) {
+          checkForStackOverflow(e, context)
+          context.runtime.isRunning = false
+          clearInterval(interval)
+          resolve({ status: 'error' })
+        }
+        if (itValue.done) {
+          context.runtime.isRunning = false
+          clearInterval(interval)
+          if (actuallyBreak) {
+            resolve({
+              status: 'suspended',
+              it,
+              scheduler: this,
+              context
+            })
+          } else {
+            resolve({ status: 'finished', context, value: itValue.value })
+          }
+        }
+      })
     })
   }
 }
