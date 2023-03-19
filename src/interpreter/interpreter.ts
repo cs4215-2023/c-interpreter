@@ -261,12 +261,20 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
   },
 
   Program: function* (node:  Node, context: Context) {
+	if (node.type !== 'Program') {
+		return handleRuntimeError(context, new RuntimeSourceError(node));
+	  }
     //create new environment in program
     console.log(currentEnvironment(context)) //this is a null env
     const environment = createBlockEnvironment(context, 'globalEnvironment');
     pushEnvironment(context, environment);
     console.log(currentEnvironment(context)) //this is the 'global' env
-    const result = yield*evaluateBlockStatement(context, node)
+	console.log(node)
+    let result;
+	// eslint-disable-next-line @typescript-eslint/no-for-in-array
+	for (let i = 0; i < node.body.length; i++) {
+		result = yield* evaluate(node.body[i], context)
+	}
     return result;
   }
 }
