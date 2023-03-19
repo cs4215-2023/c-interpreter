@@ -1,8 +1,7 @@
-import { Program } from 'estree'
-
 import createContext from '../../createContext'
 import { Variant } from '../../types'
 import { parse } from '../parser'
+import { Program } from '../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
@@ -13,7 +12,6 @@ describe('Conditional Statements', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           alternate: {
@@ -24,10 +22,10 @@ describe('Conditional Statements', () => {
                     {
                       argument: {
                         name: 'b',
-                        type: 'Identifier'
+                        type: 'Identifier',
+                        primitiveType: undefined
                       },
                       operator: '--',
-                      prefix: false,
                       type: 'UpdateExpression'
                     },
                     {
@@ -51,10 +49,10 @@ describe('Conditional Statements', () => {
                     {
                       argument: {
                         name: 'a',
-                        type: 'Identifier'
+                        type: 'Identifier',
+                        primitiveType: undefined
                       },
                       operator: '--',
-                      prefix: false,
                       type: 'UpdateExpression'
                     },
                     {
@@ -81,9 +79,9 @@ describe('Conditional Statements', () => {
                 line: 1
               }
             },
-            raw: '1',
             type: 'Literal',
-            value: 1
+            value: 1,
+            valueType: 'int'
           },
           type: 'IfStatement'
         }
@@ -97,7 +95,6 @@ describe('Conditional Statements', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           alternate: {
@@ -112,10 +109,10 @@ describe('Conditional Statements', () => {
                       {
                         argument: {
                           name: 'b',
-                          type: 'Identifier'
+                          type: 'Identifier',
+                          primitiveType: undefined
                         },
                         operator: '--',
-                        prefix: false,
                         type: 'UpdateExpression'
                       },
                       {
@@ -142,9 +139,9 @@ describe('Conditional Statements', () => {
                   line: 1
                 }
               },
-              raw: '2',
               type: 'Literal',
-              value: 2
+              value: 2,
+              valueType: 'int'
             },
             type: 'IfStatement'
           },
@@ -156,10 +153,10 @@ describe('Conditional Statements', () => {
                     {
                       argument: {
                         name: 'a',
-                        type: 'Identifier'
+                        type: 'Identifier',
+                        primitiveType: undefined
                       },
                       operator: '--',
-                      prefix: false,
                       type: 'UpdateExpression'
                     },
                     {
@@ -186,9 +183,9 @@ describe('Conditional Statements', () => {
                 line: 1
               }
             },
-            raw: '1',
             type: 'Literal',
-            value: 1
+            value: 1,
+            valueType: 'int'
           },
           type: 'IfStatement'
         }
