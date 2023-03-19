@@ -1,3 +1,5 @@
+import { isInteger } from 'lodash'
+
 import {
   CallExpression,
   Expression,
@@ -25,11 +27,17 @@ export const identifier = (
   primitiveType
 })
 
-export const literal = (value: string | number | null, loc?: SourceLocation | null): Literal => ({
-  type: 'Literal',
-  value,
-  loc
-})
+export const literal = (value: string | number | null, loc?: SourceLocation | null): Literal => {
+  if (typeof value == 'string') {
+    return { type: 'Literal', value, valueType: 'char', loc }
+  } else if (value == null) {
+    return { type: 'Literal', value, valueType: 'void', loc }
+  } else if (typeof value === 'number' && isInteger(value)) {
+    return { type: 'Literal', value, valueType: 'int', loc }
+  } else {
+    return { type: 'Literal', value, valueType: 'float', loc }
+  }
+}
 
 export const callExpression = (
   callee: Expression,
