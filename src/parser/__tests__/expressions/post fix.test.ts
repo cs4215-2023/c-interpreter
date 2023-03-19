@@ -1,8 +1,7 @@
-import { Program } from 'estree'
-
 import createContext from '../../../createContext'
 import { Variant } from '../../../types'
 import { parse } from '../../parser'
+import { Program } from '../../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
@@ -13,7 +12,6 @@ describe('Post fix notation', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           expression: {
@@ -21,10 +19,10 @@ describe('Post fix notation', () => {
               {
                 argument: {
                   name: 'a',
-                  type: 'Identifier'
+                  type: 'Identifier',
+                  primitiveType: undefined
                 },
                 operator: '++',
-                prefix: false,
                 type: 'UpdateExpression'
               },
               {
@@ -46,7 +44,7 @@ describe('Post fix notation', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -54,10 +52,10 @@ describe('Post fix notation', () => {
               {
                 argument: {
                   name: 'b',
-                  type: 'Identifier'
+                  type: 'Identifier',
+                  primitiveType: undefined
                 },
                 operator: '--',
-                prefix: false,
                 type: 'UpdateExpression'
               },
               {
