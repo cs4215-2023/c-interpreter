@@ -1,8 +1,7 @@
-import { Program } from 'estree'
-
 import createContext from '../../../createContext'
 import { Variant } from '../../../types'
 import { parse } from '../../parser'
+import { Program } from '../../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
@@ -13,7 +12,7 @@ describe('Unary Operations', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -22,7 +21,7 @@ describe('Unary Operations', () => {
                 argument: {
                   type: 'Literal',
                   value: 1,
-                  raw: '1',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 1,
@@ -35,7 +34,6 @@ describe('Unary Operations', () => {
                   }
                 },
                 operator: '+',
-                prefix: true,
                 type: 'UnaryExpression'
               },
               { expressions: [], type: 'SequenceExpression' }
@@ -54,7 +52,7 @@ describe('Unary Operations', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -63,7 +61,7 @@ describe('Unary Operations', () => {
                 argument: {
                   type: 'Literal',
                   value: 1,
-                  raw: '1',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 1,
@@ -76,7 +74,6 @@ describe('Unary Operations', () => {
                   }
                 },
                 operator: '-',
-                prefix: true,
                 type: 'UnaryExpression'
               },
               { expressions: [], type: 'SequenceExpression' }
@@ -95,7 +92,7 @@ describe('Unary Operations', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -110,7 +107,7 @@ describe('Unary Operations', () => {
                     {
                       type: 'Literal',
                       value: 1,
-                      raw: '1',
+                      valueType: 'int',
                       loc: {
                         end: {
                           column: 2,
@@ -130,7 +127,6 @@ describe('Unary Operations', () => {
                   type: 'SequenceExpression'
                 },
                 operator: '!',
-                prefix: true,
                 type: 'UnaryExpression'
               },
               { expressions: [], type: 'SequenceExpression' }
