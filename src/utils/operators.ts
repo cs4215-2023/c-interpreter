@@ -182,7 +182,17 @@ export function logicalOp(
 ) {
   left = forceIt(left)
   right = forceIt(right)
-  return evaluateLogicalExpression(operator, left, right)
+  const error = rttc.checkLogicalExpression(
+    create.locationDummyNode(line, column),
+    operator,
+    left,
+    right
+  )
+  if (error === undefined) {
+    return evaluateLogicalExpression(operator, left, right)
+  } else {
+    throw error
+  }
 }
 
 export function evaluateLogicalExpression(operator: LogicalOperator, left: any, right: any) {
