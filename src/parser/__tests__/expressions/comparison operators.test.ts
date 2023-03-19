@@ -1,8 +1,7 @@
-import { Program } from 'estree'
-
 import createContext from '../../../createContext'
 import { Variant } from '../../../types'
 import { parse } from '../../parser'
+import { Program } from '../../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
@@ -13,7 +12,6 @@ describe('Comparison Operators', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           expression: {
@@ -22,7 +20,7 @@ describe('Comparison Operators', () => {
                 left: {
                   type: 'Literal',
                   value: 3,
-                  raw: '3',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -37,7 +35,7 @@ describe('Comparison Operators', () => {
                 right: {
                   type: 'Literal',
                   value: 2,
-                  raw: '2',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 4,
@@ -78,7 +76,7 @@ describe('Comparison Operators', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -87,7 +85,7 @@ describe('Comparison Operators', () => {
                 left: {
                   type: 'Literal',
                   value: 4,
-                  raw: '4',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -102,7 +100,7 @@ describe('Comparison Operators', () => {
                 right: {
                   type: 'Literal',
                   value: 5,
-                  raw: '5',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 4,
@@ -143,7 +141,7 @@ describe('Comparison Operators', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -152,7 +150,7 @@ describe('Comparison Operators', () => {
                 left: {
                   type: 'Literal',
                   value: 7,
-                  raw: '7',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -167,7 +165,7 @@ describe('Comparison Operators', () => {
                 right: {
                   type: 'Literal',
                   value: 1,
-                  raw: '1',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 5,
@@ -208,7 +206,7 @@ describe('Comparison Operators', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -217,7 +215,7 @@ describe('Comparison Operators', () => {
                 left: {
                   type: 'Literal',
                   value: 3,
-                  raw: '3',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -232,7 +230,7 @@ describe('Comparison Operators', () => {
                 right: {
                   type: 'Literal',
                   value: 5,
-                  raw: '5',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 5,
@@ -273,7 +271,7 @@ describe('Comparison Operators', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -282,7 +280,7 @@ describe('Comparison Operators', () => {
                 left: {
                   type: 'Literal',
                   value: 0,
-                  raw: '0',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -297,7 +295,7 @@ describe('Comparison Operators', () => {
                 right: {
                   type: 'Literal',
                   value: 0,
-                  raw: '0',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 5,
@@ -338,7 +336,7 @@ describe('Comparison Operators', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -347,7 +345,7 @@ describe('Comparison Operators', () => {
                 left: {
                   type: 'Literal',
                   value: 1,
-                  raw: '1',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -362,7 +360,7 @@ describe('Comparison Operators', () => {
                 right: {
                   type: 'Literal',
                   value: 2,
-                  raw: '2',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 5,
