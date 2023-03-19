@@ -1,8 +1,7 @@
-import { BinaryOperator, LogicalOperator, UnaryOperator } from 'estree'
-
 import { LazyBuiltIn } from '../createContext'
 import { CallingNonFunctionValue, ExceptionError, InvalidNumberOfArguments } from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
+import { BinaryOperator, LogicalOperator, UnaryOperator } from '../parser/types'
 import { Thunk } from '../types'
 import * as create from './astCreator'
 import { makeWrapper } from './makeWrapper'
@@ -138,11 +137,10 @@ export function evaluateUnaryExpression(operator: UnaryOperator, value: any) {
     return !value
   } else if (operator === '-') {
     return -value
-  } else if (operator === 'typeof') {
-    return typeof value
-  } else {
+  } else if (operator === '+') {
     return +value
   }
+  throw new Error('Pointer not implemented yet')
 }
 
 export function binaryOp(
