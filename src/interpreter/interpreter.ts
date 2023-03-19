@@ -3,7 +3,7 @@ import * as constants from '../constants'
 import { LazyBuiltIn } from '../createContext'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
-import { Node } from '../parser/types'
+import { BlockStatement, CallExpression, Identifier, Node } from '../parser/types'
 import { Context, Environment, Value } from '../types'
 import {
   evaluateBinaryExpression,
@@ -20,7 +20,7 @@ import {
   pushEnvironment,
   replaceEnvironment
 } from './environment'
-import { DivisionByZeroError, handleRuntimeError, InterpreterError } from './errors'
+import { DivisionByZeroError, handleRuntimeError } from './errors'
 import {
   checkNumberOfArguments,
   getValueFromIdentifier,
@@ -97,10 +97,16 @@ function* evaluateBlockStatement(context: Context, node: Node) {
 export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
   /** Simple Values */
   Literal: function* (node:  Node, _context: Context) {
+	if (node.type != 'Literal') {
+		throw new Error('Not literal')
+	}
     return node.value
   },
 
   SequenceExpression: function* (node:  Node, context: Context) {
+	if (node.type != 'SequenceExpression') {
+		throw new Error('Not sequence expression')
+	}
     let result
     for (const expr of node.expressions) {
       if (expr.type === 'SequenceExpression' && expr.expressions.length === 0) { continue }
@@ -120,6 +126,9 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 
 
   Identifier: function* (node:  Node, context: Context) {
+	if (node.type != 'Identifier') {
+		throw new Error('Not identifier')
+	}
     const identifier = getValueFromIdentifier(context, node.name)
     return identifier
   },
@@ -129,16 +138,25 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
   },
 
   UnaryExpression: function* (node:  Node, context: Context) {
+	if (node.type != 'UnaryExpression') {
+		throw new Error('Not unary expression')
+	}
     const value = yield* actualValue(node.argument, context)
 
     const error = rttc.checkUnaryExpression(node, node.operator, value)
     if (error) {
       return handleRuntimeError(context, error)
     }
+	if (node.operator == '&' || node.operator == '*') {
+		throw new Error('Pointer not implemented yet')
+	}
     return evaluateUnaryExpression(node.operator, value)
   },
 
   BinaryExpression: function* (node:  Node, context: Context) {
+	if (node.type != 'BinaryExpression') {
+		throw new Error('Not binary expression')
+	}
     const left =yield* actualValue(node.left, context)
     const right = yield*actualValue(node.right, context)
     console.log("evaluating binaryexpression for " + left + " and " + right)
@@ -154,6 +172,9 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 
   //need to verify this once loops are implemented
   ConditionalExpression: function* (node:  Node, context: Context) {
+	if (node.type != 'ConditionalExpression') {
+		throw new Error('Not conditional expression')
+	}
     const result = yield*evaluate(node.test, context)
     //not sure if pushenv is needed here, depending on the definition of conditional expr
     if (result) {
@@ -165,6 +186,9 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
   },
 
   LogicalExpression: function* (node:  Node, context: Context) {
+	if (node.type != 'LogicalExpression') {
+		throw new Error('Not logical expression')
+	}
 	const left =yield* actualValue(node.left, context)
     const right = yield*actualValue(node.right, context)
     console.log("evaluating logicalexpression for " + left + " and " + right)
@@ -183,9 +207,9 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 
 
   AssignmentExpression: function* (node: Node , context: Context) {
-    if (node.left.type === 'MemberExpression') {
-      throw new Error('member expression not allowed')
-    }
+	if (node.type != 'AssignmentExpression') {
+		throw new Error('Not assignment expression')
+	}
 
     const id = node.left as  Identifier
     const value = yield*evaluate(node.right, context)
@@ -198,6 +222,9 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
   },
 
   IfStatement: function* (node: Node, context: Context) {
+	if (node.type != 'IfStatement') {
+		throw new Error('Not if statement')
+	}
     const result =yield* evaluate(node.test, context)
     if (result) {
       const consequent = node.consequent as  BlockStatement
@@ -213,6 +240,9 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
   },
 
   ExpressionStatement: function* (node:  Node, context: Context) {
+	if (node.type != 'ExpressionStatement') {
+		throw new Error('Not expression statement')
+	}
     return yield*evaluate(node.expression, context)
   },
 
