@@ -271,7 +271,6 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
     console.log(currentEnvironment(context)) //this is the 'global' env
 	console.log(node)
     let result;
-	// eslint-disable-next-line @typescript-eslint/no-for-in-array
 	for (let i = 0; i < node.body.length; i++) {
 		result = yield* evaluate(node.body[i], context)
 	}
