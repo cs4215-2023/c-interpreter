@@ -12,14 +12,15 @@ import { ClangVisitor } from '../lang/ClangVisitor'
 import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
 import { StatementParser } from './statementParser'
+import { Statement } from './types'
 
 export class IterationStatementParser
-  extends AbstractParseTreeVisitor<es.Statement>
-  implements ClangVisitor<es.Statement>
+  extends AbstractParseTreeVisitor<Statement>
+  implements ClangVisitor<Statement>
 {
   private expressionParser = new ExpressionParser()
 
-  bodyWrapper(ctx: ForLoopContext | WhileLoopContext | DoWhileLoopContext): es.Statement[] {
+  bodyWrapper(ctx: ForLoopContext | WhileLoopContext | DoWhileLoopContext): Statement[] {
     console.log('body wapper')
     const body = ctx._body
 
@@ -36,13 +37,13 @@ export class IterationStatementParser
     }
   }
 
-  protected defaultResult(): es.Statement {
+  protected defaultResult(): Statement {
     return {
       type: 'EmptyStatement'
     }
   }
 
-  visitErrorNode(node: ErrorNode): es.Statement {
+  visitErrorNode(node: ErrorNode): Statement {
     throw new FatalSyntaxError(
       {
         start: {
@@ -58,7 +59,7 @@ export class IterationStatementParser
     )
   }
 
-  visitIterationStatement(ctx: IterationStatementContext): es.Statement {
+  visitIterationStatement(ctx: IterationStatementContext): Statement {
     const forLoop = ctx.forLoop()
     const doWhileLoop = ctx.doWhileLoop()
     const whileLoop = ctx.whileLoop()
@@ -72,7 +73,7 @@ export class IterationStatementParser
     return this.defaultResult()
   }
 
-  visitForStatement(ctx: ForLoopContext): es.Statement {
+  visitForStatement(ctx: ForLoopContext): Statement {
     const forCondition = ctx._innerForCondition
     return {
       type: 'ForStatement',
@@ -83,7 +84,7 @@ export class IterationStatementParser
     }
   }
 
-  visitWhileStatement(ctx: WhileLoopContext): es.Statement {
+  visitWhileStatement(ctx: WhileLoopContext): Statement {
     return {
       type: 'WhileStatement',
       test: this.expressionParser.visit(ctx._condition),
@@ -91,7 +92,7 @@ export class IterationStatementParser
     }
   }
 
-  visitDoWhileStatement(ctx: DoWhileLoopContext): es.Statement {
+  visitDoWhileStatement(ctx: DoWhileLoopContext): Statement {
     return {
       type: 'DoWhileStatement',
       test: this.expressionParser.visit(ctx._condition),
