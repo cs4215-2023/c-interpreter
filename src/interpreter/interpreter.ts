@@ -5,15 +5,9 @@ import * as constants from '../constants'
 import { LazyBuiltIn } from '../createContext'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
-import { Identifier } from '../parser/types'
 import { Context, Environment, Value } from '../types'
 import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
 import * as rttc from '../utils/rttc'
-import {
-  DivisionByZeroError,
-  handleRuntimeError,
-  InterpreterError,
-} from './errors';
 import Closure from './closure'
 import {
   createBlockEnvironment,
@@ -23,6 +17,7 @@ import {
   pushEnvironment,
   replaceEnvironment
 } from './environment'
+import { DivisionByZeroError, handleRuntimeError, InterpreterError } from './errors'
 import {
   checkNumberOfArguments,
   getValueFromIdentifier,
@@ -32,11 +27,11 @@ import {
 } from './utils'
 
 class ReturnValue {
-  constructor(public value: Value) { }
+  constructor(public value: Value) {}
 }
 
 class TailCallReturnValue {
-  constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) { }
+  constructor(public callee: Closure, public args: Value[], public node: es.CallExpression) {}
 }
 
 class Thunk {

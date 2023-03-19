@@ -1,10 +1,10 @@
 import * as es from 'estree'
 
-import * as errors from '../../errors/errors'
-import { Context, Environment, Frame, Value } from '../../types'
-import Closure from '../closure'
-import { currentEnvironment } from '../environment'
-import { handleRuntimeError } from '../errors'
+import * as errors from '../errors/errors'
+import { Context, Environment, Frame, Value } from '../types'
+import Closure from './closure'
+import { currentEnvironment } from './environment'
+import { handleRuntimeError } from './errors'
 
 export function checkNumberOfArguments(
   context: Context,
