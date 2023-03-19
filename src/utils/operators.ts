@@ -1,55 +1,8 @@
-import { LazyBuiltIn } from '../createContext'
 import { CallingNonFunctionValue, ExceptionError, InvalidNumberOfArguments } from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import { BinaryOperator, LogicalOperator, UnaryOperator } from '../parser/types'
-import { Thunk } from '../types'
 import * as create from './astCreator'
-import { makeWrapper } from './makeWrapper'
 import * as rttc from './rttc'
-
-export function forceIt(val: Thunk | any): any {
-  if (val !== undefined && val !== null && val.isMemoized !== undefined) {
-    if (val.isMemoized) {
-      return val.memoizedValue
-    }
-
-    const evaluatedValue = forceIt(val.f())
-
-    val.isMemoized = true
-    val.memoizedValue = evaluatedValue
-
-    return evaluatedValue
-  } else {
-    return val
-  }
-}
-
-export function wrapLazyCallee(candidate: any) {
-  candidate = forceIt(candidate)
-  if (typeof candidate === 'function') {
-    const wrapped: any = (...args: any[]) => candidate(...args.map(forceIt))
-    makeWrapper(candidate, wrapped)
-    wrapped[Symbol.toStringTag] = () => candidate.toString()
-    wrapped.toString = () => candidate.toString()
-    return wrapped
-  } else if (candidate instanceof LazyBuiltIn) {
-    if (candidate.evaluateArgs) {
-      const wrapped: any = (...args: any[]) => candidate.func(...args.map(forceIt))
-      makeWrapper(candidate.func, wrapped)
-      wrapped[Symbol.toStringTag] = () => candidate.toString()
-      wrapped.toString = () => candidate.toString()
-      return wrapped
-    } else {
-      return candidate
-    }
-  }
-  // doesn't look like a function, not our business to error now
-  return candidate
-}
-
-export function makeLazyFunction(candidate: any) {
-  return new LazyBuiltIn(candidate, false)
-}
 
 export function callIfFuncAndRightArgs(
   candidate: any,
@@ -79,22 +32,7 @@ export function callIfFuncAndRightArgs(
       )
     }
     try {
-      const forcedArgs = args.map(forceIt)
-      return originalCandidate(...forcedArgs)
-    } catch (error) {
-      // if we already handled the error, simply pass it on
-      if (!(error instanceof RuntimeSourceError || error instanceof ExceptionError)) {
-        throw new ExceptionError(error, dummy.loc!)
-      } else {
-        throw error
-      }
-    }
-  } else if (candidate instanceof LazyBuiltIn) {
-    try {
-      if (candidate.evaluateArgs) {
-        args = args.map(forceIt)
-      }
-      return candidate.func(...args)
+      return originalCandidate(...args)
     } catch (error) {
       // if we already handled the error, simply pass it on
       if (!(error instanceof RuntimeSourceError || error instanceof ExceptionError)) {
@@ -109,7 +47,6 @@ export function callIfFuncAndRightArgs(
 }
 
 export function boolOrErr(candidate: any, line: number, column: number) {
-  candidate = forceIt(candidate)
   const error = rttc.checkIfStatement(create.locationDummyNode(line, column), candidate)
   if (error === undefined) {
     return candidate
@@ -119,7 +56,6 @@ export function boolOrErr(candidate: any, line: number, column: number) {
 }
 
 export function unaryOp(operator: UnaryOperator, argument: any, line: number, column: number) {
-  argument = forceIt(argument)
   const error = rttc.checkUnaryExpression(
     create.locationDummyNode(line, column),
     operator,
@@ -150,8 +86,6 @@ export function binaryOp(
   line: number,
   column: number
 ) {
-  left = forceIt(left)
-  right = forceIt(right)
   const error = rttc.checkBinaryExpression(
     create.locationDummyNode(line, column),
     operator,
@@ -172,8 +106,6 @@ export function logicalOp(
   line: number,
   column: number
 ) {
-  left = forceIt(left)
-  right = forceIt(right)
   const error = rttc.checkLogicalExpression(
     create.locationDummyNode(line, column),
     operator,

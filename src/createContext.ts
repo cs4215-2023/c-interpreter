@@ -2,15 +2,6 @@
 
 import { Context, Environment, Variant } from './types'
 
-export class LazyBuiltIn {
-  func: (...arg0: any) => any
-  evaluateArgs: boolean
-  constructor(func: (...arg0: any) => any, evaluateArgs: boolean) {
-    this.func = func
-    this.evaluateArgs = evaluateArgs
-  }
-}
-
 export class EnvTree {
   private _root: EnvTreeNode | null = null
   private map = new Map<Environment, EnvTreeNode>()

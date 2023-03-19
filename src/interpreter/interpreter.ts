@@ -35,26 +35,9 @@ class TailCallReturnValue {
   constructor(public callee: Closure, public args: Value[], public node: CallExpression) {}
 }
 
-class Thunk {
-  public value: Value
-  public isMemoized: boolean
-  constructor(public exp: Node, public env: Environment) {
-    this.isMemoized = false
-    this.value = null
-  }
-}
-
 //not a needed function atm
 function* forceIt(val: any, context: Context): Value {
-  if (val instanceof Thunk) {
-    if (val.isMemoized) return val.value
-    pushEnvironment(context, val.env)
-    const evalRes = yield* actualValue(val.exp, context)
-    popEnvironment(context)
-    val.value = evalRes
-    val.isMemoized = true
-    return evalRes
-  } else return val
+  return val
 }
 
 export function* actualValue(exp: Node, context: Context): Value {
@@ -298,7 +281,7 @@ function* leave(context: Context) {
 export function apply(
   context: Context,
   fun: Closure | Value,
-  args: (Thunk | Value)[],
+  args: Value[],
   node: CallExpression,
   thisContext?: Value
 ) {
