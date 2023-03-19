@@ -95,9 +95,6 @@ function* evaluateBlockStatement(context: Context, node: es.BlockStatement) {
 export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   /** Simple Values */
   Literal: function* (node: es.Literal, _context: Context) {
-    if (node.type !== 'Literal') {
-      return handleRuntimeError(_context, new InterpreterError(node));
-    }
     return node.value
   },
 
@@ -116,17 +113,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   ArrayExpression: function* (node: es.ArrayExpression, context: Context) {
-    if (node.type !== 'ArrayExpression') {
-      return handleRuntimeError(context, new InterpreterError(node));
-    }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
 
   FunctionExpression: function* (node: es.FunctionExpression, context: Context) {
-    if (node.type !== 'FunctionExpression') {
-      return handleRuntimeError(context, new InterpreterError(node));
-    }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
@@ -190,9 +181,6 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
 
 
   ForStatement: function* (node: es.ForStatement, context: Context) {
-    if (node.type !== 'ForStatement') {
-      return handleRuntimeError(context, new InterpreterError(node));
-    }
     throw new Error(`not supported yet: ${node.type}`)
   },
 
