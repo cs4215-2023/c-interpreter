@@ -1,8 +1,7 @@
-import { Program } from 'estree'
-
 import createContext from '../../../createContext'
 import { Variant } from '../../../types'
 import { parse } from '../../parser'
+import { Program } from '../../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
@@ -13,7 +12,6 @@ describe('  declarations', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           expression: {
@@ -21,8 +19,9 @@ describe('  declarations', () => {
               {
                 elements: [
                   {
-                    name: 'a#int',
-                    type: 'Identifier'
+                    name: 'a',
+                    type: 'Identifier',
+                    primitiveType: { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
                   }
                 ],
                 type: 'ArrayExpression'
@@ -47,16 +46,27 @@ describe('  declarations', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           expression: {
             expressions: [
               {
                 elements: [
-                  { type: 'Identifier', name: 'a#int' },
-                  { type: 'Literal', value: 1, raw: '1' },
-                  { type: 'Literal', value: 2, raw: '2' }
+                  {
+                    name: 'a',
+                    type: 'Identifier',
+                    primitiveType: { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
+                  },
+                  {
+                    type: 'Literal',
+                    value: 1,
+                    valueType: 'int'
+                  },
+                  {
+                    type: 'Literal',
+                    value: 2,
+                    valueType: 'int'
+                  }
                 ],
                 type: 'ArrayExpression'
               },
@@ -80,16 +90,19 @@ describe('  declarations', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           expression: {
             expressions: [
               {
                 elements: [
-                  { type: 'Identifier', name: 'v#int' },
-                  { type: 'Literal', value: 3, raw: '3' },
-                  { type: 'Literal', value: 3, raw: '3' }
+                  {
+                    name: 'v',
+                    type: 'Identifier',
+                    primitiveType: { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
+                  },
+                  { type: 'Literal', value: 3, valueType: 'int' },
+                  { type: 'Literal', value: 3, valueType: 'int' }
                 ],
                 type: 'ArrayExpression'
               },
