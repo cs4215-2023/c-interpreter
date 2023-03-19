@@ -71,13 +71,6 @@ const createEmptyRuntime = () => ({
   nodes: []
 })
 
-export const createGlobalEnvironment = (): Environment => ({
-  tail: null,
-  name: 'global',
-  head: {},
-  id: '-1'
-})
-
 export const createEmptyContext = <T>(
   variant: Variant,
   externalSymbols: string[],
@@ -95,23 +88,6 @@ export const createEmptyContext = <T>(
     moduleContexts: {},
     unTypecheckedCode: [],
     previousCode: []
-  }
-}
-
-export const ensureGlobalEnvironmentExist = (context: Context) => {
-  if (!context.runtime) {
-    context.runtime = createEmptyRuntime()
-  }
-  if (!context.runtime.environments) {
-    context.runtime.environments = []
-  }
-  if (!context.runtime.environmentTree) {
-    context.runtime.environmentTree = new EnvTree()
-  }
-  if (context.runtime.environments.length === 0) {
-    const globalEnvironment = createGlobalEnvironment()
-    context.runtime.environments.push(globalEnvironment)
-    context.runtime.environmentTree.insert(globalEnvironment)
   }
 }
 

@@ -3,7 +3,7 @@ import * as constants from '../constants'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import { BlockStatement, CallExpression, Identifier, Node } from '../parser/types'
-import { Context, Environment, Value } from '../types'
+import { Context, Value } from '../types'
 import {
   evaluateBinaryExpression,
   evaluateLogicalExpression,

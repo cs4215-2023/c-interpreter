@@ -1,56 +1,28 @@
 #!/usr/bin/env node
-import { start } from 'repl' // 'repl' here refers to the module named 'repl' in index.d.ts
-import { inspect } from 'util'
-
 import { sourceLanguages } from '../constants'
-import { createContext, IOptions, parseError, runInContext } from '../index'
+import { createContext, IOptions, parseError } from '../index'
+import { sourceRunner } from '../runner/sourceRunner'
 import { ExecutionMethod, Variant } from '../types'
 
 function startRepl(
   executionMethod: ExecutionMethod = 'interpreter',
   variant: Variant = Variant.DEFAULT,
   useSubst: boolean = false,
-  useRepl: boolean,
+
   prelude = ''
 ) {
   // use defaults for everything
-  const context = createContext(variant, undefined, undefined)
+  const context = createContext(Variant.DEFAULT, undefined, undefined)
   const options: Partial<IOptions> = {
     scheduler: 'preemptive',
     executionMethod,
     variant,
     useSubst
   }
-  runInContext(prelude, context, options).then(preludeResult => {
+
+  sourceRunner(prelude, context, options).then(preludeResult => {
     if (preludeResult.status === 'finished' || preludeResult.status === 'suspended-non-det') {
       console.dir(preludeResult.value, { depth: null })
-      if (!useRepl) {
-        return
-      }
-      start(
-        // the object being passed as argument fits the interface ReplOptions in the repl module.
-        {
-          eval: (cmd, unusedContext, unusedFilename, callback) => {
-            runInContext(cmd, context, options).then(obj => {
-              if (obj.status === 'finished' || obj.status === 'suspended-non-det') {
-                callback(null, obj.value)
-              } else {
-                callback(new Error(parseError(context.errors)), undefined)
-              }
-            })
-          },
-          // set depth to a large number so that `parse()` output will not be folded,
-          // setting to null also solves the problem, however a reference loop might crash
-          writer: output => {
-            return typeof output === 'function'
-              ? output.toString()
-              : inspect(output, {
-                  depth: 1000,
-                  colors: true
-                })
-          }
-        }
-      )
     } else {
       console.error(parseError(context.errors))
     }
@@ -92,9 +64,8 @@ function main() {
       ? 'interpreter'
       : 'native'
   const useSubst = opt.options.variant === 'substituter'
-  const useRepl = !opt.options.e
   const prelude = opt.argv[0] ?? ''
-  startRepl(executionMethod, variant, useSubst, useRepl, prelude)
+  startRepl(executionMethod, variant, useSubst, prelude)
 }
 
 main()
