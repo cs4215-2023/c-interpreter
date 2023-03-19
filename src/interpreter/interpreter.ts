@@ -6,7 +6,11 @@ import { LazyBuiltIn } from '../createContext'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import { Context, Environment, Value } from '../types'
-import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
+import {
+  evaluateBinaryExpression,
+  evaluateLogicalExpression,
+  evaluateUnaryExpression
+} from '../utils/operators'
 import * as rttc from '../utils/rttc'
 import Closure from './closure'
 import {
@@ -173,7 +177,11 @@ export const evaluators: { [nodeType: string]: Evaluator<es.Node> } = {
   },
 
   LogicalExpression: function* (node: es.LogicalExpression, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+	const left =yield* actualValue(node.left, context)
+    const right = yield*actualValue(node.right, context)
+    console.log("evaluating logicalexpression for " + left + " and " + right)
+
+    return evaluateLogicalExpression(node.operator, left, right)
   },
 
   VariableDeclaration: function* (node: es.VariableDeclaration, context: Context) {
