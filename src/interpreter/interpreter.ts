@@ -1,6 +1,5 @@
 /* tslint:disable:max-classes-per-file */
 import * as constants from '../constants'
-import { LazyBuiltIn } from '../createContext'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import { BlockStatement, CallExpression, Identifier, Node } from '../parser/types'
@@ -328,33 +327,6 @@ export function apply(
       } else if (!(result instanceof ReturnValue)) {
         // No Return Value, set it as undefined
         result = new ReturnValue(undefined)
-      }
-    } else if (fun instanceof LazyBuiltIn) {
-      try {
-        let finalArgs = args
-        if (fun.evaluateArgs) {
-          finalArgs = []
-          for (const arg of args) {
-            finalArgs.push(forceIt(arg, context))
-          }
-        }
-        result = fun.func.apply(thisContext, finalArgs)
-        break
-      } catch (e) {
-        // Recover from exception
-        context.runtime.environments = context.runtime.environments.slice(
-          -context.numberOfOuterEnvironments
-        )
-
-        const loc = node ? node.loc! : constants.UNKNOWN_LOCATION
-        if (!(e instanceof RuntimeSourceError || e instanceof errors.ExceptionError)) {
-          // The error could've arisen when the builtin called a source function which errored.
-          // If the cause was a source error, we don't want to include the error.
-          // However if the error came from the builtin itself, we need to handle it.
-          return handleRuntimeError(context, new errors.ExceptionError(e, loc))
-        }
-        result = undefined
-        throw e
       }
     } else if (typeof fun === 'function') {
       checkNumberOfArguments(context, fun, args, node!)

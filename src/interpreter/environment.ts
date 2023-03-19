@@ -23,11 +23,7 @@ export function createEnvironment(
     }
   }
   closure.node.params.forEach((param, index) => {
-    if (param.type === 'RestElement') {
-      environment.head[(param.argument as Identifier).name] = args.slice(index)
-    } else {
-      environment.head[(param as Identifier).name] = args[index]
-    }
+    environment.head[(param as Identifier).name] = args[index]
   })
   return environment
 }

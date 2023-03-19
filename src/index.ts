@@ -1,17 +1,7 @@
 import { SourceMapConsumer } from 'source-map'
 
 import createContext from './createContext'
-import { InterruptedError } from './errors/errors'
-import {
-  Context,
-  Error as ResultError,
-  ExecutionMethod,
-  Finished,
-  ModuleContext,
-  Result,
-  SourceError,
-  Variant
-} from './types'
+import { Context, ExecutionMethod, ModuleContext, Result, SourceError, Variant } from './types'
 export { SourceDocumentation } from './editors/ace/docTooltip'
 
 import { CannotFindModuleError } from './errors/localImportErrors'
@@ -78,21 +68,6 @@ export async function runFilesInContext(
     return resolvedErrorPromise
   }
   return sourceFilesRunner(files, entrypointFilePath, context, options)
-}
-
-export function resume(result: Result): Finished | ResultError | Promise<Result> {
-  if (result.status === 'finished' || result.status === 'error') {
-    return result
-  } else {
-    return result.scheduler.run(result.it, result.context)
-  }
-}
-
-export function interrupt(context: Context) {
-  const globalEnvironment = context.runtime.environments[context.runtime.environments.length - 1]
-  context.runtime.environments = [globalEnvironment]
-  context.runtime.isRunning = false
-  context.errors.push(new InterruptedError(context.runtime.nodes[0]))
 }
 
 export { createContext, Context, ModuleContext, Result }

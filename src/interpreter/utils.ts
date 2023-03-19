@@ -19,16 +19,10 @@ export function checkNumberOfArguments(
 ) {
   if (callee instanceof Closure) {
     const params = callee.node.params
-    const hasVarArgs = params[params.length - 1]?.type === 'RestElement'
-    if (hasVarArgs ? params.length - 1 > args.length : params.length !== args.length) {
+    if (params.length !== args.length) {
       return handleRuntimeError(
         context,
-        new errors.InvalidNumberOfArguments(
-          exp,
-          hasVarArgs ? params.length - 1 : params.length,
-          args.length,
-          hasVarArgs
-        )
+        new errors.InvalidNumberOfArguments(exp, params.length, args.length)
       )
     }
   } else {
