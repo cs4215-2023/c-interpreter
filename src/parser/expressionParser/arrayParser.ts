@@ -1,5 +1,3 @@
-import * as es from 'estree'
-
 import {
   ArrayContentContext,
   ArrayIdentifierWithTypeContext,
@@ -9,16 +7,17 @@ import {
   NumberListContext
 } from '../../lang/ClangParser'
 import { TypeParser } from '../typeParser'
+import { Expression, Identifier, Literal } from '../types'
 import { Constructable, tokenToIdentifierWrapper } from '../util'
 
 export const parserArrayExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    visitArrayInitialisationExpression(ctx: ArrayInitialisationExpressionContext): es.Expression {
+    visitArrayInitialisationExpression(ctx: ArrayInitialisationExpressionContext): Expression {
       return this.visitArrayInitialisation(ctx.arrayInitialisation())
     }
-    visitArrayInitialisation(ctx: ArrayInitialisationContext): es.Expression {
+    visitArrayInitialisation(ctx: ArrayInitialisationContext): Expression {
       console.log('visitArrayInitialisation')
       const identifier = this.visitArrayIdentifierWithType(ctx.arrayIdentifierWithType())
       const expressions = []
@@ -30,7 +29,7 @@ export const parserArrayExpression = <T extends Constructable>(
         elements: expressions
       }
     }
-    visitArrayContent(ctx: ArrayContentContext): es.Expression[] {
+    visitArrayContent(ctx: ArrayContentContext): Expression[] {
       if (ctx === undefined) {
         return []
       } else {
@@ -39,46 +38,44 @@ export const parserArrayExpression = <T extends Constructable>(
         return numberList.length !== 0 ? numberList : identifierList
       }
     }
-    visitIdentifierList(ctx: IdentifierListContext): es.Expression[] {
+    visitIdentifierList(ctx: IdentifierListContext): Expression[] {
       console.log('visit identifierlist')
       if (ctx === undefined) {
         return []
       }
       const tokens = ctx.IDENTIFIER()
-      const identifier: es.Expression[] | { type: 'Identifier'; name: string }[] = []
+      const identifier: Expression[] | Identifier[] = []
       tokens.forEach(token => {
         console.log(token.text)
         identifier.push({
           type: 'Identifier',
-          name: token.text
+          name: token.text,
+          primitiveType: undefined
         })
       })
       return identifier
     }
-    visitNumberList(ctx: NumberListContext): es.Expression[] {
+    visitNumberList(ctx: NumberListContext): Expression[] {
       if (ctx === undefined) {
         return []
       }
       const tokens = ctx.NUMBER()
-      const numbers: es.Expression[] | { type: 'Literal'; value: number; raw: string }[] = []
+      const numbers: Expression[] | Literal[] = []
       tokens.forEach(token => {
         console.log(token.text)
         numbers.push({
           type: 'Literal',
           value: parseInt(token.text),
-          raw: token.text
+          valueType: 'int'
         })
       })
       return numbers
     }
-    visitArrayIdentifierWithType(ctx: ArrayIdentifierWithTypeContext): es.Expression {
+    visitArrayIdentifierWithType(ctx: ArrayIdentifierWithTypeContext): Expression {
       console.log('visitarrayidentifierwithtypecontext')
       const type = new TypeParser().visit(ctx._idType)
       const identifier = tokenToIdentifierWrapper(ctx._id, type)
-      return {
-        type: 'Identifier',
-        name: identifier.name + '#' + type.valueType
-      }
+      return identifier
     }
   }
 

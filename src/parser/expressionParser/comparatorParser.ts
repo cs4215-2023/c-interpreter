@@ -1,5 +1,3 @@
-import * as es from 'estree'
-
 import {
   EqualityCheckingContext,
   GreaterThanContext,
@@ -8,13 +6,14 @@ import {
   LesserThanOrEqualContext,
   NotEqualContext
 } from '../../lang/ClangParser'
+import { Expression } from '../types'
 import { Constructable, contextToLocation } from '../util'
 
 export const parserComparatorExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    visitLesserThan(ctx: LesserThanContext): es.Expression {
+    visitLesserThan(ctx: LesserThanContext): Expression {
       console.log('visiting less than')
       return {
         type: 'BinaryExpression',
@@ -25,7 +24,7 @@ export const parserComparatorExpression = <T extends Constructable>(
       }
     }
 
-    visitLesserThanOrEqual(ctx: LesserThanOrEqualContext): es.Expression {
+    visitLesserThanOrEqual(ctx: LesserThanOrEqualContext): Expression {
       return {
         type: 'BinaryExpression',
         operator: '<=',
@@ -35,7 +34,7 @@ export const parserComparatorExpression = <T extends Constructable>(
       }
     }
 
-    visitGreaterThan(ctx: GreaterThanContext): es.Expression {
+    visitGreaterThan(ctx: GreaterThanContext): Expression {
       return {
         type: 'BinaryExpression',
         operator: '>',
@@ -45,7 +44,7 @@ export const parserComparatorExpression = <T extends Constructable>(
       }
     }
 
-    visitGreaterThanOrEqual(ctx: GreaterThanOrEqualContext): es.Expression {
+    visitGreaterThanOrEqual(ctx: GreaterThanOrEqualContext): Expression {
       return {
         type: 'BinaryExpression',
         operator: '>=',
@@ -55,7 +54,7 @@ export const parserComparatorExpression = <T extends Constructable>(
       }
     }
 
-    visitEqualityChecking(ctx: EqualityCheckingContext): es.Expression {
+    visitEqualityChecking(ctx: EqualityCheckingContext): Expression {
       return {
         type: 'BinaryExpression',
         operator: '==',
@@ -65,7 +64,7 @@ export const parserComparatorExpression = <T extends Constructable>(
       }
     }
 
-    visitNotEqual(ctx: NotEqualContext): es.Expression {
+    visitNotEqual(ctx: NotEqualContext): Expression {
       return {
         type: 'BinaryExpression',
         operator: '!=',

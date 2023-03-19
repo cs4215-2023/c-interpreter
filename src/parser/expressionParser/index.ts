@@ -1,12 +1,12 @@
 import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
-import * as es from 'estree'
 import { flow } from 'lodash'
 
 import { ParenthesesExpressionContext } from '../../lang/ClangParser'
 import { ClangVisitor } from '../../lang/ClangVisitor'
 import { FatalSyntaxError } from '../errors'
+import { Expression } from '../types'
 import { parserArrayExpression } from './arrayParser'
 import { parserAssignmentExpression } from './assignmentParser'
 import { parserBitwiseOpExpression } from './bitwiseOpParser'
@@ -20,23 +20,20 @@ import { parserPostFixExpression } from './postFixParser'
 import { parserPrimitiveExpression } from './primitiveParser'
 import { parserUnaryOpExpression } from './unaryOpParser'
 
-class BaseParser
-  extends AbstractParseTreeVisitor<es.Expression>
-  implements ClangVisitor<es.Expression>
-{
-  protected defaultResult(): es.Expression {
+class BaseParser extends AbstractParseTreeVisitor<Expression> implements ClangVisitor<Expression> {
+  protected defaultResult(): Expression {
     return {
       type: 'SequenceExpression',
       expressions: []
     }
   }
 
-  visitParentheses(ctx: ParenthesesExpressionContext): es.Expression {
+  visitParentheses(ctx: ParenthesesExpressionContext): Expression {
     return this.visit(ctx.expression())
   }
 
-  visitChildren(node: RuleNode): es.Expression {
-    const expressions: es.Expression[] = []
+  visitChildren(node: RuleNode): Expression {
+    const expressions: Expression[] = []
     for (let i = 0; i < node.childCount; i++) {
       expressions.push(node.getChild(i).accept(this))
     }
@@ -45,7 +42,7 @@ class BaseParser
       expressions
     }
   }
-  visitErrorNode(node: ErrorNode): es.Expression {
+  visitErrorNode(node: ErrorNode): Expression {
     throw new FatalSyntaxError(
       {
         start: {

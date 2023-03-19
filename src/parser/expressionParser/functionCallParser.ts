@@ -1,26 +1,24 @@
-import * as es from 'estree'
-
 import { FunctionCallContext, FunctionCallParametersContext } from '../../lang/ClangParser'
+import { Expression } from '../types'
 import { Constructable, tokenToIdentifierWrapper } from '../util'
 
 export const parserFunctionCallExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    visitFunctionCall(ctx: FunctionCallContext): es.Expression {
+    visitFunctionCall(ctx: FunctionCallContext): Expression {
       console.log('visitFunctioncall')
       return {
         type: 'CallExpression',
         callee: tokenToIdentifierWrapper(ctx._func, undefined),
-        arguments: this.visit(ctx._args),
-        optional: false
+        arguments: this.visit(ctx._args)
       }
     }
 
-    visitFunctionCallParameters(ctx: FunctionCallParametersContext): es.Expression[] {
+    visitFunctionCallParameters(ctx: FunctionCallParametersContext): Expression[] {
       console.log('visitfunctionarguments')
       // only one child
-      const expressions: es.Expression[] = this.visit(ctx.getChild(0))
+      const expressions: Expression[] = this.visit(ctx.getChild(0))
       return expressions
     }
   }

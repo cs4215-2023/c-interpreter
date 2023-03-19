@@ -99,6 +99,7 @@ export interface FunctionDeclaration extends BaseFunction, BaseExpression {
   type: 'FunctionDeclaration'
   id: Identifier
   body: BlockStatement
+  params: Pattern[]
   typeDeclaration: Type
 }
 

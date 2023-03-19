@@ -1,40 +1,39 @@
-import * as es from 'estree'
-
 import {
   CharExpressionContext,
   FloatExpressionContext,
   NumberExpressionContext
 } from '../../lang/ClangParser'
+import { Expression } from '../types'
 import { Constructable, contextToLocation } from '../util'
 
 export const parserPrimitiveExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    visitNumberExpression(ctx: NumberExpressionContext): es.Expression {
+    visitNumberExpression(ctx: NumberExpressionContext): Expression {
       console.log('literal')
       return {
         type: 'Literal',
+        valueType: 'int',
         value: parseInt(ctx.text),
-        raw: ctx.text,
         loc: contextToLocation(ctx)
       }
     }
-    visitFloatExpression(ctx: FloatExpressionContext): es.Expression {
+    visitFloatExpression(ctx: FloatExpressionContext): Expression {
       console.log('float')
       return {
         type: 'Literal',
+        valueType: 'float',
         value: parseFloat(ctx.text),
-        raw: ctx.text,
         loc: contextToLocation(ctx)
       }
     }
-    visitCharExpression(ctx: CharExpressionContext): es.Expression {
+    visitCharExpression(ctx: CharExpressionContext): Expression {
       console.log('char')
       return {
         type: 'Literal',
+        valueType: 'char',
         value: ctx.text.trim().charAt(1),
-        raw: ctx.text,
         loc: contextToLocation(ctx)
       }
     }
