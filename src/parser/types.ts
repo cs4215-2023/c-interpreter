@@ -42,6 +42,7 @@ export type Statement =
   | DoWhileStatement
   | WhileStatement
   | ForStatement
+  | Function
 
 export interface BlockStatement extends BaseStatement {
   type: 'BlockStatement'
