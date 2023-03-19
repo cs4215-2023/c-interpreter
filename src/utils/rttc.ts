@@ -92,6 +92,22 @@ export const checkBinaryExpression = (
   }
 }
 
+export const checkLogicalExpression = (
+  node: es.Node,
+  operator: es.LogicalOperator,
+  left: Value,
+  right: Value
+) => {
+  switch (operator) {
+    case '&&':
+    case '||':
+    case '??':
+      throw new Error('Invalid operator: ??')
+    default:
+      return
+  }
+}
+
 export const checkIfStatement = (node: es.Node, test: Value) => {
   return isBool(test) ? undefined : new TypeError(node, ' as condition', 'boolean', typeOf(test))
 }
