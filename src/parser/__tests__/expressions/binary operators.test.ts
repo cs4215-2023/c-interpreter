@@ -1,8 +1,7 @@
-import { Program } from 'estree'
-
 import createContext from '../../../createContext'
 import { Variant } from '../../../types'
 import { parse } from '../../parser'
+import { Program } from '../../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
@@ -13,7 +12,6 @@ describe('Binary Operator Tests', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           expression: {
@@ -22,7 +20,7 @@ describe('Binary Operator Tests', () => {
                 left: {
                   type: 'Literal',
                   value: 4,
-                  raw: '4',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -37,7 +35,7 @@ describe('Binary Operator Tests', () => {
                 right: {
                   type: 'Literal',
                   value: 1,
-                  raw: '1',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 2,
@@ -73,12 +71,13 @@ describe('Binary Operator Tests', () => {
     }
     expect(prog).toEqual(expectedProg)
   })
+
   it('Test subtraction', () => {
     const code = '3-1;'
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -87,7 +86,7 @@ describe('Binary Operator Tests', () => {
                 left: {
                   type: 'Literal',
                   value: 3,
-                  raw: '3',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -102,7 +101,7 @@ describe('Binary Operator Tests', () => {
                 right: {
                   type: 'Literal',
                   value: 1,
-                  raw: '1',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 2,
@@ -138,12 +137,13 @@ describe('Binary Operator Tests', () => {
     }
     expect(prog).toEqual(expectedProg)
   })
+
   it('Test division', () => {
     const code = '5/2;'
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -152,7 +152,7 @@ describe('Binary Operator Tests', () => {
                 left: {
                   type: 'Literal',
                   value: 5,
-                  raw: '5',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -167,7 +167,7 @@ describe('Binary Operator Tests', () => {
                 right: {
                   type: 'Literal',
                   value: 2,
-                  raw: '2',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 2,
@@ -203,12 +203,13 @@ describe('Binary Operator Tests', () => {
     }
     expect(prog).toEqual(expectedProg)
   })
+
   it('Test multiplication', () => {
     const code = '8*3;'
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -217,7 +218,7 @@ describe('Binary Operator Tests', () => {
                 left: {
                   type: 'Literal',
                   value: 8,
-                  raw: '8',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -232,7 +233,7 @@ describe('Binary Operator Tests', () => {
                 right: {
                   type: 'Literal',
                   value: 3,
-                  raw: '3',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 2,
@@ -274,7 +275,7 @@ describe('Binary Operator Tests', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -283,7 +284,7 @@ describe('Binary Operator Tests', () => {
                 left: {
                   type: 'Literal',
                   value: 5,
-                  raw: '5',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -298,7 +299,7 @@ describe('Binary Operator Tests', () => {
                 right: {
                   type: 'Literal',
                   value: 7,
-                  raw: '7',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 2,
@@ -340,7 +341,7 @@ describe('Binary Operator Tests', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -349,7 +350,7 @@ describe('Binary Operator Tests', () => {
                 left: {
                   type: 'Literal',
                   value: 3,
-                  raw: '3',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -364,7 +365,7 @@ describe('Binary Operator Tests', () => {
                 right: {
                   type: 'Literal',
                   value: 1,
-                  raw: '1',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 5,
@@ -406,7 +407,7 @@ describe('Binary Operator Tests', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -415,7 +416,7 @@ describe('Binary Operator Tests', () => {
                 left: {
                   type: 'Literal',
                   value: 4,
-                  raw: '4',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -430,7 +431,7 @@ describe('Binary Operator Tests', () => {
                 right: {
                   type: 'Literal',
                   value: 2,
-                  raw: '2',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 5,
@@ -472,7 +473,7 @@ describe('Binary Operator Tests', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -481,7 +482,7 @@ describe('Binary Operator Tests', () => {
                 left: {
                   type: 'Literal',
                   value: 1,
-                  raw: '1',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -496,7 +497,7 @@ describe('Binary Operator Tests', () => {
                 right: {
                   type: 'Literal',
                   value: 0,
-                  raw: '0',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 5,
@@ -538,7 +539,7 @@ describe('Binary Operator Tests', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -547,7 +548,7 @@ describe('Binary Operator Tests', () => {
                 left: {
                   type: 'Literal',
                   value: 2,
-                  raw: '2',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -562,7 +563,7 @@ describe('Binary Operator Tests', () => {
                 right: {
                   type: 'Literal',
                   value: 5,
-                  raw: '5',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 5,
@@ -604,7 +605,7 @@ describe('Binary Operator Tests', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -613,7 +614,7 @@ describe('Binary Operator Tests', () => {
                 left: {
                   type: 'Literal',
                   value: 3,
-                  raw: '3',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 0,
@@ -628,7 +629,7 @@ describe('Binary Operator Tests', () => {
                 right: {
                   type: 'Literal',
                   value: 2,
-                  raw: '2',
+                  valueType: 'int',
                   loc: {
                     end: {
                       column: 4,
@@ -664,12 +665,12 @@ describe('Binary Operator Tests', () => {
     }
     expect(prog).toEqual(expectedProg)
   })
+
   it('Test assignment', () => {
     const code = 'a = 2;'
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           expression: {
@@ -677,7 +678,8 @@ describe('Binary Operator Tests', () => {
               {
                 left: {
                   name: 'a',
-                  type: 'Identifier'
+                  type: 'Identifier',
+                  primitiveType: undefined
                 },
                 loc: {
                   end: {
@@ -701,9 +703,9 @@ describe('Binary Operator Tests', () => {
                       line: 1
                     }
                   },
-                  raw: '2',
                   type: 'Literal',
-                  value: 2
+                  value: 2,
+                  valueType: 'int'
                 },
                 type: 'AssignmentExpression'
               },
