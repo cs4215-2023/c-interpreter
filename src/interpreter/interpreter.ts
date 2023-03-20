@@ -248,6 +248,7 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 	  }
     //create new environment in program
     console.log(currentEnvironment(context)) //this is a null env
+    context.numberOfOuterEnvironments += 1;
     const environment = createBlockEnvironment(context, 'globalEnvironment');
     pushEnvironment(context, environment);
     console.log(currentEnvironment(context)) //this is the 'global' env
