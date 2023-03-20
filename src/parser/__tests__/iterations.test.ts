@@ -1,9 +1,7 @@
-import { Program } from 'estree'
-
 import createContext from '../../createContext'
 import { Variant } from '../../types'
 import { parse } from '../parser'
-import { Identifier } from '../types'
+import { Identifier, Program } from '../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
@@ -50,7 +48,6 @@ describe('Iterative Statements', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           body: {
@@ -81,8 +78,8 @@ describe('Iterative Statements', () => {
                   line: 1
                 }
               },
-              raw: '0',
               type: 'Literal',
+              valueType: 'int',
               value: 0
             },
             type: 'AssignmentExpression'
@@ -111,8 +108,8 @@ describe('Iterative Statements', () => {
                   line: 1
                 }
               },
-              raw: '10',
               type: 'Literal',
+              valueType: 'int',
               value: 10
             },
             type: 'BinaryExpression'
@@ -121,7 +118,6 @@ describe('Iterative Statements', () => {
           update: {
             argument: variableIWithNoType,
             operator: '++',
-            prefix: false,
             type: 'UpdateExpression'
           }
         }
@@ -135,7 +131,6 @@ describe('Iterative Statements', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           body: {
@@ -167,8 +162,8 @@ describe('Iterative Statements', () => {
                             line: 1
                           }
                         },
-                        raw: '1',
                         type: 'Literal',
+                        valueType: 'int',
                         value: 1
                       },
                       type: 'AssignmentExpression'
@@ -254,8 +249,8 @@ describe('Iterative Statements', () => {
                   line: 1
                 }
               },
-              raw: '0',
               type: 'Literal',
+              valueType: 'int',
               value: 0
             },
             type: 'AssignmentExpression'
@@ -284,8 +279,8 @@ describe('Iterative Statements', () => {
                   line: 1
                 }
               },
-              raw: '10',
               type: 'Literal',
+              valueType: 'int',
               value: 10
             },
             type: 'BinaryExpression'
@@ -294,7 +289,6 @@ describe('Iterative Statements', () => {
           update: {
             argument: variableIWithNoType,
             operator: '++',
-            prefix: false,
             type: 'UpdateExpression'
           }
         }
@@ -308,7 +302,6 @@ describe('Iterative Statements', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           body: {
@@ -318,10 +311,10 @@ describe('Iterative Statements', () => {
           test: {
             argument: {
               name: 'i',
-              type: 'Identifier'
+              type: 'Identifier',
+              primitiveType: undefined
             },
             operator: '--',
-            prefix: false,
             type: 'UpdateExpression'
           },
           type: 'WhileStatement'
@@ -336,7 +329,6 @@ describe('Iterative Statements', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           body: {
@@ -368,8 +360,8 @@ describe('Iterative Statements', () => {
                             line: 1
                           }
                         },
-                        raw: '2',
                         type: 'Literal',
+                        valueType: 'int',
                         value: 2
                       },
                       type: 'AssignmentExpression'
@@ -412,8 +404,8 @@ describe('Iterative Statements', () => {
                               line: 1
                             }
                           },
-                          raw: '3',
                           type: 'Literal',
+                          valueType: 'int',
                           value: 3
                         },
                         loc: {
@@ -448,7 +440,6 @@ describe('Iterative Statements', () => {
           test: {
             argument: variableIWithNoType,
             operator: '--',
-            prefix: false,
             type: 'UpdateExpression'
           },
           type: 'WhileStatement'
@@ -463,7 +454,6 @@ describe('Iterative Statements', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           body: {
@@ -473,10 +463,10 @@ describe('Iterative Statements', () => {
           test: {
             argument: {
               name: 'i',
-              type: 'Identifier'
+              type: 'Identifier',
+              primitiveType: undefined
             },
             operator: '--',
-            prefix: false,
             type: 'UpdateExpression'
           },
           type: 'DoWhileStatement'
@@ -491,7 +481,6 @@ describe('Iterative Statements', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           body: {
@@ -523,8 +512,8 @@ describe('Iterative Statements', () => {
                             line: 1
                           }
                         },
-                        raw: '1',
                         type: 'Literal',
+                        valueType: 'int',
                         value: 1
                       },
                       type: 'AssignmentExpression'
@@ -567,8 +556,8 @@ describe('Iterative Statements', () => {
                               line: 1
                             }
                           },
-                          raw: '10',
                           type: 'Literal',
+                          valueType: 'int',
                           value: 10
                         },
                         loc: {
@@ -603,7 +592,6 @@ describe('Iterative Statements', () => {
           test: {
             argument: variableIWithNoType,
             operator: '--',
-            prefix: false,
             type: 'UpdateExpression'
           },
           type: 'DoWhileStatement'

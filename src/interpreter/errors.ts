@@ -1,6 +1,5 @@
-import * as es from 'estree'
-
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
+import { Node } from '../parser/types'
 import { Context } from '../types'
 import { ErrorSeverity, ErrorType } from '../types'
 import Closure from './closure'
@@ -8,7 +7,7 @@ import Closure from './closure'
 export class InterpreterError extends RuntimeSourceError {
   public type = ErrorType.SYNTAX
   public severity = ErrorSeverity.ERROR
-  public constructor(public node: es.Node, public message = 'Unexpected evaluation') {
+  public constructor(public node: Node, public message = 'Unexpected evaluation') {
     super(node)
   }
 
@@ -25,7 +24,7 @@ export class DivisionByZeroError extends RuntimeSourceError {
   public type = ErrorType.RUNTIME
   public severity = ErrorSeverity.ERROR
 
-  public constructor(public node: es.Node, public message = 'Division by zero') {
+  public constructor(public node: Node, public message = 'Division by zero') {
     super(node)
   }
 
@@ -46,7 +45,7 @@ export function handleRuntimeError(context: Context, error: RuntimeSourceError):
   throw error
 }
 
-export function assertClosure(closure: any, node: es.Node, context: Context): closure is Closure {
+export function assertClosure(closure: any, node: Node, context: Context): closure is Closure {
   if (!(closure instanceof Closure)) {
     return handleRuntimeError(
       context,

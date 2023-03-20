@@ -1,6 +1,12 @@
-import * as es from 'estree'
-
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
+import {
+  BinaryOperator,
+  Identifier,
+  LogicalOperator,
+  Node,
+  SourceLocation,
+  UnaryOperator
+} from '../parser/types'
 import { ErrorSeverity, ErrorType, Value } from '../types'
 
 const LHS = ' on left hand side of operation'
@@ -9,9 +15,9 @@ const RHS = ' on right hand side of operation'
 export class TypeError extends RuntimeSourceError {
   public type = ErrorType.RUNTIME
   public severity = ErrorSeverity.ERROR
-  public location: es.SourceLocation
+  public location: SourceLocation
 
-  constructor(node: es.Node, public side: string, public expected: string, public got: string) {
+  constructor(node: Node, public side: string, public expected: string, public got: string) {
     super(node)
   }
 
@@ -39,13 +45,11 @@ const isNumber = (v: Value) => typeOf(v) === 'number'
 // See section 4 of https://2ality.com/2012/12/arrays.html
 // v >>> 0 === v checks that v is a valid unsigned 32-bit int
 // tslint:disable-next-line:no-bitwise
-const isArrayIndex = (v: Value) => isNumber(v) && v >>> 0 === v && v < 2 ** 32 - 1
+
 const isString = (v: Value) => typeOf(v) === 'string'
 const isBool = (v: Value) => typeOf(v) === 'boolean'
-const isObject = (v: Value) => typeOf(v) === 'object'
-const isArray = (v: Value) => typeOf(v) === 'array'
 
-export const checkUnaryExpression = (node: es.Node, operator: es.UnaryOperator, value: Value) => {
+export const checkUnaryExpression = (node: Node, operator: UnaryOperator, value: Value) => {
   if ((operator === '+' || operator === '-') && !isNumber(value)) {
     return new TypeError(node, '', 'number', typeOf(value))
   } else if (operator === '!' && !isBool(value)) {
@@ -56,8 +60,8 @@ export const checkUnaryExpression = (node: es.Node, operator: es.UnaryOperator, 
 }
 
 export const checkBinaryExpression = (
-  node: es.Node,
-  operator: es.BinaryOperator,
+  node: Node,
+  operator: BinaryOperator,
   left: Value,
   right: Value
 ) => {
@@ -78,8 +82,8 @@ export const checkBinaryExpression = (
     case '<=':
     case '>':
     case '>=':
-    case '!==':
-    case '===':
+    case '!=':
+    case '==':
       if (isNumber(left)) {
         return isNumber(right) ? undefined : new TypeError(node, RHS, 'number', typeOf(right))
       } else if (isString(left)) {
@@ -93,39 +97,23 @@ export const checkBinaryExpression = (
 }
 
 export const checkLogicalExpression = (
-  node: es.Node,
-  operator: es.LogicalOperator,
+  node: Node,
+  operator: LogicalOperator,
   left: Value,
   right: Value
 ) => {
   switch (operator) {
     case '&&':
     case '||':
-    case '??':
-      throw new Error('Invalid operator: ??')
     default:
       return
   }
 }
 
-export const checkIfStatement = (node: es.Node, test: Value) => {
+export const checkIfStatement = (node: Node, test: Value) => {
   return isBool(test) ? undefined : new TypeError(node, ' as condition', 'boolean', typeOf(test))
 }
 
-export const checkMemberAccess = (node: es.Node, obj: Value, prop: Value) => {
-  if (isObject(obj)) {
-    return isString(prop) ? undefined : new TypeError(node, ' as prop', 'string', typeOf(prop))
-  } else if (isArray(obj)) {
-    return isArrayIndex(prop)
-      ? undefined
-      : isNumber(prop)
-      ? new TypeError(node, ' as prop', 'array index', 'other number')
-      : new TypeError(node, ' as prop', 'array index', typeOf(prop))
-  } else {
-    return new TypeError(node, '', 'object or array', typeOf(obj))
-  }
-}
-
-export const isIdentifier = (node: any): node is es.Identifier => {
-  return (node as es.Identifier).name !== undefined
+export const isIdentifier = (node: any): node is Identifier => {
+  return (node as Identifier).name !== undefined
 }

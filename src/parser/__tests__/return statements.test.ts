@@ -1,8 +1,7 @@
-import { Program } from 'estree'
-
 import createContext from '../../createContext'
 import { Variant } from '../../types'
 import { parse } from '../parser'
+import { Program } from '../types'
 import { Identifier } from '../types'
 
 const variant = Variant.DEFAULT
@@ -32,7 +31,6 @@ describe('Return statements', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           body: {
@@ -46,7 +44,8 @@ describe('Return statements', () => {
           },
           id: idVoidType,
           params: [parameterA],
-          type: 'FunctionDeclaration'
+          type: 'FunctionDeclaration',
+          typeDeclaration: { type: 'PrimitiveType', valueType: 'void', signed: undefined }
         }
       ]
     }
@@ -58,7 +57,6 @@ describe('Return statements', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           body: {
@@ -66,8 +64,8 @@ describe('Return statements', () => {
               {
                 argument: {
                   type: 'Literal',
+                  valueType: 'int',
                   value: 1,
-                  raw: '1',
                   loc: {
                     end: {
                       column: 23,
@@ -86,7 +84,8 @@ describe('Return statements', () => {
           },
           id: idIntType,
           params: [parameterA],
-          type: 'FunctionDeclaration'
+          type: 'FunctionDeclaration',
+          typeDeclaration: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
         }
       ]
     }

@@ -32,6 +32,18 @@ export type Node = Program | Statement | Expression
 
 type BaseStatement = BaseNode
 
+export type Statement =
+  | Declaration
+  | ExpressionStatement
+  | EmptyStatement
+  | ReturnStatement
+  | BlockStatement
+  | IfStatement
+  | DoWhileStatement
+  | WhileStatement
+  | ForStatement
+  | Function
+
 export interface BlockStatement extends BaseStatement {
   type: 'BlockStatement'
   body: Array<Statement>
@@ -52,14 +64,34 @@ export interface ReturnStatement extends BaseStatement {
   argument?: Expression | null | undefined
 }
 
-export type Function = FunctionDeclaration
+export interface IfStatement extends BaseStatement {
+  type: 'IfStatement'
+  test: Expression
+  alternate: Statement
+  consequent: Statement
+}
 
-export type Statement =
-  | Declaration
-  | ExpressionStatement
-  | EmptyStatement
-  | ReturnStatement
-  | BlockStatement
+export interface DoWhileStatement extends BaseStatement {
+  type: 'DoWhileStatement'
+  test: Expression
+  body: BlockStatement
+}
+
+export interface WhileStatement extends BaseStatement {
+  type: 'WhileStatement'
+  test: Expression
+  body: BlockStatement
+}
+
+export interface ForStatement extends BaseStatement {
+  type: 'ForStatement'
+  init: Expression
+  test: Expression
+  update: Expression
+  body: BlockStatement
+}
+
+export type Function = FunctionDeclaration
 
 export type Declaration = FunctionDeclaration | VariableDeclaration
 
@@ -67,6 +99,7 @@ export interface FunctionDeclaration extends BaseFunction, BaseExpression {
   type: 'FunctionDeclaration'
   id: Identifier
   body: BlockStatement
+  params: Pattern[]
   typeDeclaration: Type
 }
 

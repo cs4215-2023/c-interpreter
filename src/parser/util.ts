@@ -1,10 +1,9 @@
 import { Token } from 'antlr4ts/Token'
-import * as es from 'estree'
 
 import { ExpressionContext } from '../lang/ClangParser'
-import { Identifier, PrimitiveType } from './types'
+import { Identifier, PrimitiveType, SourceLocation } from './types'
 
-export function contextToLocation(ctx: ExpressionContext): es.SourceLocation {
+export function contextToLocation(ctx: ExpressionContext): SourceLocation {
   return {
     start: {
       line: ctx.start.line,

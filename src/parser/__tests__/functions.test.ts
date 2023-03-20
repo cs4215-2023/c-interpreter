@@ -1,8 +1,7 @@
-import { Program } from 'estree'
-
 import createContext from '../../createContext'
 import { Variant } from '../../types'
 import { parse } from '../parser'
+import { Program } from '../types'
 import { Identifier } from '../types'
 
 const variant = Variant.DEFAULT
@@ -33,7 +32,6 @@ describe('Function related tests', () => {
 
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           body: {
@@ -42,7 +40,8 @@ describe('Function related tests', () => {
           },
           id: id,
           params: [parameterA],
-          type: 'FunctionDeclaration'
+          type: 'FunctionDeclaration',
+          typeDeclaration: { type: 'PrimitiveType', valueType: 'void', signed: undefined }
         }
       ]
     }
@@ -67,7 +66,6 @@ describe('Function related tests', () => {
 
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           body: {
@@ -99,9 +97,9 @@ describe('Function related tests', () => {
                             line: 1
                           }
                         },
-                        raw: '1',
                         type: 'Literal',
-                        value: 1
+                        value: 1,
+                        valueType: 'int'
                       },
                       type: 'AssignmentExpression'
                     },
@@ -132,10 +130,7 @@ describe('Function related tests', () => {
                       },
                       operator: '=',
                       right: {
-                        left: {
-                          name: 'a',
-                          type: 'Identifier'
-                        },
+                        left: { primitiveType: undefined, type: 'Identifier', name: 'a' },
                         loc: {
                           end: {
                             column: 40,
@@ -149,7 +144,8 @@ describe('Function related tests', () => {
                         operator: '+',
                         right: {
                           name: 'b',
-                          type: 'Identifier'
+                          type: 'Identifier',
+                          primitiveType: undefined
                         },
                         type: 'BinaryExpression'
                       },
@@ -170,7 +166,8 @@ describe('Function related tests', () => {
           },
           id: id,
           params: [parameterA],
-          type: 'FunctionDeclaration'
+          type: 'FunctionDeclaration',
+          typeDeclaration: { type: 'PrimitiveType', valueType: 'void', signed: undefined }
         }
       ]
     }
@@ -182,7 +179,6 @@ describe('Function related tests', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           body: {
@@ -191,7 +187,8 @@ describe('Function related tests', () => {
           },
           id: id,
           params: [parameterA, parameterB],
-          type: 'FunctionDeclaration'
+          type: 'FunctionDeclaration',
+          typeDeclaration: { type: 'PrimitiveType', valueType: 'void', signed: undefined }
         }
       ]
     }
@@ -203,7 +200,6 @@ describe('Function related tests', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           body: {
@@ -212,7 +208,8 @@ describe('Function related tests', () => {
           },
           id: id,
           params: [parameterA, parameterB],
-          type: 'FunctionDeclaration'
+          type: 'FunctionDeclaration',
+          typeDeclaration: { type: 'PrimitiveType', valueType: 'void', signed: undefined }
         },
         {
           expression: {
@@ -221,14 +218,14 @@ describe('Function related tests', () => {
                 expressions: [
                   {
                     arguments: [
-                      { type: 'Literal', value: 1, raw: '1' },
-                      { type: 'Literal', value: 2, raw: '2' }
+                      { type: 'Literal', value: 1, valueType: 'int' },
+                      { type: 'Literal', value: 2, valueType: 'int' }
                     ],
                     callee: {
                       name: 'foo',
-                      type: 'Identifier'
+                      type: 'Identifier',
+                      primitiveType: undefined
                     },
-                    optional: false,
                     type: 'CallExpression'
                   }
                 ],

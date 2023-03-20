@@ -1,8 +1,7 @@
-import { Program } from 'estree'
-
 import createContext from '../../createContext'
 import { Variant } from '../../types'
 import { parse } from '../parser'
+import { Program } from '../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
@@ -13,7 +12,6 @@ describe('Top-level edge cases', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: []
     }
     expect(prog).toEqual(expectedProg)
@@ -24,7 +22,6 @@ describe('Top-level edge cases', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: []
     }
     expect(prog).toEqual(expectedProg)

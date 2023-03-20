@@ -2,15 +2,6 @@
 
 import { Context, Environment, Variant } from './types'
 
-export class LazyBuiltIn {
-  func: (...arg0: any) => any
-  evaluateArgs: boolean
-  constructor(func: (...arg0: any) => any, evaluateArgs: boolean) {
-    this.func = func
-    this.evaluateArgs = evaluateArgs
-  }
-}
-
 export class EnvTree {
   private _root: EnvTreeNode | null = null
   private map = new Map<Environment, EnvTreeNode>()
@@ -80,13 +71,6 @@ const createEmptyRuntime = () => ({
   nodes: []
 })
 
-export const createGlobalEnvironment = (): Environment => ({
-  tail: null,
-  name: 'global',
-  head: {},
-  id: '-1'
-})
-
 export const createEmptyContext = <T>(
   variant: Variant,
   externalSymbols: string[],
@@ -101,26 +85,8 @@ export const createEmptyContext = <T>(
     prelude: null,
     executionMethod: 'auto',
     variant,
-    moduleContexts: {},
     unTypecheckedCode: [],
     previousCode: []
-  }
-}
-
-export const ensureGlobalEnvironmentExist = (context: Context) => {
-  if (!context.runtime) {
-    context.runtime = createEmptyRuntime()
-  }
-  if (!context.runtime.environments) {
-    context.runtime.environments = []
-  }
-  if (!context.runtime.environmentTree) {
-    context.runtime.environmentTree = new EnvTree()
-  }
-  if (context.runtime.environments.length === 0) {
-    const globalEnvironment = createGlobalEnvironment()
-    context.runtime.environments.push(globalEnvironment)
-    context.runtime.environmentTree.insert(globalEnvironment)
   }
 }
 

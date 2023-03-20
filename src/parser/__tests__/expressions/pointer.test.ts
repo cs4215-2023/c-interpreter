@@ -1,8 +1,7 @@
-import { Program } from 'estree'
-
 import createContext from '../../../createContext'
 import { Variant } from '../../../types'
 import { parse } from '../../parser'
+import { Program } from '../../types'
 import { Identifier, PointerIdentifier } from '../../types'
 
 const variant = Variant.DEFAULT
@@ -50,7 +49,7 @@ describe('Pointer', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -76,7 +75,7 @@ describe('Pointer', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {
@@ -117,7 +116,7 @@ describe('Pointer', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
+
       body: [
         {
           expression: {

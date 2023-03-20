@@ -1,7 +1,6 @@
 import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
-import * as es from 'estree'
 
 import {
   ConditionalStatementContext,
@@ -17,20 +16,21 @@ import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
 import { FunctionParser } from './functionParser'
 import { IterationStatementParser } from './iterationStatementParser'
+import { Expression, Statement } from './types'
 
 export class StatementParser
-  extends AbstractParseTreeVisitor<es.Statement>
-  implements ClangVisitor<es.Statement>
+  extends AbstractParseTreeVisitor<Statement>
+  implements ClangVisitor<Statement>
 {
-  protected defaultResult(): es.Statement {
+  protected defaultResult(): Statement {
     return {
       type: 'EmptyStatement'
     }
   }
 
-  visitStart?: ((ctx: StartContext) => es.Statement) | undefined
+  visitStart?: ((ctx: StartContext) => Statement) | undefined
 
-  private wrapAsExpressionStatement(e: es.Expression): es.Statement {
+  private wrapAsExpressionStatement(e: Expression): Statement {
     return {
       type: 'ExpressionStatement',
       expression: e,
@@ -38,8 +38,8 @@ export class StatementParser
     }
   }
 
-  visitChildren(node: RuleNode): es.Statement {
-    const statements: es.Statement[] = []
+  visitChildren(node: RuleNode): Statement {
+    const statements: Statement[] = []
     for (let i = 0; i < node.childCount; i++) {
       statements.push(node.getChild(i).accept(this))
     }
@@ -49,7 +49,7 @@ export class StatementParser
     }
   }
 
-  visitErrorNode(node: ErrorNode): es.Statement {
+  visitErrorNode(node: ErrorNode): Statement {
     throw new FatalSyntaxError(
       {
         start: {
@@ -65,7 +65,7 @@ export class StatementParser
     )
   }
 
-  visitStatement(ctx: StatementContext): es.Statement {
+  visitStatement(ctx: StatementContext): Statement {
     const exp = ctx.expressionStatement()
     const iter = ctx.iterationStatement()
     const func = ctx.functionDeclaration()
@@ -85,21 +85,21 @@ export class StatementParser
     return this.defaultResult()
   }
 
-  visitExpression(ctx: ExpressionStatementContext): es.Statement {
+  visitExpression(ctx: ExpressionStatementContext): Statement {
     console.log('visiting expr')
     return this.wrapAsExpressionStatement(new ExpressionParser().visit(ctx))
   }
 
-  visitIterative(ctx: IterationStatementContext): es.Statement {
+  visitIterative(ctx: IterationStatementContext): Statement {
     console.log('visiting iter')
     return new IterationStatementParser().visit(ctx)
   }
 
-  visitFunctionDeclaration(ctx: FunctionDeclarationContext): es.Statement {
+  visitFunctionDeclaration(ctx: FunctionDeclarationContext): Statement {
     return new FunctionParser().visit(ctx)
   }
 
-  visitConditionalStatement(ctx: ConditionalStatementContext): es.Statement {
+  visitConditionalStatement(ctx: ConditionalStatementContext): Statement {
     console.log('if statement')
 
     let alternate = undefined
@@ -120,7 +120,7 @@ export class StatementParser
     }
   }
 
-  visitReturnStatement(ctx: ReturnStatementContext): es.Statement {
+  visitReturnStatement(ctx: ReturnStatementContext): Statement {
     console.log('return statement')
     let argument = undefined
     if (ctx._argument != undefined) {

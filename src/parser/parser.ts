@@ -10,7 +10,6 @@ import {
 import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
-import * as es from 'estree'
 
 import { ClangLexer } from '../lang/ClangLexer'
 import { ClangParser } from '../lang/ClangParser'
@@ -18,19 +17,20 @@ import { ClangVisitor } from '../lang/ClangVisitor'
 import { Context } from '../types'
 import { FatalSyntaxError } from './errors'
 import { StatementParser } from './statementParser'
+import { Program, Statement } from './types'
 
 export class StatementsParser
-  extends AbstractParseTreeVisitor<es.Statement[]>
-  implements ClangVisitor<es.Statement[]>
+  extends AbstractParseTreeVisitor<Statement[]>
+  implements ClangVisitor<Statement[]>
 {
   private statementParser = new StatementParser()
 
-  protected defaultResult(): es.Statement[] {
+  protected defaultResult(): Statement[] {
     return []
   }
 
-  visitChildren(node: RuleNode): es.Statement[] {
-    let statements: es.Statement[] = []
+  visitChildren(node: RuleNode): Statement[] {
+    let statements: Statement[] = []
 
     for (let i = 0; i < node.childCount; i++) {
       const stmt = node.getChild(i).accept(this.statementParser)
@@ -44,7 +44,7 @@ export class StatementsParser
     return statements
   }
 
-  visitErrorNode(node: ErrorNode): es.Statement[] {
+  visitErrorNode(node: ErrorNode): Statement[] {
     throw new FatalSyntaxError(
       {
         start: {
@@ -95,7 +95,7 @@ function addCustomErrorListeners(lexer: ClangLexer, parser: ClangParser): void {
   })
 }
 
-export function parse(source: string, context: Context): es.Program | undefined {
+export function parse(source: string, context: Context): Program | undefined {
   const inputStream = CharStreams.fromString(source)
   const lexer = new ClangLexer(inputStream)
   const tokenStream = new CommonTokenStream(lexer)
@@ -108,7 +108,6 @@ export function parse(source: string, context: Context): es.Program | undefined 
 
   return {
     type: 'Program',
-    sourceType: 'script',
     body: content
   }
 }

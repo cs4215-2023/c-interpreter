@@ -1,8 +1,7 @@
-import { Program } from 'estree'
-
 import createContext from '../../createContext'
 import { Variant } from '../../types'
 import { parse } from '../parser'
+import { Program } from '../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
@@ -13,15 +12,14 @@ describe('Parsable Values', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           expression: {
             expressions: [
               {
                 type: 'Literal',
+                valueType: 'int',
                 value: 1,
-                raw: '1',
                 loc: {
                   end: {
                     column: 0,
@@ -44,20 +42,20 @@ describe('Parsable Values', () => {
     }
     expect(prog).toEqual(expectedProg)
   })
+
   it('Test float', () => {
     const code = '1.0;'
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           expression: {
             expressions: [
               {
                 type: 'Literal',
+                valueType: 'float',
                 value: 1.0,
-                raw: '1.0',
                 loc: {
                   end: {
                     column: 0,
@@ -85,15 +83,14 @@ describe('Parsable Values', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-      sourceType: 'script',
       body: [
         {
           expression: {
             expressions: [
               {
                 type: 'Literal',
+                valueType: 'char',
                 value: 'a',
-                raw: "'a'",
                 loc: {
                   end: {
                     column: 0,
