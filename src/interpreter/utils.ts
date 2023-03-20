@@ -42,8 +42,7 @@ export function checkNumberOfArguments(
   return undefined
 }
 
-//should be block statement
-export function scanBlockVariables(nodes: Statement[]): Frame {
+export function scanFrameVariables(nodes: Statement[]): Frame {
   let var_arr = {}
   for (let node of nodes) {
     node = node as ExpressionStatement
@@ -76,7 +75,7 @@ export function scanVariables(node: Statement | Expression): Frame {
 /* 
 Gets a variable from the environment based on the name.
 */
-export const getValueFromIdentifier = (context: Context, name: string) => {
+export const getIdentifierFromEnvironment = (context: Context, name: string) => {
   let environment: Environment | null = currentEnvironment(context)
   while (environment) {
     if (environment.head.hasOwnProperty(name)) {

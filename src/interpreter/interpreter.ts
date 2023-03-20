@@ -22,8 +22,8 @@ import {
 import { DivisionByZeroError, handleRuntimeError } from './errors'
 import {
   checkNumberOfArguments,
-  getValueFromIdentifier,
-  scanBlockVariables,
+  getIdentifierFromEnvironment,
+  scanFrameVariables,
   setValueToIdentifier
 } from './utils'
 
@@ -47,7 +47,7 @@ function* evaluateBlockStatement(context: Context, node: Node) {
     throw new Error('Not evaluating block statement')
   }
   //scan block statement here
-  const frame = scanBlockVariables(node.body)
+  const frame = scanFrameVariables(node.body)
   console.log(frame)
   const env = createBlockEnvironment(context, 'blockEnvironment', frame)
   pushEnvironment(context, env)
@@ -105,7 +105,7 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 	if (node.type != 'Identifier') {
 		throw new Error('Not identifier')
 	}
-    const identifier = getValueFromIdentifier(context, node.name)
+    const identifier = getIdentifierFromEnvironment(context, node.name)
     return identifier
   },
 
@@ -233,25 +233,32 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 
   BlockStatement: function* (node:  Node, context: Context) {
     return yield*evaluateBlockStatement(context, node)
-
   },
 
   Program: function* (node:  Node, context: Context) {
 	if (node.type !== 'Program') {
 		return handleRuntimeError(context, new RuntimeSourceError(node));
-	  }
-    //create new environment in program
+	}
+	
+    // Create global environment 
     console.log(currentEnvironment(context)) //this is a null env
     context.numberOfOuterEnvironments += 1;
     const environment = createBlockEnvironment(context, 'globalEnvironment');
     pushEnvironment(context, environment);
     console.log(currentEnvironment(context)) //this is the 'global' env
-	console.log(node)
-    let result;
-	for (let i = 0; i < node.body.length; i++) {
-		result = yield* evaluate(node.body[i], context)
+
+
+	// Create local environment
+	const frame = scanFrameVariables(node.body)
+	console.log(frame)
+	const env = createBlockEnvironment(context, 'localEnvironment', frame)
+	context.numberOfOuterEnvironments += 1;
+	pushEnvironment(context, env)
+	let result
+	for (const statement of node.body) {
+	  result = yield* evaluate(statement, context)
 	}
-    return result;
+	return result
   }
 }
 // tslint:enable:object-literal-shorthand
