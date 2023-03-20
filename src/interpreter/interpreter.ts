@@ -172,13 +172,8 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
     return evaluateLogicalExpression(node.operator, left, right)
   },
 
-  VariableDeclaration: function* (node: Node, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
-  },
-
-
   ForStatement: function* (node:  Node, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+	throw new Error(`not supported yet: ${node.type}`)
   },
 
 
@@ -239,7 +234,7 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 	if (node.type !== 'Program') {
 		return handleRuntimeError(context, new RuntimeSourceError(node));
 	}
-	
+
     // Create global environment 
     console.log(currentEnvironment(context)) //this is a null env
     context.numberOfOuterEnvironments += 1;
@@ -247,8 +242,9 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
     pushEnvironment(context, environment);
     console.log(currentEnvironment(context)) //this is the 'global' env
 
-
+	
 	// Create local environment
+	// TODO: create a frame update instead of scanning all the variables at one shot in the beginning
 	const frame = scanFrameVariables(node.body)
 	console.log(frame)
 	const env = createBlockEnvironment(context, 'localEnvironment', frame)

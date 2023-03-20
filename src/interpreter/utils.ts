@@ -46,7 +46,7 @@ export function scanFrameVariables(nodes: Statement[]): Frame {
   let var_arr = {}
   for (let node of nodes) {
     node = node as ExpressionStatement
-    const res = scanVariables(node)
+    const res = makeVariableDeclarations(node)
     var_arr = { ...var_arr, ...res }
   }
   // var_arr = var_arr.filter((item, pos) => var_arr.indexOf(item) === pos)
@@ -54,15 +54,15 @@ export function scanFrameVariables(nodes: Statement[]): Frame {
   return var_arr
 }
 
-export function scanVariables(node: Statement | Expression): Frame {
+export function makeVariableDeclarations(node: Statement | Expression): Frame {
   let arr = {}
   if (node.type == 'SequenceExpression') {
     for (const expr of node.expressions) {
-      const res = scanVariables(expr)
+      const res = makeVariableDeclarations(expr)
       arr = { ...arr, ...res }
     }
   } else if (node.type == 'ExpressionStatement') {
-    return scanVariables(node.expression)
+    return makeVariableDeclarations(node.expression)
   } else if (node.type == 'AssignmentExpression') {
     const left = node.left as Identifier
     arr[left.name] = undefined
