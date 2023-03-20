@@ -35,15 +35,9 @@ class TailCallReturnValue {
   constructor(public callee: Closure, public args: Value[], public node: CallExpression) {}
 }
 
-//not a needed function atm
-function* forceIt(val: any, context: Context): Value {
-  return val
-}
-
 export function* actualValue(exp: Node, context: Context): Value {
   const evalResult = yield* evaluate(exp, context)
-  const forced = yield* forceIt(evalResult, context)
-  return forced
+  return evalResult
 }
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => IterableIterator<Value>
@@ -193,7 +187,7 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 		throw new Error('Not assignment expression')
 	}
 
-    const id = node.left as  Identifier
+    const id = node.left as Identifier
     const value = yield*evaluate(node.right, context)
     setValueToIdentifier(context, id.name, value)
     return value;
@@ -318,7 +312,7 @@ export function apply(
         const forcedArgs = []
 
         for (const arg of args) {
-          forcedArgs.push(forceIt(arg, context))
+          forcedArgs.push(arg)
         }
 
         result = fun.apply(thisContext, forcedArgs)
