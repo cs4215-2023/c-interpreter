@@ -1,6 +1,4 @@
 /* tslint:disable:max-classes-per-file */
-import * as es from 'estree'
-
 import * as constants from '../constants'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
@@ -24,6 +22,7 @@ import {
 import { DivisionByZeroError, handleRuntimeError } from './errors'
 import {
   checkNumberOfArguments,
+  declareVariable,
   getIdentifierFromEnvironment,
   scanFrameVariables,
   setValueToIdentifier
@@ -35,11 +34,6 @@ class ReturnValue {
 
 class TailCallReturnValue {
   constructor(public callee: Closure, public args: Value[], public node: CallExpression) {}
-}
-
-export function* actualValue(exp: Node, context: Context): Value {
-  const evalResult = yield* evaluate(exp, context)
-  return evalResult
 }
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => IterableIterator<Value>
@@ -97,13 +91,15 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-
   FunctionExpression: function* (node:  Node, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  IdentifierWithTypeExpression: function* (node: Node, context: Context) {
-	throw new Error(`not supported yet: ${node.type}`)
+  VariableDeclarationExpression: function* (node: Node, context: Context) {
+	if (node.type != 'VariableDeclarationExpression') {
+		throw new Error('not var declaration')
+	}
+	declareVariable(context, node)
   },
 
 
@@ -123,7 +119,7 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 	if (node.type != 'UnaryExpression') {
 		throw new Error('Not unary expression')
 	}
-    const value = yield* actualValue(node.argument, context)
+    const value = yield* evaluate(node.argument, context)
 
     const error = rttc.checkUnaryExpression(node, node.operator, value)
     if (error) {
@@ -139,8 +135,8 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 	if (node.type != 'BinaryExpression') {
 		throw new Error('Not binary expression')
 	}
-    const left =yield* actualValue(node.left, context)
-    const right = yield*actualValue(node.right, context)
+    const left =yield* evaluate(node.left, context)
+    const right = yield*evaluate(node.right, context)
     console.log("evaluating binaryexpression for " + left + " and " + right)
     const error = rttc.checkBinaryExpression(node, node.operator, left, right)
     if (error) {
@@ -171,8 +167,8 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 	if (node.type != 'LogicalExpression') {
 		throw new Error('Not logical expression')
 	}
-	const left =yield* actualValue(node.left, context)
-    const right = yield*actualValue(node.right, context)
+	const left =yield* evaluate(node.left, context)
+    const right = yield*evaluate(node.right, context)
     console.log("evaluating logicalexpression for " + left + " and " + right)
 
     return evaluateLogicalExpression(node.operator, left, right)
@@ -185,8 +181,7 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 	const loopEnvironment = createBlockEnvironment(context, 'forLoopEnvironment')
     pushEnvironment(context, loopEnvironment)
 	const init = node.init
-	console.log(init)
-
+	yield* evaluate(init, context)
 	console.log(currentEnvironment(context))
   },
 
@@ -196,8 +191,12 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 		throw new Error('Not assignment expression')
 	}
 
-
-    const id = node.left as Identifier
+	let id = node.left as Identifier
+	if (node.left.type == 'VariableDeclarationExpression') {
+		console.log(node.left)
+		yield * evaluate(node.left, context)
+		id = node.left.identifier
+	}
     const value = yield*evaluate(node.right, context)
     setValueToIdentifier(context, id.name, value)
     return value;

@@ -1,11 +1,13 @@
 import * as errors from '../errors/errors'
 import {
+  ArrayDeclarationExpression,
   CallExpression,
   Expression,
   ExpressionStatement,
   Identifier,
   Node,
-  Statement
+  Statement,
+  VariableDeclarationExpression
 } from '../parser/types'
 import { Context, Environment, Frame, Value } from '../types'
 import Closure from './closure'
@@ -102,4 +104,23 @@ export const setValueToIdentifier = (context: Context, name: string, value: any)
     }
   }
   return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
+}
+
+export function declareVariable(
+  context: Context,
+  node: VariableDeclarationExpression | ArrayDeclarationExpression
+) {
+  const id = node.identifier
+  const name = id.name
+  const environment = currentEnvironment(context)
+  if (environment.head.hasOwnProperty(name)) {
+    const descriptors = Object.getOwnPropertyDescriptors(environment.head)
+
+    return handleRuntimeError(
+      context,
+      new errors.ExceptionError(new Error('Redeclared'), node.loc!)
+    )
+  }
+  environment.head[name] = undefined
+  return environment
 }

@@ -85,7 +85,7 @@ export interface WhileStatement extends BaseStatement {
 
 export interface ForStatement extends BaseStatement {
   type: 'ForStatement'
-  init: Expression | VariableDeclaration
+  init: Expression
   test: Expression
   update: Expression
   body: BlockStatement
@@ -93,7 +93,7 @@ export interface ForStatement extends BaseStatement {
 
 export type Function = FunctionDeclaration
 
-export type Declaration = FunctionDeclaration | VariableDeclaration
+export type Declaration = FunctionDeclaration
 
 export interface FunctionDeclaration extends BaseFunction, BaseExpression {
   type: 'FunctionDeclaration'
@@ -101,18 +101,6 @@ export interface FunctionDeclaration extends BaseFunction, BaseExpression {
   body: BlockStatement
   params: Pattern[]
   typeDeclaration: Type
-}
-
-export interface VariableDeclaration extends BaseDeclaration {
-  type: 'VariableDeclaration'
-  declarations: VariableDeclarator
-  typeDeclaration: Type
-}
-
-export interface VariableDeclarator extends BaseNode {
-  type: 'VariableDeclarator'
-  id: Pattern
-  init?: Expression | null | undefined
 }
 
 export type Expression =
