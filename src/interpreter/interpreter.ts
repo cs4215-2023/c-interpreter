@@ -180,7 +180,7 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
     pushEnvironment(context, loopEnvironment)
   },
 
-
+  // TODO: handle case for -= and += 
   AssignmentExpression: function* (node: Node , context: Context) {
 	if (node.type != 'AssignmentExpression') {
 		throw new Error('Not assignment expression')
