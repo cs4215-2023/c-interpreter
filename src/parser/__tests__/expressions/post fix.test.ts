@@ -19,8 +19,7 @@ describe('Post fix notation', () => {
               {
                 argument: {
                   name: 'a',
-                  type: 'Identifier',
-                  primitiveType: undefined
+                  type: 'Identifier'
                 },
                 operator: '++',
                 type: 'UpdateExpression'
@@ -52,8 +51,7 @@ describe('Post fix notation', () => {
               {
                 argument: {
                   name: 'b',
-                  type: 'Identifier',
-                  primitiveType: undefined
+                  type: 'Identifier'
                 },
                 operator: '--',
                 type: 'UpdateExpression'

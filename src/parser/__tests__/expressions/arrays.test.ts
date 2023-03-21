@@ -19,9 +19,10 @@ describe('  declarations', () => {
               {
                 elements: [
                   {
-                    name: 'a',
-                    type: 'Identifier',
-                    primitiveType: { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
+                    arrayType: { signed: undefined, type: 'PrimitiveType', valueType: 'int' },
+                    size: 2,
+                    identifier: { name: 'a', type: 'Identifier' },
+                    type: 'ArrayDeclarationExpression'
                   }
                 ],
                 type: 'ArrayExpression'
@@ -53,9 +54,10 @@ describe('  declarations', () => {
               {
                 elements: [
                   {
-                    name: 'a',
-                    type: 'Identifier',
-                    primitiveType: { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
+                    arrayType: { signed: undefined, type: 'PrimitiveType', valueType: 'int' },
+                    size: 2,
+                    identifier: { name: 'a', type: 'Identifier' },
+                    type: 'ArrayDeclarationExpression'
                   },
                   {
                     type: 'Literal',
@@ -97,9 +99,10 @@ describe('  declarations', () => {
               {
                 elements: [
                   {
-                    name: 'v',
-                    type: 'Identifier',
-                    primitiveType: { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
+                    arrayType: { signed: undefined, type: 'PrimitiveType', valueType: 'int' },
+                    size: undefined,
+                    identifier: { name: 'v', type: 'Identifier' },
+                    type: 'ArrayDeclarationExpression'
                   },
                   { type: 'Literal', value: 3, valueType: 'int' },
                   { type: 'Literal', value: 3, valueType: 'int' }

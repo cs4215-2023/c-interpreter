@@ -1,7 +1,7 @@
 import createContext from '../../createContext'
 import { Variant } from '../../types'
 import { parse } from '../parser'
-import { Program } from '../types'
+import { PrimitiveType, Program } from '../types'
 import { Identifier } from '../types'
 
 const variant = Variant.DEFAULT
@@ -9,20 +9,17 @@ const context = createContext(variant, undefined, undefined)
 
 const parameterA: Identifier = {
   name: 'a',
-  type: 'Identifier',
-  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+  type: 'Identifier'
 }
 
 const parameterB: Identifier = {
   name: 'b',
-  type: 'Identifier',
-  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+  type: 'Identifier'
 }
 
 const id: Identifier = {
   name: 'foo',
-  type: 'Identifier',
-  primitiveType: { type: 'PrimitiveType', valueType: 'void', signed: undefined }
+  type: 'Identifier'
 }
 
 describe('Function related tests', () => {
@@ -52,16 +49,16 @@ describe('Function related tests', () => {
     const code = `void foo(int a) {int b = 1; int c = a + b;}`
     const prog = parse(code, context)
 
+    const intType: PrimitiveType = { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
+
     const bodyB: Identifier = {
       name: 'b',
-      type: 'Identifier',
-      primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+      type: 'Identifier'
     }
 
     const bodyC: Identifier = {
       name: 'c',
-      type: 'Identifier',
-      primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+      type: 'Identifier'
     }
 
     const expectedProg: Program = {
@@ -74,7 +71,11 @@ describe('Function related tests', () => {
                 expression: {
                   expressions: [
                     {
-                      left: bodyB,
+                      left: {
+                        identifier: bodyB,
+                        type: 'VariableDeclarationExpression',
+                        identifierType: intType
+                      },
                       loc: {
                         end: {
                           column: 25,
@@ -117,7 +118,11 @@ describe('Function related tests', () => {
                 expression: {
                   expressions: [
                     {
-                      left: bodyC,
+                      left: {
+                        identifier: bodyC,
+                        type: 'VariableDeclarationExpression',
+                        identifierType: intType
+                      },
                       loc: {
                         end: {
                           column: 40,
@@ -130,7 +135,7 @@ describe('Function related tests', () => {
                       },
                       operator: '=',
                       right: {
-                        left: { primitiveType: undefined, type: 'Identifier', name: 'a' },
+                        left: { type: 'Identifier', name: 'a' },
                         loc: {
                           end: {
                             column: 40,
@@ -144,8 +149,7 @@ describe('Function related tests', () => {
                         operator: '+',
                         right: {
                           name: 'b',
-                          type: 'Identifier',
-                          primitiveType: undefined
+                          type: 'Identifier'
                         },
                         type: 'BinaryExpression'
                       },
@@ -223,8 +227,7 @@ describe('Function related tests', () => {
                     ],
                     callee: {
                       name: 'foo',
-                      type: 'Identifier',
-                      primitiveType: undefined
+                      type: 'Identifier'
                     },
                     type: 'CallExpression'
                   }

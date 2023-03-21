@@ -1,7 +1,7 @@
 import { Token } from 'antlr4ts/Token'
 
 import { ExpressionContext } from '../lang/ClangParser'
-import { Identifier, PrimitiveType, SourceLocation } from './types'
+import { Identifier, SourceLocation } from './types'
 
 export function contextToLocation(ctx: ExpressionContext): SourceLocation {
   return {
@@ -16,21 +16,10 @@ export function contextToLocation(ctx: ExpressionContext): SourceLocation {
   }
 }
 
-export function tokenToIdentifierWrapper(
-  token: Token,
-  primitiveType: PrimitiveType | undefined
-): Identifier {
-  if (token.text) {
-    return {
-      type: 'Identifier',
-      name: token.text,
-      primitiveType: primitiveType
-    }
-  }
+export function tokenToIdentifierWrapper(token: Token): Identifier {
   return {
     type: 'Identifier',
-    name: '',
-    primitiveType: primitiveType
+    name: token.text!
   }
 }
 

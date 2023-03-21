@@ -10,7 +10,6 @@ const context = createContext(variant, undefined, undefined)
 const typedPointer: PointerIdentifier = {
   type: 'Identifier',
   name: 'a',
-  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined },
   pointerAddress: undefined,
   pointingAddress: undefined,
   isReferenced: false,
@@ -20,7 +19,6 @@ const typedPointer: PointerIdentifier = {
 const referencePointer: PointerIdentifier = {
   type: 'Identifier',
   name: 'b',
-  primitiveType: undefined,
   pointerAddress: undefined,
   pointingAddress: undefined,
   isReferenced: true,
@@ -30,7 +28,6 @@ const referencePointer: PointerIdentifier = {
 const dereferencePointer: PointerIdentifier = {
   type: 'Identifier',
   name: 'b',
-  primitiveType: undefined,
   pointerAddress: undefined,
   pointingAddress: undefined,
   isReferenced: false,
@@ -39,8 +36,7 @@ const dereferencePointer: PointerIdentifier = {
 
 const variableA: Identifier = {
   type: 'Identifier',
-  name: 'a',
-  primitiveType: undefined
+  name: 'a'
 }
 
 describe('Pointer', () => {
@@ -54,7 +50,11 @@ describe('Pointer', () => {
         {
           expression: {
             expressions: [
-              typedPointer,
+              {
+                pointer: typedPointer,
+                pointerType: { type: 'PrimitiveType', valueType: 'int', signed: undefined },
+                type: 'PointerDeclarationExpression'
+              },
               {
                 expressions: [],
                 type: 'SequenceExpression'

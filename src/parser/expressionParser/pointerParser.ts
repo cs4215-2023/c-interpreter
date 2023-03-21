@@ -7,7 +7,7 @@ import {
   PointerReferenceExpressionContext
 } from '../../lang/ClangParser'
 import { TypeParser } from '../typeParser'
-import { PointerIdentifier } from '../types'
+import { Expression, PointerIdentifier } from '../types'
 import { Constructable } from '../util'
 
 export const parserPointerExpression = <T extends Constructable>(
@@ -17,19 +17,23 @@ export const parserPointerExpression = <T extends Constructable>(
     typeParser = new TypeParser()
     visitPointer(ctx: PointerContext): PointerIdentifier {
       console.log('pointercontext')
-      const type = this.typeParser.visit(ctx._idType)
       return {
         type: 'Identifier',
         name: ctx.IDENTIFIER().text,
-        primitiveType: type,
         pointerAddress: undefined,
         pointingAddress: undefined,
         isReferenced: false,
         isDereferenced: false
       }
     }
-    visitPointerDeclarationExpression(ctx: PointerDeclarationExpressionContext): PointerIdentifier {
-      return this.visit(ctx.pointer())
+    visitPointerDeclarationExpression(ctx: PointerDeclarationExpressionContext): Expression {
+      const pointer = ctx.pointer()
+      const type = this.typeParser.visit(pointer._idType)
+      return {
+        type: 'PointerDeclarationExpression',
+        pointer: this.visitPointer(pointer),
+        pointerType: type
+      }
     }
     visitPointerDereferenceExpression(ctx: PointerDereferenceExpressionContext): PointerIdentifier {
       return this.visit(ctx.pointerDerefernce())
@@ -40,7 +44,6 @@ export const parserPointerExpression = <T extends Constructable>(
       return {
         type: 'Identifier',
         name: ctx.IDENTIFIER().text,
-        primitiveType: undefined,
         pointerAddress: undefined,
         pointingAddress: undefined,
         isReferenced: false,
@@ -55,7 +58,6 @@ export const parserPointerExpression = <T extends Constructable>(
       return {
         type: 'Identifier',
         name: ctx.IDENTIFIER().text,
-        primitiveType: undefined,
         pointerAddress: undefined,
         pointingAddress: undefined,
         isReferenced: true,

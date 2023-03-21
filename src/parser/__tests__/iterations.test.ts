@@ -1,45 +1,31 @@
 import createContext from '../../createContext'
 import { Variant } from '../../types'
 import { parse } from '../parser'
-import { Identifier, Program } from '../types'
+import { Identifier, PrimitiveType, Program } from '../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
 
-const variableIWithType: Identifier = {
+const intType: PrimitiveType = { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
+
+const identifierI: Identifier = {
   name: 'i',
-  type: 'Identifier',
-  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+  type: 'Identifier'
 }
 
-const variableIWithNoType: Identifier = {
-  name: 'i',
-  type: 'Identifier',
-  primitiveType: undefined
-}
-
-const variableBWithType: Identifier = {
+const identifierB: Identifier = {
   name: 'b',
-  type: 'Identifier',
-  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+  type: 'Identifier'
 }
 
-const variableBWithNoType: Identifier = {
-  name: 'b',
-  type: 'Identifier',
-  primitiveType: undefined
-}
-
-const variableAWithNoType: Identifier = {
+const identifierA: Identifier = {
   name: 'a',
-  type: 'Identifier',
-  primitiveType: undefined
+  type: 'Identifier'
 }
 
-const variableCWithType: Identifier = {
+const identifierC: Identifier = {
   name: 'c',
-  type: 'Identifier',
-  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+  type: 'Identifier'
 }
 
 describe('Iterative Statements', () => {
@@ -55,7 +41,11 @@ describe('Iterative Statements', () => {
             type: 'BlockStatement'
           },
           init: {
-            left: variableIWithType,
+            left: {
+              identifier: identifierI,
+              type: 'VariableDeclarationExpression',
+              identifierType: intType
+            },
             loc: {
               end: {
                 column: 13,
@@ -85,7 +75,7 @@ describe('Iterative Statements', () => {
             type: 'AssignmentExpression'
           },
           test: {
-            left: variableIWithNoType,
+            left: identifierI,
             loc: {
               end: {
                 column: 20,
@@ -116,7 +106,7 @@ describe('Iterative Statements', () => {
           },
           type: 'ForStatement',
           update: {
-            argument: variableIWithNoType,
+            argument: identifierI,
             operator: '++',
             type: 'UpdateExpression'
           }
@@ -139,7 +129,11 @@ describe('Iterative Statements', () => {
                 expression: {
                   expressions: [
                     {
-                      left: variableBWithType,
+                      left: {
+                        identifier: identifierB,
+                        type: 'VariableDeclarationExpression',
+                        identifierType: intType
+                      },
                       loc: {
                         end: {
                           column: 38,
@@ -182,7 +176,11 @@ describe('Iterative Statements', () => {
                 expression: {
                   expressions: [
                     {
-                      left: variableCWithType,
+                      left: {
+                        identifier: identifierC,
+                        type: 'VariableDeclarationExpression',
+                        identifierType: intType
+                      },
                       loc: {
                         end: {
                           column: 53,
@@ -195,7 +193,7 @@ describe('Iterative Statements', () => {
                       },
                       operator: '=',
                       right: {
-                        left: variableAWithNoType,
+                        left: identifierA,
                         loc: {
                           end: {
                             column: 53,
@@ -207,7 +205,7 @@ describe('Iterative Statements', () => {
                           }
                         },
                         operator: '+',
-                        right: variableBWithNoType,
+                        right: identifierB,
                         type: 'BinaryExpression'
                       },
                       type: 'AssignmentExpression'
@@ -226,7 +224,11 @@ describe('Iterative Statements', () => {
             type: 'BlockStatement'
           },
           init: {
-            left: variableIWithType,
+            left: {
+              identifier: identifierI,
+              type: 'VariableDeclarationExpression',
+              identifierType: intType
+            },
             loc: {
               end: {
                 column: 13,
@@ -256,7 +258,7 @@ describe('Iterative Statements', () => {
             type: 'AssignmentExpression'
           },
           test: {
-            left: variableIWithNoType,
+            left: identifierI,
             loc: {
               end: {
                 column: 20,
@@ -287,7 +289,7 @@ describe('Iterative Statements', () => {
           },
           type: 'ForStatement',
           update: {
-            argument: variableIWithNoType,
+            argument: identifierI,
             operator: '++',
             type: 'UpdateExpression'
           }
@@ -311,8 +313,7 @@ describe('Iterative Statements', () => {
           test: {
             argument: {
               name: 'i',
-              type: 'Identifier',
-              primitiveType: undefined
+              type: 'Identifier'
             },
             operator: '--',
             type: 'UpdateExpression'
@@ -337,7 +338,11 @@ describe('Iterative Statements', () => {
                 expression: {
                   expressions: [
                     {
-                      left: variableBWithType,
+                      left: {
+                        identifier: identifierB,
+                        type: 'VariableDeclarationExpression',
+                        identifierType: intType
+                      },
                       loc: {
                         end: {
                           column: 21,
@@ -380,7 +385,11 @@ describe('Iterative Statements', () => {
                 expression: {
                   expressions: [
                     {
-                      left: variableCWithType,
+                      left: {
+                        identifier: identifierC,
+                        type: 'VariableDeclarationExpression',
+                        identifierType: intType
+                      },
                       loc: {
                         end: {
                           column: 36,
@@ -419,7 +428,7 @@ describe('Iterative Statements', () => {
                           }
                         },
                         operator: '+',
-                        right: variableAWithNoType,
+                        right: identifierA,
                         type: 'BinaryExpression'
                       },
                       type: 'AssignmentExpression'
@@ -438,7 +447,7 @@ describe('Iterative Statements', () => {
             type: 'BlockStatement'
           },
           test: {
-            argument: variableIWithNoType,
+            argument: identifierI,
             operator: '--',
             type: 'UpdateExpression'
           },
@@ -463,8 +472,7 @@ describe('Iterative Statements', () => {
           test: {
             argument: {
               name: 'i',
-              type: 'Identifier',
-              primitiveType: undefined
+              type: 'Identifier'
             },
             operator: '--',
             type: 'UpdateExpression'
@@ -489,7 +497,11 @@ describe('Iterative Statements', () => {
                 expression: {
                   expressions: [
                     {
-                      left: variableBWithType,
+                      left: {
+                        identifier: identifierB,
+                        type: 'VariableDeclarationExpression',
+                        identifierType: intType
+                      },
                       loc: {
                         end: {
                           column: 12,
@@ -532,7 +544,11 @@ describe('Iterative Statements', () => {
                 expression: {
                   expressions: [
                     {
-                      left: variableCWithType,
+                      left: {
+                        identifier: identifierC,
+                        type: 'VariableDeclarationExpression',
+                        identifierType: intType
+                      },
                       loc: {
                         end: {
                           column: 28,
@@ -571,7 +587,7 @@ describe('Iterative Statements', () => {
                           }
                         },
                         operator: '-',
-                        right: variableBWithNoType,
+                        right: identifierB,
                         type: 'BinaryExpression'
                       },
                       type: 'AssignmentExpression'
@@ -590,7 +606,7 @@ describe('Iterative Statements', () => {
             type: 'BlockStatement'
           },
           test: {
-            argument: variableIWithNoType,
+            argument: identifierI,
             operator: '--',
             type: 'UpdateExpression'
           },

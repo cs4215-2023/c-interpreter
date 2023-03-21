@@ -22,8 +22,7 @@ describe('Conditional Statements', () => {
                     {
                       argument: {
                         name: 'b',
-                        type: 'Identifier',
-                        primitiveType: undefined
+                        type: 'Identifier'
                       },
                       operator: '--',
                       type: 'UpdateExpression'
@@ -49,8 +48,7 @@ describe('Conditional Statements', () => {
                     {
                       argument: {
                         name: 'a',
-                        type: 'Identifier',
-                        primitiveType: undefined
+                        type: 'Identifier'
                       },
                       operator: '--',
                       type: 'UpdateExpression'
@@ -109,8 +107,7 @@ describe('Conditional Statements', () => {
                       {
                         argument: {
                           name: 'b',
-                          type: 'Identifier',
-                          primitiveType: undefined
+                          type: 'Identifier'
                         },
                         operator: '--',
                         type: 'UpdateExpression'
@@ -153,8 +150,7 @@ describe('Conditional Statements', () => {
                     {
                       argument: {
                         name: 'a',
-                        type: 'Identifier',
-                        primitiveType: undefined
+                        type: 'Identifier'
                       },
                       operator: '--',
                       type: 'UpdateExpression'

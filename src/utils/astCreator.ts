@@ -1,30 +1,14 @@
 import { isInteger } from 'lodash'
 
-import {
-  CallExpression,
-  Expression,
-  Identifier,
-  Literal,
-  PrimitiveType,
-  SourceLocation,
-  VariableDeclaration
-} from '../parser/types'
-
-export const getVariableDecarationName = (decl: VariableDeclaration) =>
-  (decl.declarations[0].id as Identifier).name
+import { CallExpression, Expression, Identifier, Literal, SourceLocation } from '../parser/types'
 
 export const locationDummyNode = (line: number, column: number) =>
   literal('Dummy', { start: { line, column }, end: { line, column } })
 
-export const identifier = (
-  name: string,
-  loc?: SourceLocation | null,
-  primitiveType?: PrimitiveType | undefined
-): Identifier => ({
+export const identifier = (name: string, loc?: SourceLocation | null): Identifier => ({
   type: 'Identifier',
   name,
-  loc,
-  primitiveType
+  loc
 })
 
 export const literal = (value: string | number | null, loc?: SourceLocation | null): Literal => {

@@ -1,4 +1,6 @@
 /* tslint:disable:max-classes-per-file */
+import * as es from 'estree'
+
 import * as constants from '../constants'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
@@ -100,6 +102,10 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
+  IdentifierWithTypeExpression: function* (node: Node, context: Context) {
+	throw new Error(`not supported yet: ${node.type}`)
+  },
+
 
   Identifier: function* (node:  Node, context: Context) {
 	if (node.type != 'Identifier') {
@@ -178,6 +184,10 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 	}
 	const loopEnvironment = createBlockEnvironment(context, 'forLoopEnvironment')
     pushEnvironment(context, loopEnvironment)
+	const init = node.init
+	console.log(init)
+
+	console.log(currentEnvironment(context))
   },
 
   // TODO: handle case for -= and += 
@@ -185,6 +195,7 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
 	if (node.type != 'AssignmentExpression') {
 		throw new Error('Not assignment expression')
 	}
+
 
     const id = node.left as Identifier
     const value = yield*evaluate(node.right, context)

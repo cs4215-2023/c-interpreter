@@ -2,7 +2,7 @@ import createContext from '../../../createContext'
 import { Variant } from '../../../types'
 import { FatalSyntaxError } from '../../errors'
 import { parse } from '../../parser'
-import { Program } from '../../types'
+import { PrimitiveType, Program } from '../../types'
 import { Identifier } from '../../types'
 
 const variant = Variant.DEFAULT
@@ -13,32 +13,23 @@ describe('Variable declarations', () => {
     const code = 'int a;'
     const prog = parse(code, context)
 
-    const identifier: Identifier = {
-      name: 'a',
-      primitiveType: {
-        signed: undefined,
-        type: 'PrimitiveType',
-        valueType: 'int'
-      },
-      type: 'Identifier'
-    }
-
     const expectedProg: Program = {
       type: 'Program',
       body: [
         {
           expression: {
             expressions: [
-              identifier,
               {
-                expressions: [],
-                type: 'SequenceExpression'
-              }
+                identifier: { name: 'a', type: 'Identifier' },
+                type: 'VariableDeclarationExpression',
+                identifierType: { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
+              },
+              { expressions: [], type: 'SequenceExpression' }
             ],
             type: 'SequenceExpression'
           },
-          loc: undefined,
-          type: 'ExpressionStatement'
+          type: 'ExpressionStatement',
+          loc: undefined
         }
       ]
     }
@@ -49,23 +40,15 @@ describe('Variable declarations', () => {
     const code = 'int a; int b;'
     const prog = parse(code, context)
 
+    const intType: PrimitiveType = { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
+
     const identifierA: Identifier = {
       name: 'a',
-      primitiveType: {
-        signed: undefined,
-        type: 'PrimitiveType',
-        valueType: 'int'
-      },
       type: 'Identifier'
     }
 
     const identifierB: Identifier = {
       name: 'b',
-      primitiveType: {
-        signed: undefined,
-        type: 'PrimitiveType',
-        valueType: 'int'
-      },
       type: 'Identifier'
     }
 
@@ -74,7 +57,14 @@ describe('Variable declarations', () => {
       body: [
         {
           expression: {
-            expressions: [identifierA, { expressions: [], type: 'SequenceExpression' }],
+            expressions: [
+              {
+                identifier: identifierA,
+                type: 'VariableDeclarationExpression',
+                identifierType: intType
+              },
+              { expressions: [], type: 'SequenceExpression' }
+            ],
             type: 'SequenceExpression'
           },
           loc: undefined,
@@ -83,7 +73,11 @@ describe('Variable declarations', () => {
         {
           expression: {
             expressions: [
-              identifierB,
+              {
+                identifier: identifierB,
+                type: 'VariableDeclarationExpression',
+                identifierType: intType
+              },
               {
                 expressions: [],
                 type: 'SequenceExpression'

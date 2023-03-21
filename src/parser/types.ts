@@ -85,7 +85,7 @@ export interface WhileStatement extends BaseStatement {
 
 export interface ForStatement extends BaseStatement {
   type: 'ForStatement'
-  init: Expression
+  init: Expression | VariableDeclaration
   test: Expression
   update: Expression
   body: BlockStatement
@@ -116,7 +116,9 @@ export interface VariableDeclarator extends BaseNode {
 }
 
 export type Expression =
-  | IdentifierWithTypeExpression
+  | VariableDeclarationExpression
+  | PointerDeclarationExpression
+  | ArrayDeclarationExpression
   | ArrayExpression
   | Literal
   | Identifier
@@ -141,10 +143,24 @@ export interface CallExpression extends BaseCallExpression {
   type: 'CallExpression'
 }
 
-export interface IdentifierWithTypeExpression extends BaseExpression {
-  type: 'IdentifierWithTypeExpression'
+export interface ArrayDeclarationExpression extends BaseExpression {
+  type: 'ArrayDeclarationExpression'
+  array?: ArrayExpression
+  arrayType: Type
+  size?: number
   identifier: Identifier
-  identifierType?: Type
+}
+
+export interface VariableDeclarationExpression extends BaseExpression {
+  type: 'VariableDeclarationExpression'
+  identifier: Identifier
+  identifierType: Type
+}
+
+export interface PointerDeclarationExpression extends BaseExpression {
+  type: 'PointerDeclarationExpression'
+  pointer: PointerIdentifier
+  pointerType: Type
 }
 
 export interface ArrayExpression extends BaseExpression {
@@ -172,7 +188,7 @@ export interface BinaryExpression extends BaseExpression {
 export interface AssignmentExpression extends BaseExpression {
   type: 'AssignmentExpression'
   operator: AssignmentOperator
-  left: Pattern
+  left: Pattern | VariableDeclarationExpression | PointerDeclarationExpression
   right: Expression
 }
 
@@ -206,14 +222,12 @@ export type Pattern = Identifier | PointerIdentifier
 export interface Identifier extends BaseExpression {
   type: 'Identifier'
   name: string
-  primitiveType: PrimitiveType | undefined
 }
 
 // Have to be the same type as Identifier otherwise an error is thrown by acorn
 export interface PointerIdentifier extends BaseExpression {
   type: 'Identifier'
   name: string
-  primitiveType: PrimitiveType | undefined
   pointingAddress: undefined
   pointerAddress: undefined
   isReferenced: boolean

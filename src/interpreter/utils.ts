@@ -4,6 +4,7 @@ import {
   Expression,
   ExpressionStatement,
   Identifier,
+  Node,
   Statement
 } from '../parser/types'
 import { Context, Environment, Frame, Value } from '../types'
@@ -66,17 +67,12 @@ export function makeVariableDeclarations(node: Statement | Expression): Frame {
     return makeVariableDeclarations(node.expression)
   } else if (node.type == 'AssignmentExpression') {
     const left = node.left as Identifier
-    if (checkIdentifierType(left)) {
-      arr[left.name] = undefined
-    }
-  } else if (node.type == 'Identifier' && checkIdentifierType(node)) {
+
+    arr[left.name] = undefined
+  } else if (node.type == 'Identifier') {
     arr[node.name] = undefined
   }
   return arr
-}
-
-function checkIdentifierType(node: Identifier): boolean {
-  return node.primitiveType != undefined
 }
 
 /* 

@@ -75,7 +75,7 @@ statement:
 	| functionDeclaration;
 
 expression:
-	identifierWithType														# IdentifierDeclarationExpression
+	identifierWithType														# VariableDeclarationExpression
 	| NUMBER																# NumberExpression
 	| CHAR																	# CharExpression
 	| FLOAT																	# FloatExpression
@@ -150,7 +150,7 @@ forCondition:
 	initialise = expression ';' test = expression? ';' update = expression;
 
 arrayIdentifierWithType:
-	id = identifierWithType '[' size = NUMBER? ']';
+	idType = type id = IDENTIFIER '[' size = NUMBER? ']';
 
 arrayContent:
 	'{' (pointerList | numberList | identifierList) '}';
@@ -170,7 +170,7 @@ pointerReference: operator = BITWISEAND argument = IDENTIFIER;
 functionDeclaration: function;
 
 function:
-	id = identifierWithType (
+	idType = type id = IDENTIFIER (
 		'(' params = identifierWithTypeList ')'
 	) '{' body = statementBlock '}';
 

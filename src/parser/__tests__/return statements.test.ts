@@ -9,20 +9,17 @@ const context = createContext(variant, undefined, undefined)
 
 const parameterA: Identifier = {
   name: 'a',
-  type: 'Identifier',
-  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+  type: 'Identifier'
 }
 
 const idVoidType: Identifier = {
   name: 'foo',
-  type: 'Identifier',
-  primitiveType: { type: 'PrimitiveType', valueType: 'void', signed: undefined }
+  type: 'Identifier'
 }
 
 const idIntType: Identifier = {
   name: 'foo',
-  type: 'Identifier',
-  primitiveType: { type: 'PrimitiveType', valueType: 'int', signed: undefined }
+  type: 'Identifier'
 }
 
 describe('Return statements', () => {

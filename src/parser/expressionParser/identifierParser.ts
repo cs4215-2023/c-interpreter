@@ -1,38 +1,40 @@
 import {
-  IdentifierDeclarationExpressionContext,
   IdentifierExpressionContext,
-  IdentifierWithTypeContext
+  IdentifierWithTypeContext,
+  VariableDeclarationExpressionContext
 } from '../../lang/ClangParser'
 import { TypeParser } from '../typeParser'
-import { Identifier } from '../types'
+import { Expression, Identifier } from '../types'
 import { Constructable } from '../util'
 
 export const parserIdentifierExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    visitIdentifierDeclarationExpression(ctx: IdentifierDeclarationExpressionContext): Identifier {
+    visitVariableDeclarationExpression(ctx: VariableDeclarationExpressionContext): Expression {
       console.log('visitTypedIdentifierExpression')
-      return this.visitIdentifierWithType(ctx.identifierWithType())
+      const idWithType = ctx.identifierWithType()
+      const type = new TypeParser().visit(idWithType._idType)
+      console.log('type is ' + type.valueType)
+      return {
+        identifier: this.visitIdentifierWithType(ctx.identifierWithType()),
+        identifierType: type,
+        type: 'VariableDeclarationExpression'
+      }
     }
 
     visitIdentifierWithType(ctx: IdentifierWithTypeContext): Identifier {
       console.log('visitIdentifierWithType')
-      const type = new TypeParser().visit(ctx._idType)
-      console.log(ctx.IDENTIFIER().text)
-      console.log('type is ' + type.valueType)
       return {
         type: 'Identifier',
-        name: ctx.IDENTIFIER().text,
-        primitiveType: type
+        name: ctx.IDENTIFIER().text
       }
     }
 
     visitIdentifierExpression(ctx: IdentifierExpressionContext): Identifier {
       return {
         type: 'Identifier',
-        name: ctx.IDENTIFIER().text,
-        primitiveType: undefined
+        name: ctx.IDENTIFIER().text
       }
     }
   }
