@@ -6,9 +6,9 @@ import {
   IdentifierListContext,
   NumberListContext
 } from '../../lang/ClangParser'
-import { TypeParser } from '../typeParser'
 import { Expression, Identifier, Literal } from '../types'
-import { Constructable, tokenToIdentifierWrapper } from '../util'
+import { Constructable } from '../util'
+import ExpressionParser from '.'
 
 export const parserArrayExpression = <T extends Constructable>(
   BaseClass: T
@@ -73,8 +73,7 @@ export const parserArrayExpression = <T extends Constructable>(
     }
     visitArrayIdentifierWithType(ctx: ArrayIdentifierWithTypeContext): Expression {
       console.log('visitarrayidentifierwithtypecontext')
-      const type = new TypeParser().visit(ctx._idType)
-      const identifier = tokenToIdentifierWrapper(ctx._id, type)
+      const identifier = new ExpressionParser().visit(ctx._id)
       return identifier
     }
   }

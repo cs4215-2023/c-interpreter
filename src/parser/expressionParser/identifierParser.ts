@@ -1,7 +1,7 @@
 import {
+  IdentifierDeclarationExpressionContext,
   IdentifierExpressionContext,
-  IdentifierWithTypeContext,
-  TypedIdentifierExpressionContext
+  IdentifierWithTypeContext
 } from '../../lang/ClangParser'
 import { TypeParser } from '../typeParser'
 import { Identifier } from '../types'
@@ -11,7 +11,7 @@ export const parserIdentifierExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    visitTypedIdentifierExpression(ctx: TypedIdentifierExpressionContext): Identifier {
+    visitIdentifierDeclarationExpression(ctx: IdentifierDeclarationExpressionContext): Identifier {
       console.log('visitTypedIdentifierExpression')
       return this.visitIdentifierWithType(ctx.identifierWithType())
     }

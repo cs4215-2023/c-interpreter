@@ -6,9 +6,7 @@ import { ClangVisitor } from '../lang/ClangVisitor'
 import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
 import { StatementParser } from './statementParser'
-import { TypeParser } from './typeParser'
-import { Pattern, Statement } from './types'
-import { tokenToIdentifierWrapper } from './util'
+import { Identifier, Pattern, Statement } from './types'
 
 export class FunctionParser
   extends AbstractParseTreeVisitor<Statement>
@@ -76,14 +74,13 @@ export class FunctionParser
 
   visitFunctionProperties(ctx: FunctionContext): Statement {
     console.log('visit function declaration')
-    const type = new TypeParser().visit(ctx._funcType)
-    console.log('func type is: ', type)
+    const id = new ExpressionParser().visit(ctx._id) as Identifier
     return {
       type: 'FunctionDeclaration',
-      id: tokenToIdentifierWrapper(ctx._funcName, type),
+      id: id,
       body: { type: 'BlockStatement', body: this.bodyWrapper(ctx) },
       params: this.paramsWrapper(ctx),
-      typeDeclaration: type
+      typeDeclaration: id.primitiveType!
     }
   }
 }

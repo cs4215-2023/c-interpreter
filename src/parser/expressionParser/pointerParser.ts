@@ -1,8 +1,8 @@
 import {
   PointerContext,
+  PointerDeclarationExpressionContext,
   PointerDereferenceExpressionContext,
   PointerDerefernceContext,
-  PointerExpressionContext,
   PointerReferenceContext,
   PointerReferenceExpressionContext
 } from '../../lang/ClangParser'
@@ -28,7 +28,7 @@ export const parserPointerExpression = <T extends Constructable>(
         isDereferenced: false
       }
     }
-    visitPointerExpression(ctx: PointerExpressionContext): PointerIdentifier {
+    visitPointerDeclarationExpression(ctx: PointerDeclarationExpressionContext): PointerIdentifier {
       return this.visit(ctx.pointer())
     }
     visitPointerDereferenceExpression(ctx: PointerDereferenceExpressionContext): PointerIdentifier {
