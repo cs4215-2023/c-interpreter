@@ -173,7 +173,11 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
   },
 
   ForStatement: function* (node:  Node, context: Context) {
-	throw new Error(`not supported yet: ${node.type}`)
+	if (node.type != 'ForStatement') {
+		throw new Error('Not for loop')
+	}
+	const loopEnvironment = createBlockEnvironment(context, 'forLoopEnvironment')
+    pushEnvironment(context, loopEnvironment)
   },
 
 

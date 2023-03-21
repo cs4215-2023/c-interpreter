@@ -54,6 +54,7 @@ export function scanFrameVariables(nodes: Statement[]): Frame {
   return var_arr
 }
 
+// TODO: Add identifier type to type environment
 export function makeVariableDeclarations(node: Statement | Expression): Frame {
   let arr = {}
   if (node.type == 'SequenceExpression') {
@@ -65,11 +66,17 @@ export function makeVariableDeclarations(node: Statement | Expression): Frame {
     return makeVariableDeclarations(node.expression)
   } else if (node.type == 'AssignmentExpression') {
     const left = node.left as Identifier
-    arr[left.name] = undefined
-  } else if (node.type == 'Identifier') {
+    if (checkIdentifierType(left)) {
+      arr[left.name] = undefined
+    }
+  } else if (node.type == 'Identifier' && checkIdentifierType(node)) {
     arr[node.name] = undefined
   }
   return arr
+}
+
+function checkIdentifierType(node: Identifier): boolean {
+  return node.primitiveType != undefined
 }
 
 /* 
