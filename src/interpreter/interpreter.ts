@@ -19,6 +19,13 @@ import {
   pushEnvironment,
   replaceEnvironment
 } from './environment'
+import {
+  createBlockTypeEnvironment,
+  popTypeEnvironment,
+  currentTypeEnvironment,
+  pushTypeEnvironment,
+  replaceTypeEnvironment
+} from './typeEnvironment'
 import { DivisionByZeroError, handleRuntimeError } from './errors'
 import {
   checkNumberOfArguments,
@@ -29,11 +36,11 @@ import {
 } from './utils'
 
 class ReturnValue {
-  constructor(public value: Value) {}
+  constructor(public value: Value) { }
 }
 
 class TailCallReturnValue {
-  constructor(public callee: Closure, public args: Value[], public node: CallExpression) {}
+  constructor(public callee: Closure, public args: Value[], public node: CallExpression) { }
 }
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => IterableIterator<Value>
@@ -44,9 +51,10 @@ function* evaluateBlockStatement(context: Context, node: Node) {
   }
   //scan block statement here
   const frame = scanFrameVariables(node.body)
-  console.log(frame)
-  const env = createBlockEnvironment(context, 'blockEnvironment', frame)
+  const env = createBlockEnvironment(context, 'blockEnvironment', frame[0])
+  const typeEnv = createBlockTypeEnvironment(context, 'blockEnvironment', frame[1])
   pushEnvironment(context, env)
+  pushTypeEnvironment(context, typeEnv)
   let result
   for (const statement of node.body) {
     result = yield* evaluate(statement, context)
@@ -66,19 +74,19 @@ function* evaluateBlockStatement(context: Context, node: Node) {
  */
 // tslint:disable:object-literal-shorthand
 // prettier-ignore
-export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
+export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
   /** Simple Values */
-  Literal: function* (node:  Node, _context: Context) {
-	if (node.type != 'Literal') {
-		throw new Error('Not literal')
-	}
+  Literal: function* (node: Node, _context: Context) {
+    if (node.type != 'Literal') {
+      throw new Error('Not literal')
+    }
     return node.value
   },
 
-  SequenceExpression: function* (node:  Node, context: Context) {
-	if (node.type != 'SequenceExpression') {
-		throw new Error('Not sequence expression')
-	}
+  SequenceExpression: function* (node: Node, context: Context) {
+    if (node.type != 'SequenceExpression') {
+      throw new Error('Not sequence expression')
+    }
     let result
     for (const expr of node.expressions) {
       if (expr.type === 'SequenceExpression' && expr.expressions.length === 0) { continue }
@@ -87,57 +95,56 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
     return result
   },
 
-  ArrayExpression: function* (node:  Node, context: Context) {
+  ArrayExpression: function* (node: Node, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  FunctionExpression: function* (node:  Node, context: Context) {
+  FunctionExpression: function* (node: Node, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
   VariableDeclarationExpression: function* (node: Node, context: Context) {
-	if (node.type != 'VariableDeclarationExpression') {
-		throw new Error('not var declaration')
-	}
-	declareVariable(context, node)
+    if (node.type != 'VariableDeclarationExpression') {
+      throw new Error('not var declaration')
+    }
+    declareVariable(context, node)
   },
 
 
-  Identifier: function* (node:  Node, context: Context) {
-	if (node.type != 'Identifier') {
-		throw new Error('Not identifier')
-	}
+  Identifier: function* (node: Node, context: Context) {
+    if (node.type != 'Identifier') {
+      throw new Error('Not identifier')
+    }
     const identifier = getIdentifierFromEnvironment(context, node.name)
     return identifier
   },
 
-  CallExpression: function* (node:  Node, context: Context) {
+  CallExpression: function* (node: Node, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  UnaryExpression: function* (node:  Node, context: Context) {
-	if (node.type != 'UnaryExpression') {
-		throw new Error('Not unary expression')
-	}
+  UnaryExpression: function* (node: Node, context: Context) {
+    if (node.type != 'UnaryExpression') {
+      throw new Error('Not unary expression')
+    }
     const value = yield* evaluate(node.argument, context)
 
     const error = rttc.checkUnaryExpression(node, node.operator, value)
     if (error) {
       return handleRuntimeError(context, error)
     }
-	if (node.operator == '&' || node.operator == '*') {
-		throw new Error('Pointer not implemented yet')
-	}
+    if (node.operator == '&' || node.operator == '*') {
+      throw new Error('Pointer not implemented yet')
+    }
     return evaluateUnaryExpression(node.operator, value)
   },
 
-  BinaryExpression: function* (node:  Node, context: Context) {
-	if (node.type != 'BinaryExpression') {
-		throw new Error('Not binary expression')
-	}
-    const left =yield* evaluate(node.left, context)
-    const right = yield*evaluate(node.right, context)
-    console.log("evaluating binaryexpression for " + left + " and " + right)
+  BinaryExpression: function* (node: Node, context: Context) {
+    if (node.type != 'BinaryExpression') {
+      throw new Error('Not binary expression')
+    }
+    const left = yield* evaluate(node.left, context)
+    const right = yield* evaluate(node.right, context)
     const error = rttc.checkBinaryExpression(node, node.operator, left, right)
     if (error) {
       return handleRuntimeError(context, error)
@@ -149,126 +156,128 @@ export const evaluators: { [nodeType: string]: Evaluator< Node> } = {
   },
 
   //need to verify this once loops are implemented
-  ConditionalExpression: function* (node:  Node, context: Context) {
-	if (node.type != 'ConditionalExpression') {
-		throw new Error('Not conditional expression')
-	}
-    const result = yield*evaluate(node.test, context)
+  ConditionalExpression: function* (node: Node, context: Context) {
+    if (node.type != 'ConditionalExpression') {
+      throw new Error('Not conditional expression')
+    }
+    const result = yield* evaluate(node.test, context)
     //not sure if pushenv is needed here, depending on the definition of conditional expr
     if (result) {
-      return yield*evaluate(node.consequent, context)
+      return yield* evaluate(node.consequent, context)
     }
     else {
-      return yield*evaluate(node.alternate, context)
+      return yield* evaluate(node.alternate, context)
     }
   },
 
-  LogicalExpression: function* (node:  Node, context: Context) {
-	if (node.type != 'LogicalExpression') {
-		throw new Error('Not logical expression')
-	}
-	const left =yield* evaluate(node.left, context)
-    const right = yield*evaluate(node.right, context)
-    console.log("evaluating logicalexpression for " + left + " and " + right)
+  LogicalExpression: function* (node: Node, context: Context) {
+    if (node.type != 'LogicalExpression') {
+      throw new Error('Not logical expression')
+    }
+    const left = yield* evaluate(node.left, context)
+    const right = yield* evaluate(node.right, context)
 
     return evaluateLogicalExpression(node.operator, left, right)
   },
 
-  ForStatement: function* (node:  Node, context: Context) {
-	if (node.type != 'ForStatement') {
-		throw new Error('Not for loop')
-	}
-	const loopEnvironment = createBlockEnvironment(context, 'forLoopEnvironment')
+  ForStatement: function* (node: Node, context: Context) {
+    if (node.type != 'ForStatement') {
+      throw new Error('Not for loop')
+    }
+    const loopEnvironment = createBlockEnvironment(context, 'forLoopEnvironment')
     pushEnvironment(context, loopEnvironment)
-	const init = node.init
-	yield* evaluate(init, context)
-	console.log(currentEnvironment(context))
+    const init = node.init
+    yield* evaluate(init, context)
+    console.log(currentEnvironment(context))
   },
 
   // TODO: handle case for -= and += 
-  AssignmentExpression: function* (node: Node , context: Context) {
-	if (node.type != 'AssignmentExpression') {
-		throw new Error('Not assignment expression')
-	}
+  AssignmentExpression: function* (node: Node, context: Context) {
+    if (node.type != 'AssignmentExpression') {
+      throw new Error('Not assignment expression')
+    }
 
-	let id = node.left as Identifier
-	if (node.left.type == 'VariableDeclarationExpression') {
-		console.log(node.left)
-		yield * evaluate(node.left, context)
-		id = node.left.identifier
-	}
-    const value = yield*evaluate(node.right, context)
+    let id = node.left as Identifier
+    if (node.left.type == 'VariableDeclarationExpression') {
+      console.log(node.left)
+      yield* evaluate(node.left, context)
+      id = node.left.identifier
+    }
+    const value = yield* evaluate(node.right, context)
     setValueToIdentifier(context, id.name, value)
     return value;
   },
 
-  FunctionDeclaration: function* (node:  Node, context: Context) {
+  FunctionDeclaration: function* (node: Node, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
   IfStatement: function* (node: Node, context: Context) {
-	if (node.type != 'IfStatement') {
-		throw new Error('Not if statement')
-	}
-    const result =yield* evaluate(node.test, context)
+    if (node.type != 'IfStatement') {
+      throw new Error('Not if statement')
+    }
+    const result = yield* evaluate(node.test, context)
     if (result) {
-      const consequent = node.consequent as  BlockStatement
-      return yield*evaluate(consequent, context)
+      const consequent = node.consequent as BlockStatement
+      return yield* evaluate(consequent, context)
     }
     else {
       if (node.alternate == null || node.alternate == undefined) { return undefined }
       else {
-        const alternate = node.alternate as  BlockStatement
-        return yield*evaluate(alternate, context)
+        const alternate = node.alternate as BlockStatement
+        return yield* evaluate(alternate, context)
       }
     }
   },
 
-  ExpressionStatement: function* (node:  Node, context: Context) {
-	if (node.type != 'ExpressionStatement') {
-		throw new Error('Not expression statement')
-	}
-    return yield*evaluate(node.expression, context)
+  ExpressionStatement: function* (node: Node, context: Context) {
+    if (node.type != 'ExpressionStatement') {
+      throw new Error('Not expression statement')
+    }
+    return yield* evaluate(node.expression, context)
   },
 
-  ReturnStatement: function* (node:  Node, context: Context) {
+  ReturnStatement: function* (node: Node, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  WhileStatement: function* (node:  Node, context: Context) {
+  WhileStatement: function* (node: Node, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
 
-  BlockStatement: function* (node:  Node, context: Context) {
-    return yield*evaluateBlockStatement(context, node)
+  BlockStatement: function* (node: Node, context: Context) {
+    return yield* evaluateBlockStatement(context, node)
   },
 
-  Program: function* (node:  Node, context: Context) {
-	if (node.type !== 'Program') {
-		return handleRuntimeError(context, new RuntimeSourceError(node));
-	}
+  Program: function* (node: Node, context: Context) {
+    if (node.type !== 'Program') {
+      return handleRuntimeError(context, new RuntimeSourceError(node));
+    }
 
     // Create global environment 
     console.log(currentEnvironment(context)) //this is a null env
     context.numberOfOuterEnvironments += 1;
     const environment = createBlockEnvironment(context, 'globalEnvironment');
+    const type = createBlockTypeEnvironment(context, 'globalTypeEnvironment');
     pushEnvironment(context, environment);
     console.log(currentEnvironment(context)) //this is the 'global' env
 
-	
-	// Create local environment
-	// TODO: create a frame update instead of scanning all the variables at one shot in the beginning
-	const frame = scanFrameVariables(node.body)
-	console.log(frame)
-	const env = createBlockEnvironment(context, 'localEnvironment', frame)
-	context.numberOfOuterEnvironments += 1;
-	pushEnvironment(context, env)
-	let result
-	for (const statement of node.body) {
-	  result = yield* evaluate(statement, context)
-	}
-	return result
+
+    // Create local environment
+    // TODO: create a frame update instead of scanning all the variables at one shot in the beginning
+    const frame = scanFrameVariables(node.body)
+    const env = createBlockEnvironment(context, 'localEnvironment', frame[0])
+    const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment', frame[1])
+    context.numberOfOuterEnvironments += 1;
+    pushEnvironment(context, env)
+    pushTypeEnvironment(context, typeEnv)
+    console.log(currentTypeEnvironment(context))
+    let result
+    for (const statement of node.body) {
+      result = yield* evaluate(statement, context)
+    }
+    return result
   }
 }
 // tslint:enable:object-literal-shorthand
