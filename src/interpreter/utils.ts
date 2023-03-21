@@ -46,7 +46,7 @@ export function checkNumberOfArguments(
 }
 
 //need to account for functions perhaps
-export function scanFrameVariables(nodes: Statement[]): Frame[] {
+export function scanFrameVariables(nodes: Statement[]): [Frame, Frame] {
   let var_arr = {}
   let type_arr = {}
   for (let node of nodes) {
@@ -71,7 +71,8 @@ export function getFrameTypes(node: Statement | Expression): Frame {
     return getFrameTypes(node.expression)
   } else if (node.type == 'AssignmentExpression') {
     return getFrameTypes(node.left)
-  } else if (node.type == 'VariableDeclarationExpression') {//might want to do for functions soon) 
+  } else if (node.type == 'VariableDeclarationExpression') {
+    //might want to do for functions soon)
     arr[node.identifier.name] = node.identifierType
   } else if (node.type == 'ArrayDeclarationExpression') {
     arr[node.identifier.name] = node.arrayType //maybe should just combine w vardeclaration lmao

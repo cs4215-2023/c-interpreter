@@ -6,7 +6,7 @@
 /* tslint:disable:max-classes-per-file */
 
 import { CallExpression, Node, SourceLocation } from '../src/parser/types'
-import { EnvTree } from './createContext'
+import { EnvTree, TypeEnvTree } from './createContext'
 
 /**
  * Defines functions that act as built-ins, but might rely on
@@ -63,7 +63,7 @@ export interface Context<T = any> {
     environmentTree: EnvTree
     environments: Environment[]
     typeEnv: TypeEnvironment[]
-    // typeEnvTree: TypeEnvTree
+    typeEnvTree: TypeEnvTree
     nodes: Node[]
   }
 

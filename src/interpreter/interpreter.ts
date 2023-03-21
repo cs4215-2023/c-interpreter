@@ -19,14 +19,14 @@ import {
   pushEnvironment,
   replaceEnvironment
 } from './environment'
+import { DivisionByZeroError, handleRuntimeError } from './errors'
 import {
   createBlockTypeEnvironment,
-  popTypeEnvironment,
   currentTypeEnvironment,
+  popTypeEnvironment,
   pushTypeEnvironment,
   replaceTypeEnvironment
 } from './typeEnvironment'
-import { DivisionByZeroError, handleRuntimeError } from './errors'
 import {
   checkNumberOfArguments,
   declareVariable,
@@ -50,9 +50,10 @@ function* evaluateBlockStatement(context: Context, node: Node) {
     throw new Error('Not evaluating block statement')
   }
   //scan block statement here
-  const frame = scanFrameVariables(node.body)
-  const env = createBlockEnvironment(context, 'blockEnvironment', frame[0])
-  const typeEnv = createBlockTypeEnvironment(context, 'blockEnvironment', frame[1])
+  const [varFrame, typeFrame] = scanFrameVariables(node.body)
+  const env = createBlockEnvironment(context, 'blockEnvironment', varFrame)
+  const typeEnv = createBlockTypeEnvironment(context, 'blockEnvironment', typeFrame)
+
   pushEnvironment(context, env)
   pushTypeEnvironment(context, typeEnv)
   let result
@@ -259,16 +260,17 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     console.log(currentEnvironment(context)) //this is a null env
     context.numberOfOuterEnvironments += 1;
     const environment = createBlockEnvironment(context, 'globalEnvironment');
-    const type = createBlockTypeEnvironment(context, 'globalTypeEnvironment');
+    const type_env = createBlockTypeEnvironment(context, 'globalTypeEnvironment');
     pushEnvironment(context, environment);
+    pushTypeEnvironment(context, type_env)
     console.log(currentEnvironment(context)) //this is the 'global' env
 
 
     // Create local environment
     // TODO: create a frame update instead of scanning all the variables at one shot in the beginning
-    const frame = scanFrameVariables(node.body)
-    const env = createBlockEnvironment(context, 'localEnvironment', frame[0])
-    const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment', frame[1])
+    const [varFrame, typeFrame] = scanFrameVariables(node.body)
+    const env = createBlockEnvironment(context, 'localEnvironment', varFrame)
+    const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment', typeFrame)
     context.numberOfOuterEnvironments += 1;
     pushEnvironment(context, env)
     pushTypeEnvironment(context, typeEnv)
