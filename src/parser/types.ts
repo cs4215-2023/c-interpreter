@@ -1,5 +1,3 @@
-import { BaseDeclaration } from 'estree'
-
 export interface Position {
   /** >= 1 */
   line: number
