@@ -45,16 +45,39 @@ export function checkNumberOfArguments(
   return undefined
 }
 
-export function scanFrameVariables(nodes: Statement[]): Frame {
+//need to account for functions perhaps
+export function scanFrameVariables(nodes: Statement[]): [Frame, Frame] {
   let var_arr = {}
+  let type_arr = {}
   for (let node of nodes) {
     node = node as ExpressionStatement
-    const res = makeVariableDeclarations(node)
-    var_arr = { ...var_arr, ...res }
+    const values = makeVariableDeclarations(node)
+    const types = getFrameTypes(node)
+    var_arr = { ...var_arr, ...values }
+    type_arr = { ...type_arr, ...types }
   }
   // var_arr = var_arr.filter((item, pos) => var_arr.indexOf(item) === pos)
-  console.log(var_arr)
-  return var_arr
+  return [var_arr, type_arr]
+}
+
+export function getFrameTypes(node: Statement | Expression): Frame {
+  let arr = {}
+  if (node.type == 'SequenceExpression') {
+    for (const expr of node.expressions) {
+      const res = getFrameTypes(expr)
+      arr = { ...arr, ...res }
+    }
+  } else if (node.type == 'ExpressionStatement') {
+    return getFrameTypes(node.expression)
+  } else if (node.type == 'AssignmentExpression') {
+    return getFrameTypes(node.left)
+  } else if (node.type == 'VariableDeclarationExpression') {
+    //might want to do for functions soon)
+    arr[node.identifier.name] = node.identifierType
+  } else if (node.type == 'ArrayDeclarationExpression') {
+    arr[node.identifier.name] = node.arrayType //maybe should just combine w vardeclaration lmao
+  }
+  return arr
 }
 
 // TODO: Add identifier type to type environment

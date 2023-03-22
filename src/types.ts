@@ -1,12 +1,12 @@
 /*
-	This file contains definitions of some interfaces and classes that are used in Source (such as
-	error-related classes).
+  This file contains definitions of some interfaces and classes that are used in Source (such as
+  error-related classes).
 */
 
 /* tslint:disable:max-classes-per-file */
 
 import { CallExpression, Node, SourceLocation } from '../src/parser/types'
-import { EnvTree } from './createContext'
+import { EnvTree, TypeEnvTree } from './createContext'
 
 /**
  * Defines functions that act as built-ins, but might rely on
@@ -62,6 +62,8 @@ export interface Context<T = any> {
     isRunning: boolean
     environmentTree: EnvTree
     environments: Environment[]
+    typeEnv: TypeEnvironment[]
+    typeEnvTree: TypeEnvTree
     nodes: Node[]
   }
 
@@ -136,5 +138,10 @@ export interface Scheduler {
  * Within each scope, variable types/declaration kinds, as well as type aliases, are stored.
  */
 export type TypeEnvironment = {
-  // TODO
-}[]
+  id: string
+  name: string
+  tail: TypeEnvironment | null
+  callExpression?: CallExpression
+  head: Frame
+  thisContext?: Value
+}
