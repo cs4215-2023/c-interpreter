@@ -1,12 +1,11 @@
 import * as errors from '../errors/errors'
 import {
-  ArrayDeclarationExpression,
   CallExpression,
   Expression,
   ExpressionStatement,
   Identifier,
-  Statement,
-  VariableDeclarationExpression
+  Node,
+  Statement
 } from '../parser/types'
 import { Context, Environment, Frame, Value } from '../types'
 import Closure from './closure'
@@ -102,7 +101,7 @@ export function makeVariableDeclarations(node: Statement | Expression): Frame {
 /* 
 Gets a variable from the environment based on the name.
 */
-export const getIdentifierFromEnvironment = (context: Context, name: string) => {
+export const getIdentifierValueFromEnvironment = (context: Context, name: string) => {
   let environment: Environment | null = currentEnvironment(context)
   while (environment) {
     if (environment.head.hasOwnProperty(name)) {
@@ -128,12 +127,9 @@ export const setValueToIdentifier = (context: Context, name: string, value: any)
   return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
 }
 
-export function declareVariable(
-  context: Context,
-  node: VariableDeclarationExpression | ArrayDeclarationExpression
-) {
-  const id = node.identifier
-  const name = id.name
+const DECLARED_BUT_NOT_YET_ASSIGNED = Symbol('Used to implement hoisting')
+
+export function declareIdentifier(context: Context, name: string, node: Node) {
   const environment = currentEnvironment(context)
   if (environment.head.hasOwnProperty(name)) {
     return handleRuntimeError(
@@ -141,6 +137,25 @@ export function declareVariable(
       new errors.ExceptionError(new Error('Redeclared'), node.loc!)
     )
   }
-  environment.head[name] = undefined
+  environment.head[name] = DECLARED_BUT_NOT_YET_ASSIGNED
   return environment
+}
+
+export function getVariable(context: Context, name: string) {
+  let environment: Environment | null = currentEnvironment(context)
+  while (environment) {
+    if (environment.head.hasOwnProperty(name)) {
+      if (environment.head[name] === DECLARED_BUT_NOT_YET_ASSIGNED) {
+        return handleRuntimeError(
+          context,
+          new errors.UnassignedVariable(name, context.runtime.nodes[0])
+        )
+      } else {
+        return environment.head[name]
+      }
+    } else {
+      environment = environment.tail
+    }
+  }
+  return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
 }
