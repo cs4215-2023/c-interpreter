@@ -27,8 +27,9 @@ import {
 } from './typeEnvironment'
 import {
   checkNumberOfArguments,
-  declareVariable,
-  getIdentifierFromEnvironment,
+  declareIdentifier,
+  getIdentifierValueFromEnvironment,
+  getVariable,
   scanFrameVariables,
   setValueToIdentifier
 } from './utils'
@@ -106,15 +107,16 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'VariableDeclarationExpression') {
       throw new Error('not var declaration')
     }
-    declareVariable(context, node)
+	const identifier = node.identifier as Identifier
+	declareIdentifier(context, identifier.name, node)
   },
 
-
+  // TODO: currently returns a value
   Identifier: function* (node: Node, context: Context) {
     if (node.type != 'Identifier') {
       throw new Error('Not identifier')
     }
-    const identifier = getIdentifierFromEnvironment(context, node.name)
+    const identifier = getVariable(context, node.name)
     return identifier
   },
 
@@ -186,8 +188,23 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const loopEnvironment = createBlockEnvironment(context, 'forLoopEnvironment')
     pushEnvironment(context, loopEnvironment)
     const init = node.init
+	const test = node.test
+	const update = node.update
     yield* evaluate(init, context)
     console.log(currentEnvironment(context))
+	let value
+	while (yield *evaluate(test, context)) {
+		const innerEnv = createBlockEnvironment(context, 'forBlockEnvironment')
+		pushEnvironment(context, innerEnv)
+		for (const name in loopEnvironment.head) {
+		}
+
+		popEnvironment(context)
+		yield* evaluate(update, context)
+	}
+	console.log(currentEnvironment(context))
+	return value
+	
   },
 
   // TODO: handle case for -= and += 
@@ -205,6 +222,23 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const value = yield* evaluate(node.right, context)
     setValueToIdentifier(context, id.name, value)
     return value;
+  },
+
+  UpdateExpression: function* (node: Node, context: Context) {
+	if (node.type != 'UpdateExpression') {
+		throw new Error('Not update expression')
+	}
+
+	const identifier = node.argument as Identifier
+
+	let value = getIdentifierValueFromEnvironment(context, identifier.name)
+	if (node.operator == '++') {
+		value += 1
+	} else {
+		value -= 1
+	}
+
+	setValueToIdentifier(context, identifier.name, value)
   },
 
   FunctionDeclaration: function* (node: Node, context: Context) {
