@@ -22,17 +22,14 @@ import {
 import { DivisionByZeroError, handleRuntimeError } from './errors'
 import {
   createBlockTypeEnvironment,
-  currentTypeEnvironment,
   popTypeEnvironment,
   pushTypeEnvironment
 } from './typeEnvironment'
 import {
   checkNumberOfArguments,
   declareIdentifier,
-  defineVariable,
   getIdentifierValueFromEnvironment,
   getVariable,
-  scanFrameVariables,
   setValueToIdentifier
 } from './utils'
 
@@ -189,12 +186,16 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'ForStatement') {
       throw new Error('Not for loop')
     }
-    const loopEnvironment = createBlockEnvironment(context, 'forLoopEnvironment')
-    pushEnvironment(context, loopEnvironment)
+    const loopVariableEnvironment = createBlockEnvironment(context, 'forLoopEnvironment')
+	const loopTypeEnvironment = createBlockTypeEnvironment(context, 'forLoopTypeEnvironment')
+    pushEnvironment(context, loopVariableEnvironment)
+	pushTypeEnvironment(context, loopTypeEnvironment)
+
     const init = node.init
 	const test = node.test
 	const update = node.update
     yield* evaluate(init, context)
+
 	let value
 	while (yield *evaluate(test, context)) {
 		value = yield* evaluate(node.body, context)
@@ -204,13 +205,10 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 	
   },
 
-  // TODO: handle case for -= and += 
   AssignmentExpression: function* (node: Node, context: Context) {
     if (node.type != 'AssignmentExpression') {
       throw new Error('Not assignment expression')
     }
-
-	console.log(node.operator)
 
     let id = node.left as Identifier
     if (node.left.type == 'VariableDeclarationExpression') {
@@ -297,8 +295,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
 
     // Create local environment
-    // TODO: create a frame update instead of scanning all the variables at one shot in the beginning
-    // const [varFrame, typeFrame] = scanFrameVariables(node.body, context)
     const env = createBlockEnvironment(context, 'localEnvironment')
     const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment')
     context.numberOfOuterEnvironments += 1;

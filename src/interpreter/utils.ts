@@ -1,16 +1,10 @@
 import * as errors from '../errors/errors'
-import {
-  CallExpression,
-  Expression,
-  ExpressionStatement,
-  Identifier,
-  Node,
-  Statement
-} from '../parser/types'
-import { Context, Environment, Frame, Value } from '../types'
+import { CallExpression, Node } from '../parser/types'
+import { Context, Environment, Value } from '../types'
 import Closure from './closure'
 import { currentEnvironment } from './environment'
 import { handleRuntimeError } from './errors'
+import { currentTypeEnvironment } from './typeEnvironment'
 
 export function checkNumberOfArguments(
   context: Context,
@@ -43,61 +37,6 @@ export function checkNumberOfArguments(
   return undefined
 }
 
-//need to account for functions perhaps
-export function scanFrameVariables(nodes: Statement[]): [Frame, Frame] {
-  let var_arr = {}
-  let type_arr = {}
-  for (let node of nodes) {
-    node = node as ExpressionStatement
-    const values = makeVariableDeclarations(node)
-    const types = getFrameTypes(node)
-    var_arr = { ...var_arr, ...values }
-    type_arr = { ...type_arr, ...types }
-  }
-  // var_arr = var_arr.filter((item, pos) => var_arr.indexOf(item) === pos)
-  return [var_arr, type_arr]
-}
-
-export function getFrameTypes(node: Statement | Expression): Frame {
-  let arr = {}
-  if (node.type == 'SequenceExpression') {
-    for (const expr of node.expressions) {
-      const res = getFrameTypes(expr)
-      arr = { ...arr, ...res }
-    }
-  } else if (node.type == 'ExpressionStatement') {
-    return getFrameTypes(node.expression)
-  } else if (node.type == 'AssignmentExpression') {
-    return getFrameTypes(node.left)
-  } else if (node.type == 'VariableDeclarationExpression') {
-    //might want to do for functions soon)
-    arr[node.identifier.name] = node.identifierType
-  } else if (node.type == 'ArrayDeclarationExpression') {
-    arr[node.identifier.name] = node.arrayType //maybe should just combine w vardeclaration lmao
-  }
-  return arr
-}
-
-// TODO: Add identifier type to type environment
-export function makeVariableDeclarations(node: Statement | Expression): Frame {
-  let arr = {}
-  if (node.type == 'SequenceExpression') {
-    for (const expr of node.expressions) {
-      const res = makeVariableDeclarations(expr)
-      arr = { ...arr, ...res }
-    }
-  } else if (node.type == 'ExpressionStatement') {
-    return makeVariableDeclarations(node.expression)
-  } else if (node.type == 'AssignmentExpression') {
-    const left = node.left as Identifier
-
-    arr[left.name] = undefined
-  } else if (node.type == 'Identifier') {
-    arr[node.name] = undefined
-  }
-  return arr
-}
-
 /* 
 Gets a variable from the environment based on the name.
 */
@@ -114,6 +53,7 @@ export const getIdentifierValueFromEnvironment = (context: Context, name: string
   return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
 }
 
+// TODO: add type checking
 export const setValueToIdentifier = (context: Context, name: string, value: any) => {
   let environment: Environment | null = currentEnvironment(context)
   while (environment) {
@@ -131,6 +71,7 @@ const DECLARED_BUT_NOT_YET_ASSIGNED = Symbol('Used to implement hoisting')
 
 export function declareIdentifier(context: Context, name: string, node: Node) {
   const environment = currentEnvironment(context)
+  const typeEnvironment = currentTypeEnvironment(context)
   if (environment.head.hasOwnProperty(name)) {
     return handleRuntimeError(
       context,
@@ -138,22 +79,11 @@ export function declareIdentifier(context: Context, name: string, node: Node) {
     )
   }
   environment.head[name] = DECLARED_BUT_NOT_YET_ASSIGNED
-  return environment
-}
-
-export function defineVariable(context: Context, name: string, value: Value, constant = false) {
-  const environment = currentEnvironment(context)
-
-  if (environment.head[name] !== DECLARED_BUT_NOT_YET_ASSIGNED) {
-    return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
+  if (node.type == 'VariableDeclarationExpression') {
+    typeEnvironment.head[name] = node.identifierType
+  } else if (node.type == 'ArrayDeclarationExpression') {
+    typeEnvironment.head[name] = node.arrayType
   }
-
-  Object.defineProperty(environment.head, name, {
-    value,
-    writable: !constant,
-    enumerable: true
-  })
-
   return environment
 }
 
