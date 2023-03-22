@@ -17,15 +17,14 @@ describe('  declarations', () => {
           expression: {
             expressions: [
               {
-                elements: [
-                  {
-                    arrayType: { signed: undefined, type: 'PrimitiveType', valueType: 'int' },
-                    size: 2,
-                    identifier: { name: 'a', type: 'Identifier' },
-                    type: 'ArrayDeclarationExpression'
-                  }
-                ],
-                type: 'ArrayExpression'
+                type: 'ArrayDeclarationExpression',
+                array: { type: 'ArrayExpression', elements: [] },
+                arrayType: { type: 'PrimitiveType', signed: undefined, valueType: 'int' },
+                size: 2,
+                identifier: {
+                  name: 'a',
+                  type: 'Identifier'
+                }
               },
               {
                 expressions: [],
@@ -52,25 +51,28 @@ describe('  declarations', () => {
           expression: {
             expressions: [
               {
-                elements: [
-                  {
-                    arrayType: { signed: undefined, type: 'PrimitiveType', valueType: 'int' },
-                    size: 2,
-                    identifier: { name: 'a', type: 'Identifier' },
-                    type: 'ArrayDeclarationExpression'
-                  },
-                  {
-                    type: 'Literal',
-                    value: 1,
-                    valueType: 'int'
-                  },
-                  {
-                    type: 'Literal',
-                    value: 2,
-                    valueType: 'int'
-                  }
-                ],
-                type: 'ArrayExpression'
+                type: 'ArrayDeclarationExpression',
+                array: {
+                  elements: [
+                    {
+                      type: 'Literal',
+                      value: 1,
+                      valueType: 'int'
+                    },
+                    {
+                      type: 'Literal',
+                      value: 2,
+                      valueType: 'int'
+                    }
+                  ],
+                  type: 'ArrayExpression'
+                },
+                arrayType: { type: 'PrimitiveType', signed: undefined, valueType: 'int' },
+                size: 2,
+                identifier: {
+                  name: 'a',
+                  type: 'Identifier'
+                }
               },
               {
                 expressions: [],
@@ -97,17 +99,20 @@ describe('  declarations', () => {
           expression: {
             expressions: [
               {
-                elements: [
-                  {
-                    arrayType: { signed: undefined, type: 'PrimitiveType', valueType: 'int' },
-                    size: undefined,
-                    identifier: { name: 'v', type: 'Identifier' },
-                    type: 'ArrayDeclarationExpression'
-                  },
-                  { type: 'Literal', value: 3, valueType: 'int' },
-                  { type: 'Literal', value: 3, valueType: 'int' }
-                ],
-                type: 'ArrayExpression'
+                identifier: {
+                  name: 'v',
+                  type: 'Identifier'
+                },
+                size: undefined,
+                type: 'ArrayDeclarationExpression',
+                arrayType: { type: 'PrimitiveType', signed: undefined, valueType: 'int' },
+                array: {
+                  elements: [
+                    { type: 'Literal', value: 3, valueType: 'int' },
+                    { type: 'Literal', value: 3, valueType: 'int' }
+                  ],
+                  type: 'ArrayExpression'
+                }
               },
               {
                 expressions: [],

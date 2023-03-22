@@ -7,7 +7,7 @@ import {
   NumberListContext
 } from '../../lang/ClangParser'
 import { TypeParser } from '../typeParser'
-import { Expression, Identifier, Literal } from '../types'
+import { ArrayDeclarationExpression, Expression, Identifier, Literal } from '../types'
 import { Constructable, tokenToIdentifierWrapper } from '../util'
 
 export const parserArrayExpression = <T extends Constructable>(
@@ -19,15 +19,14 @@ export const parserArrayExpression = <T extends Constructable>(
     }
     visitArrayInitialisation(ctx: ArrayInitialisationContext): Expression {
       console.log('visitArrayInitialisation')
-      const identifier = this.visitArrayIdentifierWithType(ctx.arrayIdentifierWithType())
+      const arrayInitialisor = this.visitArrayIdentifierWithType(
+        ctx.arrayIdentifierWithType()
+      ) as ArrayDeclarationExpression
       const expressions = []
-      expressions.push(identifier) //first element will always be array metadata
       const content = this.visitArrayContent(ctx.arrayContent()!)
       expressions.push(...content)
-      return {
-        type: 'ArrayExpression',
-        elements: expressions
-      }
+      arrayInitialisor.array = { type: 'ArrayExpression', elements: expressions }
+      return arrayInitialisor
     }
     visitArrayContent(ctx: ArrayContentContext): Expression[] {
       if (ctx === undefined) {
@@ -70,6 +69,13 @@ export const parserArrayExpression = <T extends Constructable>(
       })
       return numbers
     }
+
+    /**
+     * Given int a[2] = {1,2}, this visits the int a[2] portion of the initialisation.
+     * @param ctx
+     * @returns an array declaration expression
+     */
+
     visitArrayIdentifierWithType(ctx: ArrayIdentifierWithTypeContext): Expression {
       console.log('visitarrayidentifierwithtypecontext')
       const identifier = tokenToIdentifierWrapper(ctx._id)
@@ -83,7 +89,8 @@ export const parserArrayExpression = <T extends Constructable>(
         type: 'ArrayDeclarationExpression',
         arrayType: type,
         identifier: identifier,
-        size: size
+        size: size,
+        array: undefined
       }
     }
   }
