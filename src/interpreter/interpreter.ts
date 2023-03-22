@@ -23,11 +23,13 @@ import { DivisionByZeroError, handleRuntimeError } from './errors'
 import {
   createBlockTypeEnvironment,
   currentTypeEnvironment,
+  popTypeEnvironment,
   pushTypeEnvironment
 } from './typeEnvironment'
 import {
   checkNumberOfArguments,
   declareIdentifier,
+  defineVariable,
   getIdentifierValueFromEnvironment,
   getVariable,
   scanFrameVariables,
@@ -49,9 +51,9 @@ function* evaluateBlockStatement(context: Context, node: Node) {
     throw new Error('Not evaluating block statement')
   }
   //scan block statement here
-  const [varFrame, typeFrame] = scanFrameVariables(node.body)
-  const env = createBlockEnvironment(context, 'blockEnvironment', varFrame)
-  const typeEnv = createBlockTypeEnvironment(context, 'blockEnvironment', typeFrame)
+  //   const [varFrame, typeFrame] = scanFrameVariables(node.body)
+  const env = createBlockEnvironment(context, 'blockEnvironment')
+  const typeEnv = createBlockTypeEnvironment(context, 'blockEnvironment')
 
   pushEnvironment(context, env)
   pushTypeEnvironment(context, typeEnv)
@@ -59,6 +61,9 @@ function* evaluateBlockStatement(context: Context, node: Node) {
   for (const statement of node.body) {
     result = yield* evaluate(statement, context)
   }
+  console.log(result)
+  popEnvironment(context)
+  popTypeEnvironment(context)
   return result
 }
 
@@ -111,7 +116,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 	declareIdentifier(context, identifier.name, node)
   },
 
-  // TODO: currently returns a value
   Identifier: function* (node: Node, context: Context) {
     if (node.type != 'Identifier') {
       throw new Error('Not identifier')
@@ -191,18 +195,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 	const test = node.test
 	const update = node.update
     yield* evaluate(init, context)
-    console.log(currentEnvironment(context))
 	let value
 	while (yield *evaluate(test, context)) {
-		const innerEnv = createBlockEnvironment(context, 'forBlockEnvironment')
-		pushEnvironment(context, innerEnv)
-		for (const name in loopEnvironment.head) {
-		}
-
-		popEnvironment(context)
+		value = yield* evaluate(node.body, context)
 		yield* evaluate(update, context)
 	}
-	console.log(currentEnvironment(context))
 	return value
 	
   },
@@ -213,9 +210,10 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw new Error('Not assignment expression')
     }
 
+	console.log(node.operator)
+
     let id = node.left as Identifier
     if (node.left.type == 'VariableDeclarationExpression') {
-      console.log(node.left)
       yield* evaluate(node.left, context)
       id = node.left.identifier
     }
@@ -300,13 +298,12 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     // Create local environment
     // TODO: create a frame update instead of scanning all the variables at one shot in the beginning
-    const [varFrame, typeFrame] = scanFrameVariables(node.body)
-    const env = createBlockEnvironment(context, 'localEnvironment', varFrame)
-    const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment', typeFrame)
+    // const [varFrame, typeFrame] = scanFrameVariables(node.body, context)
+    const env = createBlockEnvironment(context, 'localEnvironment')
+    const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment')
     context.numberOfOuterEnvironments += 1;
     pushEnvironment(context, env)
     pushTypeEnvironment(context, typeEnv)
-    console.log(currentTypeEnvironment(context))
     let result
     for (const statement of node.body) {
       result = yield* evaluate(statement, context)
@@ -317,6 +314,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 // tslint:enable:object-literal-shorthand
 
 export function* evaluate(node: Node, context: Context) {
+  console.log(node.type)
   const result = yield* evaluators[node.type](node, context)
   yield* leave(context)
   return result

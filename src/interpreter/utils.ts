@@ -141,6 +141,22 @@ export function declareIdentifier(context: Context, name: string, node: Node) {
   return environment
 }
 
+export function defineVariable(context: Context, name: string, value: Value, constant = false) {
+  const environment = currentEnvironment(context)
+
+  if (environment.head[name] !== DECLARED_BUT_NOT_YET_ASSIGNED) {
+    return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
+  }
+
+  Object.defineProperty(environment.head, name, {
+    value,
+    writable: !constant,
+    enumerable: true
+  })
+
+  return environment
+}
+
 export function getVariable(context: Context, name: string) {
   let environment: Environment | null = currentEnvironment(context)
   while (environment) {
