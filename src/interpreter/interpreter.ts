@@ -23,9 +23,7 @@ import { DivisionByZeroError, handleRuntimeError } from './errors'
 import {
   createBlockTypeEnvironment,
   currentTypeEnvironment,
-  popTypeEnvironment,
-  pushTypeEnvironment,
-  replaceTypeEnvironment
+  pushTypeEnvironment
 } from './typeEnvironment'
 import {
   checkNumberOfArguments,
@@ -36,11 +34,11 @@ import {
 } from './utils'
 
 class ReturnValue {
-  constructor(public value: Value) { }
+  constructor(public value: Value) {}
 }
 
 class TailCallReturnValue {
-  constructor(public callee: Closure, public args: Value[], public node: CallExpression) { }
+  constructor(public callee: Closure, public args: Value[], public node: CallExpression) {}
 }
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => IterableIterator<Value>

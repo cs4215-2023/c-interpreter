@@ -5,7 +5,6 @@ import {
   Expression,
   ExpressionStatement,
   Identifier,
-  Node,
   Statement,
   VariableDeclarationExpression
 } from '../parser/types'
@@ -137,8 +136,6 @@ export function declareVariable(
   const name = id.name
   const environment = currentEnvironment(context)
   if (environment.head.hasOwnProperty(name)) {
-    const descriptors = Object.getOwnPropertyDescriptors(environment.head)
-
     return handleRuntimeError(
       context,
       new errors.ExceptionError(new Error('Redeclared'), node.loc!)

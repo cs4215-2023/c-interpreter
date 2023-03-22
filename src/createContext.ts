@@ -1,6 +1,4 @@
-// Variable determining chapter of Source is contained in this file.
-
-import { Context, Environment, Variant, TypeEnvironment } from './types'
+import { Context, Environment, TypeEnvironment, Variant } from './types'
 
 export class EnvTree {
   private _root: EnvTreeNode | null = null
@@ -35,7 +33,7 @@ export class EnvTree {
 export class EnvTreeNode {
   private _children: EnvTreeNode[] = []
 
-  constructor(readonly environment: Environment, public parent: EnvTreeNode | null) { }
+  constructor(readonly environment: Environment, public parent: EnvTreeNode | null) {}
 
   get children(): EnvTreeNode[] {
     return this._children
@@ -94,7 +92,7 @@ export class TypeEnvTree {
 export class TypeEnvTreeNode {
   private _children: TypeEnvTreeNode[] = []
 
-  constructor(readonly environment: TypeEnvironment, public parent: TypeEnvTreeNode | null) { }
+  constructor(readonly environment: TypeEnvironment, public parent: TypeEnvTreeNode | null) {}
 
   get children(): TypeEnvTreeNode[] {
     return this._children
