@@ -273,7 +273,7 @@ export type BinaryOperator =
 
 export type LogicalOperator = '||' | '&&'
 
-export type AssignmentOperator = '=' | '+=' | '-='
+export type AssignmentOperator = '='
 
 export type UpdateOperator = '++' | '--'
 
