@@ -7,6 +7,7 @@
 
 import { CallExpression, Node, SourceLocation } from '../src/parser/types'
 import { EnvTree, TypeEnvTree } from './createContext'
+import { Stack } from './utils/stack'
 
 /**
  * Defines functions that act as built-ins, but might rely on
@@ -65,6 +66,8 @@ export interface Context<T = any> {
     typeEnv: TypeEnvironment[]
     typeEnvTree: TypeEnvTree
     nodes: Node[]
+    agenda: Stack<T>
+    stash: Stack<T>
   }
 
   numberOfOuterEnvironments: number
