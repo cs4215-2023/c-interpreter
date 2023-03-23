@@ -211,7 +211,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     // Assignment here refers to =
-
     context.runtime.agenda.push({ type: 'AssignmentExpression_i' }, node.left, node.right)
   },
 
