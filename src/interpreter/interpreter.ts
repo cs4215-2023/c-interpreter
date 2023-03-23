@@ -59,7 +59,7 @@ function* evaluateBlockStatement(context: Context, node: Node) {
   for (const statement of node.body) {
     result = yield* evaluate(statement, context)
   }
-  console.log(result)
+
   popEnvironment(context)
   popTypeEnvironment(context)
   return result
@@ -148,9 +148,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'BinaryExpression') {
       throw new Error('Not binary expression')
     }
-
-    console.log(node.right)
-    console.log(node.left)
 
     context.runtime.agenda.push(
       { type: 'BinaryExpression_i', operator: node.operator },
@@ -318,11 +315,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     const A = context.runtime.agenda
-    const E = context.runtime.environments
 
-    const [varFrame, typeFrame] = scanFrameVariables(node.body)
-    const env = createBlockEnvironment(context, 'localEnvironment', varFrame)
-    const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment', typeFrame)
+    const env = createBlockEnvironment(context, 'localEnvironment')
+    const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment')
 
     if (!(A.length() === 0)) {
       A.push({ type: 'EnvironmentRestoration_i' })
@@ -428,8 +423,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const stash = context.runtime.stash
     const agenda = context.runtime.agenda
 
-    console.log(context.runtime.environments)
-
     if (stash.pop()) {
       agenda.push(command, command.test, { type: 'Pop_i' }, command.body)
     }
@@ -502,7 +495,6 @@ export function* evaluate(node: Node, context: Context) {
   const stash = context.runtime.stash
   while (agenda.length()) {
     const command = agenda.pop() as Node
-    console.log(command.type)
     yield* evaluators[command.type](command, context)
   }
 

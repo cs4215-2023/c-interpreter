@@ -6,6 +6,7 @@
 /* tslint:disable:max-classes-per-file */
 
 import { Identifier } from 'estree'
+
 import {
   BinaryOperator,
   BlockStatement,

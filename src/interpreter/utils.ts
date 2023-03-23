@@ -71,9 +71,9 @@ export function makeVariableDeclarations(node: Statement | Expression): Frame {
   } else if (node.type == 'AssignmentExpression') {
     const left = node.left as Identifier
 
-    arr[left.name] = { tag: 'unassigned' }
+    arr[left.name] = DECLARED_BUT_NOT_YET_ASSIGNED
   } else if (node.type == 'Identifier') {
-    arr[node.name] = { tag: 'unassigned' }
+    arr[node.name] = DECLARED_BUT_NOT_YET_ASSIGNED
   }
   return arr
 }
