@@ -17,6 +17,7 @@ import {
   SourceLocation,
   Statement,
   UnaryOperator,
+  UpdateOperator,
   VariableDeclarationExpression
 } from '../src/parser/types'
 import { EnvTree, TypeEnvTree } from './createContext'
@@ -198,7 +199,6 @@ export interface LogicalExpressionInstruction {
 
 export interface AssignmentExpressionInstruction {
   type: 'AssignmentExpression_i'
-  assignee: Pattern | VariableDeclarationExpression | PointerDeclarationExpression
 }
 
 export interface IfStatementInstruction {
