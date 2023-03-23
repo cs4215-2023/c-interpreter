@@ -26,6 +26,7 @@ export class Stack<T> {
   }
 
   debug(): void {
+    console.log(this.items)
     for (const item of this.items) {
       console.log(item)
     }

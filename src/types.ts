@@ -5,6 +5,7 @@
 
 /* tslint:disable:max-classes-per-file */
 
+import { Identifier } from 'estree'
 import {
   BinaryOperator,
   BlockStatement,
@@ -175,6 +176,7 @@ export type Command =
   | DoWhileStatementInstruction
   | PopInstruction
   | ReturnInstruction
+  | EnvironmentRestorationInstruction
 
 export interface UnaryExpressionInstruction {
   type: 'UnaryExpression_i'
@@ -199,6 +201,7 @@ export interface LogicalExpressionInstruction {
 
 export interface AssignmentExpressionInstruction {
   type: 'AssignmentExpression_i'
+  symbol?: Identifier
 }
 
 export interface IfStatementInstruction {
@@ -225,4 +228,8 @@ export interface PopInstruction {
 
 export interface ReturnInstruction {
   type: 'ReturnStatement_i'
+}
+
+export interface EnvironmentRestorationInstruction {
+  type: 'EnvironmentRestoration_i'
 }

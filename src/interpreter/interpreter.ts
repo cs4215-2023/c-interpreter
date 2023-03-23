@@ -149,6 +149,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw new Error('Not binary expression')
     }
 
+    console.log(node.right)
+    console.log(node.left)
+
     context.runtime.agenda.push(
       { type: 'BinaryExpression_i', operator: node.operator },
       node.right,
@@ -210,8 +213,12 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw new Error('Not assignment expression')
     }
 
-    // Assignment here refers to =
-    context.runtime.agenda.push({ type: 'AssignmentExpression_i' }, node.left, node.right)
+    //Assignment here refers to =
+    if (node.left.type == 'Identifier') {
+      context.runtime.agenda.push({ type: 'AssignmentExpression_i', symbol: node.left }, node.right)
+    } else {
+      context.runtime.agenda.push({ type: 'AssignmentExpression_i' }, node.left, node.right)
+    }
   },
 
   UpdateExpression: function* (node: Node, context: Context) {
@@ -220,13 +227,21 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     const agenda = context.runtime.agenda
-    const numberLiteral = { type: 'Literal', value: 1 }
-
-    if (node.operator == '++') {
-      agenda.push({ type: 'BinaryExpression_i', operator: '+' }, numberLiteral, node.argument)
-    } else {
-      agenda.push({ type: 'BinaryExpression_i', operator: '-' }, numberLiteral, node.argument)
+    const numberLiteral = { type: 'Literal', value: 1, valueType: 'int' }
+    const binaryExpression = {
+      type: 'BinaryExpression',
+      operator: node.operator == '++' ? '+' : '-',
+      left: numberLiteral,
+      right: node.argument
     }
+    const assignmentExpression = {
+      type: 'AssignmentExpression',
+      operator: '=',
+      left: node.argument,
+      right: binaryExpression
+    }
+
+    agenda.push(assignmentExpression)
   },
 
   // TODO
@@ -264,7 +279,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     context.runtime.agenda.push(
-      { tag: 'lit', val: undefined },
+      { type: 'Literal', value: undefined },
       { type: 'WhileStatement_i', test: node.test, body: node.body },
       node.test
     )
@@ -290,8 +305,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     // }
     // return value
     context.runtime.agenda.push(
-      { tag: 'lit', val: undefined },
+      { type: 'Literal', value: undefined },
       { type: 'DoWhileStatement_i', test: node.test, body: node.body },
+      node.test,
       node.body
     )
   },
@@ -309,7 +325,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment', typeFrame)
 
     if (!(A.length() === 0)) {
-      A.push({ tag: 'env_i', env: E })
+      A.push({ type: 'EnvironmentRestoration_i' })
     }
 
     // reverse the order
@@ -333,12 +349,12 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     pushEnvironment(context, environment)
     pushTypeEnvironment(context, type_env)
 
-    // Create local environment
-    const env = createBlockEnvironment(context, 'localEnvironment')
-    const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment')
-    context.numberOfOuterEnvironments += 1
-    pushEnvironment(context, env)
-    pushTypeEnvironment(context, typeEnv)
+    // // Create local environment
+    // const env = createBlockEnvironment(context, 'localEnvironment')
+    // const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment')
+    // context.numberOfOuterEnvironments += 1
+    // pushEnvironment(context, env)
+    // pushTypeEnvironment(context, typeEnv)
 
     // reverse the order
     node.body.reverse()
@@ -412,6 +428,21 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const stash = context.runtime.stash
     const agenda = context.runtime.agenda
 
+    console.log(context.runtime.environments)
+
+    if (stash.pop()) {
+      agenda.push(command, command.test, { type: 'Pop_i' }, command.body)
+    }
+  },
+
+  DoWhileStatement_i: function* (command: Command, context: Context) {
+    if (command.type != 'DoWhileStatement_i') {
+      throw new Error('Not while statement instruction')
+    }
+
+    const stash = context.runtime.stash
+    const agenda = context.runtime.agenda
+
     if (stash.pop()) {
       agenda.push(command, command.test, { type: 'Pop_i' }, command.body)
     }
@@ -441,10 +472,24 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     const stash = context.runtime.stash
+    let identifier = command.symbol
 
-    const identifier = stash.pop()
+    // we are assigning to variable
+    if (command.symbol == undefined) {
+      identifier = stash.pop()
+    }
+
     const value = stash.peek()
-    setValueToIdentifier(context, identifier.name, value)
+    setValueToIdentifier(context, identifier!.name, value)
+  },
+
+  EnvironmentRestoration_i: function* (command: Command, context: Context) {
+    if (command.type != 'EnvironmentRestoration_i') {
+      throw new Error('Not assignment expression')
+    }
+
+    popEnvironment(context)
+    popTypeEnvironment(context)
   }
 }
 
