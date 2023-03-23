@@ -340,8 +340,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const env = createBlockEnvironment(context, 'localEnvironment', varFrame)
     const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment', typeFrame)
 
-    if (! (A.length() === 0)) {A.push({tag: 'env_i', env: E})}
-    A.push(node.body)
+    if (! (A.length() === 0)) {
+		A.push({tag: 'env_i', env: E})
+	}
+
+	// reverse the order
+	node.body.reverse()
+    A.push(...node.body)
 
 	context.numberOfOuterEnvironments += 1;
     pushEnvironment(context, env)
@@ -369,6 +374,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.numberOfOuterEnvironments += 1;
     pushEnvironment(context, env)
     pushTypeEnvironment(context, typeEnv)
+	
+	// reverse the order
+	node.body.reverse()
 	context.runtime.agenda.push(...node.body)
   },
 
@@ -378,6 +386,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 		throw new Error('not instruction')
 	}
 	const stash = context.runtime.stash
+	stash.debug()
     const left = stash.pop()
     const right = stash.pop()
 	const operator = command.operator
@@ -405,10 +414,8 @@ export function* evaluate(node: Node, context: Context) {
   yield* evaluators[node.type](node, context)
   const agenda = context.runtime.agenda
   const stash = context.runtime.stash
-  console.log(agenda.length())
   while (agenda.length()) {
     const command = agenda.pop() as Node
-    console.log(command)
     yield* evaluators[command.type](command, context)
   }
 
