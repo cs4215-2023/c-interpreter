@@ -235,6 +235,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 	}
 
 	setValueToIdentifier(context, identifier.name, value)
+  return value
   },
 
   FunctionDeclaration: function* (node: Node, context: Context) {
@@ -271,7 +272,21 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
   },
 
   WhileStatement: function* (node: Node, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+    if (node.type != 'WhileStatement') {
+      throw new Error('Not for loop')
+    }
+    const loopVariableEnvironment = createBlockEnvironment(context, 'whileLoopEnvironment')
+    const loopTypeEnvironment = createBlockTypeEnvironment(context, 'whileLoopTypeEnvironment')
+    pushEnvironment(context, loopVariableEnvironment)
+    pushTypeEnvironment(context, loopTypeEnvironment)
+
+    const test = node.test
+    let value
+    while (yield *evaluate(test, context)) {
+      value = yield* evaluate(node.body, context)
+      console.log(value)
+    }
+    return value
   },
 
 
