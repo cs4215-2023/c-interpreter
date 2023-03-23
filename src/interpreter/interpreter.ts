@@ -3,7 +3,7 @@ import * as constants from '../constants'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import { BlockStatement, CallExpression, Identifier, Node, Statement } from '../parser/types'
-import { Context, Value } from '../types'
+import { Command, Context, Value } from '../types'
 import {
   evaluateBinaryExpression,
   evaluateLogicalExpression,
@@ -91,8 +91,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'SequenceExpression') {
       throw new Error('Not sequence expression')
     }
-
-	context.runtime.agenda.push(node.expressions)
+	context.runtime.agenda.push(...node.expressions)
+	
     // let result
     // for (const expr of node.expressions) {
     //   if (expr.type === 'SequenceExpression' && expr.expressions.length === 0) { continue }
@@ -155,16 +155,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'BinaryExpression') {
       throw new Error('Not binary expression')
     }
-    // const left = yield* evaluate(node.left, context)
-    // const right = yield* evaluate(node.right, context)
-    // const error = rttc.checkBinaryExpression(node, node.operator, left, right)
-    // if (error) {
-    //   return handleRuntimeError(context, error)
-    // }
-    // if (node.operator === '/' && right === 0) {
-    //   return handleRuntimeError(context, new DivisionByZeroError(node));
-    // }
-    // return evaluateBinaryExpression(node.operator, left, right)
+
 	context.runtime.agenda.push( {type: 'BinaryExpression_i', operator: node.operator}, node.right, node.left)
   },
 
@@ -313,7 +304,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   DoWhileStatement: function* (node: Node, context: Context) {
     if (node.type != 'DoWhileStatement') {
-      return handleRuntimeError(context, new RuntimeSourceError(node));
+      throw handleRuntimeError(context, new RuntimeSourceError(node));
     }
 
     // const loopVariableEnvironment = createBlockEnvironment(context, 'doWhileLoopEnvironment')
@@ -361,17 +352,15 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   Program: function* (node: Node, context: Context) {
     if (node.type !== 'Program') {
-      return handleRuntimeError(context, new RuntimeSourceError(node));
+      throw handleRuntimeError(context, new RuntimeSourceError(node));
     }
 
     // Create global environment 
-    console.log(currentEnvironment(context)) //this is a null env
     context.numberOfOuterEnvironments += 1;
     const environment = createBlockEnvironment(context, 'globalEnvironment');
     const type_env = createBlockTypeEnvironment(context, 'globalTypeEnvironment');
     pushEnvironment(context, environment);
     pushTypeEnvironment(context, type_env)
-    console.log(currentEnvironment(context)) //this is the 'global' env
 
 
     // Create local environment
@@ -380,10 +369,31 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.numberOfOuterEnvironments += 1;
     pushEnvironment(context, env)
     pushTypeEnvironment(context, typeEnv)
-	context.runtime.agenda.push(node.body)
-  }
+	context.runtime.agenda.push(...node.body)
+  },
 
   // TODO: add instructions here
+  BinaryExpression_i: function* (command: Command, context: Context) {
+	if (command.type != 'BinaryExpression_i') {
+		throw new Error('not instruction')
+	}
+	const stash = context.runtime.stash
+    const left = stash.pop()
+    const right = stash.pop()
+	const operator = command.operator
+	
+    // const error = rttc.checkBinaryExpression(command, node.operator, left, right)
+    // if (error) {
+    //   return handleRuntimeError(context, error)
+    // }
+    // if (node.operator === '/' && right === 0) {
+    //   return handleRuntimeError(context, new DivisionByZeroError(node));
+    // }
+	const result = evaluateBinaryExpression(operator, left, right)
+	console.log(result)
+    stash.push(result)
+	stash.debug()
+  }
 
 
 }
@@ -391,10 +401,20 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 // tslint:enable:object-literal-shorthand
 
 export function* evaluate(node: Node, context: Context) {
-  console.log(node.type)
-  const result = yield* evaluators[node.type](node, context)
-  yield* leave(context)
-  return result
+  // compile the program to instructions
+  yield* evaluators[node.type](node, context)
+  const agenda = context.runtime.agenda
+  const stash = context.runtime.stash
+  console.log(agenda.length())
+  while (agenda.length()) {
+    const command = agenda.pop() as Node
+    console.log(command)
+    yield* evaluators[command.type](command, context)
+  }
+
+  console.log(stash.isEmpty())
+
+  return stash.peek()
 }
 
 function* visit(context: Context, node: Node) {

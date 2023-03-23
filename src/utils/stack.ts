@@ -5,8 +5,8 @@ export class Stack<T> {
     this.items = []
   }
 
-  push(...item: T[]): void {
-    this.items.push(...item)
+  push(...items: T[]): void {
+    this.items.push(...items)
   }
 
   pop(): T | undefined {
@@ -23,5 +23,9 @@ export class Stack<T> {
 
   isEmpty(): boolean {
     return this.items.length === 0
+  }
+
+  debug(): void {
+    console.log(this.items)
   }
 }
