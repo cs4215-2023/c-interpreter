@@ -1,7 +1,7 @@
+import * as create from '../ast/astToJson'
 import { CallingNonFunctionValue, ExceptionError, InvalidNumberOfArguments } from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import { BinaryOperator, LogicalOperator, UnaryOperator } from '../parser/types'
-import * as create from '../ast/astToJson'
 import * as rttc from './rttc'
 
 export function callIfFuncAndRightArgs(

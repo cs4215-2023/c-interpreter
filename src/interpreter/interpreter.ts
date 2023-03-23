@@ -77,7 +77,7 @@ function* evaluateBlockStatement(context: Context, node: Node) {
 // tslint:disable:object-literal-shorthand
 // prettier-ignore
 export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
-  /** Simple Values */
+	// expressions and statements
   Literal: function* (node: Node, _context: Context) {
     if (node.type != 'Literal') {
       throw new Error('Not literal')
@@ -342,6 +342,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
     return result
   }
+  // instructions
+
+  
 }
 // tslint:enable:object-literal-shorthand
 

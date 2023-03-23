@@ -3,7 +3,7 @@ import { generate } from 'astring'
 
 import * as pt from '../parser/types'
 import { Context, Environment, Value } from '../types'
-import { callExpression, identifier } from '../ast/astToJson'
+import { callExpression, identifier } from '../utils/astCreator'
 import { apply } from './interpreter'
 
 const closureToJS = (value: Closure, context: Context, klass: string) => {

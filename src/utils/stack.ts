@@ -5,8 +5,8 @@ export class Stack<T> {
     this.items = []
   }
 
-  push(item: T): void {
-    this.items.push(item)
+  push(...item: T[]): void {
+    this.items.push(...item)
   }
 
   pop(): T | undefined {
