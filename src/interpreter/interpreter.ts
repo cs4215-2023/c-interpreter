@@ -289,6 +289,27 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     return value
   },
 
+  DoWhileStatement: function* (node: Node, context: Context) {
+    if (node.type != 'DoWhileStatement') {
+      return handleRuntimeError(context, new RuntimeSourceError(node));
+    }
+
+    const loopVariableEnvironment = createBlockEnvironment(context, 'doWhileLoopEnvironment')
+    const loopTypeEnvironment = createBlockTypeEnvironment(context, 'doWhileLoopTypeEnvironment')
+    pushEnvironment(context, loopVariableEnvironment)
+    pushTypeEnvironment(context, loopTypeEnvironment)
+
+    // perform statements in do first
+    let value
+    value = yield* evaluate(node.body, context)
+    
+    const test = node.test
+    while (yield *evaluate(test, context)) {
+      value = yield* evaluate(node.body, context)
+    }
+    return value
+  },
+
 
   BlockStatement: function* (node: Node, context: Context) {
     return yield* evaluateBlockStatement(context, node)
