@@ -17,7 +17,7 @@ export class Stack<T> {
     return this.items[this.items.length - 1]
   }
 
-  size(): number {
+  length(): number {
     return this.items.length
   }
 

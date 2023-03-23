@@ -5,7 +5,18 @@
 
 /* tslint:disable:max-classes-per-file */
 
-import { CallExpression, Node, SourceLocation } from '../src/parser/types'
+import {
+  AssignmentOperator,
+  BinaryOperator,
+  BlockStatement,
+  CallExpression,
+  Expression,
+  LogicalOperator,
+  Node,
+  SourceLocation,
+  Statement,
+  UnaryOperator
+} from '../src/parser/types'
 import { EnvTree, TypeEnvTree } from './createContext'
 import { Stack } from './utils/stack'
 
@@ -147,4 +158,59 @@ export type TypeEnvironment = {
   callExpression?: CallExpression
   head: Frame
   thisContext?: Value
+}
+
+export type Command =
+  | Node
+  | UnaryExpressionInstruction
+  | BinaryExpressionInstruction
+  | ConditionalExpressionInstruction
+  | LogicalExpressionInstruction
+  | AssignmentExpressionInstruction
+  | IfStatementInstruction
+  | WhileStatementInstruction
+  | DoWhileStatementInstruction
+
+export interface UnaryExpressionInstruction {
+  type: 'UnaryExpression_i'
+  operator: UnaryOperator
+}
+
+export interface BinaryExpressionInstruction {
+  type: 'BinaryExpression_i'
+  operator: BinaryOperator
+}
+
+export interface ConditionalExpressionInstruction {
+  type: 'ConditionalExpression_i'
+  alternate: Expression
+  consequent: Expression
+}
+
+export interface LogicalExpressionInstruction {
+  type: 'LogicalExpression_i'
+  operator: LogicalOperator
+}
+
+export interface AssignmentExpressionInstruction {
+  type: 'AssignmentExpression_i'
+  operator: AssignmentOperator
+}
+
+export interface IfStatementInstruction {
+  type: 'IfStatement_i'
+  alternate: Statement
+  consequent: Statement
+}
+
+export interface WhileStatementInstruction {
+  type: 'WhileStatement_i'
+  test: Expression
+  body: BlockStatement
+}
+
+export interface DoWhileStatementInstruction {
+  type: 'DoWhileStatement_i'
+  test: Expression
+  body: BlockStatement
 }
