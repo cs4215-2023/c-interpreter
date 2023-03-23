@@ -287,20 +287,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new RuntimeSourceError(node))
     }
 
-    // const loopVariableEnvironment = createBlockEnvironment(context, 'doWhileLoopEnvironment')
-    // const loopTypeEnvironment = createBlockTypeEnvironment(context, 'doWhileLoopTypeEnvironment')
-    // pushEnvironment(context, loopVariableEnvironment)
-    // pushTypeEnvironment(context, loopTypeEnvironment)
-
-    // // perform statements in do first
-    // let value
-    // value = yield* evaluate(node.body, context)
-
-    // const test = node.test
-    // while (yield *evaluate(test, context)) {
-    //   value = yield* evaluate(node.body, context)
-    // }
-    // return value
     context.runtime.agenda.push(
       { type: 'Literal', value: undefined },
       { type: 'DoWhileStatement_i', test: node.test, body: node.body },
@@ -483,6 +469,22 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     popEnvironment(context)
     popTypeEnvironment(context)
+  },
+
+  LogicalExpression_i: function* (command: Command, context: Context) {
+    if (command.type != 'LogicalExpression_i') {
+      throw new Error('Not logical expression')
+    }
+
+    const stash = context.runtime.stash
+    const left = stash.pop()
+    const right = stash.pop()
+    const operator = command.operator
+
+    // TODO: error handling with rttc
+
+    const result = evaluateLogicalExpression(operator, left, right)
+    stash.push(result)
   }
 }
 
@@ -499,17 +501,6 @@ export function* evaluate(node: Node, context: Context) {
   }
 
   return stash.peek()
-}
-
-function* visit(context: Context, node: Node) {
-  context.runtime.nodes.unshift(node)
-  yield context
-}
-
-function* leave(context: Context) {
-  context.runtime.break = false
-  context.runtime.nodes.shift()
-  yield context
 }
 
 export function apply(
