@@ -203,7 +203,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw new Error('Not assignment expression')
     }
 
-	context.runtime.agenda.push( {type: 'AssignmentExpression_i', operator: node.operator}, node.left, node.right)
+	// Assignment here refers to =
+
+	context.runtime.agenda.push( {type: 'AssignmentExpression_i', assignee: node.left}, node.right)
 
     // let id = node.left as Identifier
     // if (node.left.type == 'VariableDeclarationExpression') {
@@ -446,6 +448,23 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 	
 	const agenda = context.runtime.agenda
 	agenda.pop().type === 'Mark_i' ? null : agenda.push(command)
+  },
+
+  AssignmentExpression_i: function* (command: Command, context: Context) {
+	if (command.type != 'AssignmentExpression_i') {
+		throw new Error('Not assignment expression')
+	  }
+	
+	const stash = context.runtime.stash
+    let id = command.assignee as Identifier
+    if (command.assignee.type == 'VariableDeclarationExpression') {
+      yield* evaluate(command.assignee, context)
+      id = command.assignee.identifier
+    }
+	
+    const value = stash.peek()
+    setValueToIdentifier(context, id.name, value)
+
   },
 
 

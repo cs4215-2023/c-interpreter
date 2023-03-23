@@ -6,16 +6,18 @@
 /* tslint:disable:max-classes-per-file */
 
 import {
-  AssignmentOperator,
   BinaryOperator,
   BlockStatement,
   CallExpression,
   Expression,
   LogicalOperator,
   Node,
+  Pattern,
+  PointerDeclarationExpression,
   SourceLocation,
   Statement,
-  UnaryOperator
+  UnaryOperator,
+  VariableDeclarationExpression
 } from '../src/parser/types'
 import { EnvTree, TypeEnvTree } from './createContext'
 import { Stack } from './utils/stack'
@@ -196,7 +198,7 @@ export interface LogicalExpressionInstruction {
 
 export interface AssignmentExpressionInstruction {
   type: 'AssignmentExpression_i'
-  operator: AssignmentOperator
+  assignee: Pattern | VariableDeclarationExpression | PointerDeclarationExpression
 }
 
 export interface IfStatementInstruction {
