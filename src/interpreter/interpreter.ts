@@ -83,7 +83,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'Literal') {
       throw new Error('Not literal')
     }
-    // return node.value
+
 	context.runtime.stash.push(node.value)
   },
 
@@ -111,7 +111,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  // TODO
   VariableDeclarationExpression: function* (node: Node, context: Context) {
     if (node.type != 'VariableDeclarationExpression') {
       throw new Error('not var declaration')
@@ -126,10 +125,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
     const identifier = getVariable(context, node.name)
 	context.runtime.stash.push(identifier)
-    // return identifier
   },
-  // TODO
 
+  // TODO
   CallExpression: function* (node: Node, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
@@ -138,16 +136,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'UnaryExpression') {
       throw new Error('Not unary expression')
     }
-    // const value = yield* evaluate(node.argument, context)
 
-    // const error = rttc.checkUnaryExpression(node, node.operator, value)
-    // if (error) {
-    //   return handleRuntimeError(context, error)
-    // }
     if (node.operator == '&' || node.operator == '*') {
       throw new Error('Pointer not implemented yet')
     }
-    // return evaluateUnaryExpression(node.operator, value)
+
 	context.runtime.agenda.push({type: 'UnaryExpression_i', operator: node.operator}, node.argument)
   },
 
@@ -164,14 +157,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'ConditionalExpression') {
       throw new Error('Not conditional expression')
     }
-    // const result = yield* evaluate(node.test, context)
-    // //not sure if pushenv is needed here, depending on the definition of conditional expr
-    // if (result) {
-    //   return yield* evaluate(node.consequent, context)
-    // }
-    // else {
-    //   return yield* evaluate(node.alternate, context)
-    // }
+
 	context.runtime.agenda.push({type: 'ConditionalExpression_i', consequent: node.consequent, alternate: node.alternate}, node.test)
   },
 
@@ -256,18 +242,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw new Error('Not if statement')
     }
 	context.runtime.agenda.push({type: 'IfStatement_i', consequent: node.consequent, alternate: node.alternate}, node.test)
-    // const result = yield* evaluate(node.test, context)
-    // if (result) {
-    //   const consequent = node.consequent as BlockStatement
-    //   return yield* evaluate(consequent, context)
-    // }
-    // else {
-    //   if (node.alternate == null || node.alternate == undefined) { return undefined }
-    //   else {
-    //     const alternate = node.alternate as BlockStatement
-    //     return yield* evaluate(alternate, context)
-    //   }
-    // }
   },
 
   ExpressionStatement: function* (node: Node, context: Context) {
@@ -328,7 +302,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
 
   BlockStatement: function* (node: Node, context: Context) {
-    // return yield* evaluateBlockStatement(context, node)
 	if (node.type != 'BlockStatement') {
 		throw new Error('Not evaluating block statement')
 	  }
@@ -380,16 +353,18 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 	context.runtime.agenda.push(...node.body)
   },
 
-  // TODO: add instructions here
+  // INSTRUCTIONS
+
   BinaryExpression_i: function* (command: Command, context: Context) {
 	if (command.type != 'BinaryExpression_i') {
 		throw new Error('not instruction')
 	}
 	const stash = context.runtime.stash
-	stash.debug()
     const left = stash.pop()
     const right = stash.pop()
 	const operator = command.operator
+
+	// TODO: error handling
 	
     // const error = rttc.checkBinaryExpression(command, node.operator, left, right)
     // if (error) {
@@ -399,10 +374,50 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     //   return handleRuntimeError(context, new DivisionByZeroError(node));
     // }
 	const result = evaluateBinaryExpression(operator, left, right)
-	console.log(result)
     stash.push(result)
-	stash.debug()
-  }
+  },
+
+  UnaryExpression_i: function* (command: Command, context: Context) {
+	if (command.type != 'UnaryExpression_i') {
+		throw new Error('Not unary expression instruction')
+	  }
+
+	  const stash = context.runtime.stash
+	  const operator = command.operator
+	  const value = stash.pop()
+	  // const value = yield* evaluate(node.argument, context)
+  
+	  // const error = rttc.checkUnaryExpression(node, node.operator, value)
+	  // if (error) {
+	  //   return handleRuntimeError(context, error)
+	  // }
+	  if (operator == '&' || operator  == '*') {
+		throw new Error('Pointer not implemented yet')
+	  }
+	  stash.push(evaluateUnaryExpression(operator, value))
+  },
+
+  ConditionalExpression_i: function* (command: Command, context: Context) {
+	if (command.type != 'ConditionalExpression_i') {
+		throw new Error('Not conditional expression instruction')
+	  }
+	
+	const stash = context.runtime.stash
+	const agenda = context.runtime.agenda
+
+	agenda.push(stash.pop() ? command.consequent : command.alternate)
+  },
+
+  IfStatement_i: function* (command: Command, context: Context) {
+	if (command.type != 'IfStatement_i') {
+		throw new Error('Not conditional expression instruction')
+	  }
+	
+	const stash = context.runtime.stash
+	const agenda = context.runtime.agenda
+
+	agenda.push(stash.pop() ? command.consequent : command.alternate)
+  },
 
 
 }
