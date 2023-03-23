@@ -91,7 +91,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'SequenceExpression') {
       throw new Error('Not sequence expression')
     }
-	
+
 	node.expressions.reverse()
 	context.runtime.agenda.push(...node.expressions)
 	
@@ -254,7 +254,10 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
   },
 
   ReturnStatement: function* (node: Node, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+    if (node.type != 'ReturnStatement') {
+		throw new Error('Not return statement')
+	}
+	context.runtime.agenda.push({type: 'ReturnStatement_i'}, node.argument)
   },
 
   WhileStatement: function* (node: Node, context: Context) {
@@ -434,6 +437,15 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 	
 	const stash = context.runtime.stash
 	stash.pop()
+  },
+
+  ReturnStatement_i: function* (command: Command, context: Context) {
+	if (command.type != 'ReturnStatement_i') {
+		throw new Error('Not pop instruction')
+	  }
+	
+	const agenda = context.runtime.agenda
+	agenda.pop().type === 'Mark_i' ? null : agenda.push(command)
   },
 
 

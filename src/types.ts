@@ -171,6 +171,7 @@ export type Command =
   | WhileStatementInstruction
   | DoWhileStatementInstruction
   | PopInstruction
+  | ReturnInstruction
 
 export interface UnaryExpressionInstruction {
   type: 'UnaryExpression_i'
@@ -218,4 +219,8 @@ export interface DoWhileStatementInstruction {
 
 export interface PopInstruction {
   type: 'Pop_i'
+}
+
+export interface ReturnInstruction {
+  type: 'ReturnStatement_i'
 }
