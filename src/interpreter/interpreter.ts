@@ -91,6 +91,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'SequenceExpression') {
       throw new Error('Not sequence expression')
     }
+	
+	node.expressions.reverse()
 	context.runtime.agenda.push(...node.expressions)
 	
     // let result
@@ -364,15 +366,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const right = stash.pop()
 	const operator = command.operator
 
-	// TODO: error handling
-	
-    // const error = rttc.checkBinaryExpression(command, node.operator, left, right)
-    // if (error) {
-    //   return handleRuntimeError(context, error)
-    // }
-    // if (node.operator === '/' && right === 0) {
-    //   return handleRuntimeError(context, new DivisionByZeroError(node));
-    // }
+	// TODO: error handling with rttc
+    if (operator === '/' && right === 0) {
+      throw new Error('division by 0');
+    }
+
 	const result = evaluateBinaryExpression(operator, left, right)
     stash.push(result)
   },
@@ -385,15 +383,12 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 	  const stash = context.runtime.stash
 	  const operator = command.operator
 	  const value = stash.pop()
-	  // const value = yield* evaluate(node.argument, context)
-  
-	  // const error = rttc.checkUnaryExpression(node, node.operator, value)
-	  // if (error) {
-	  //   return handleRuntimeError(context, error)
-	  // }
+
+	  // TODO: error handling with rttc
 	  if (operator == '&' || operator  == '*') {
 		throw new Error('Pointer not implemented yet')
 	  }
+
 	  stash.push(evaluateUnaryExpression(operator, value))
   },
 
@@ -417,6 +412,28 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 	const agenda = context.runtime.agenda
 
 	agenda.push(stash.pop() ? command.consequent : command.alternate)
+  },
+
+  WhileStatement_i: function* (command: Command, context: Context) {
+	if (command.type != 'WhileStatement_i') {
+		throw new Error('Not while statement instruction')
+	  }
+	
+	const stash = context.runtime.stash
+	const agenda = context.runtime.agenda
+
+	if (stash.pop()) {
+		agenda.push(command, command.test, {type: 'Pop_i'}, command.body)
+	}
+  },
+
+  Pop_i: function* (command: Command, context: Context) {
+	if (command.type != 'Pop_i') {
+		throw new Error('Not pop instruction')
+	  }
+	
+	const stash = context.runtime.stash
+	stash.pop()
   },
 
 

@@ -170,6 +170,7 @@ export type Command =
   | IfStatementInstruction
   | WhileStatementInstruction
   | DoWhileStatementInstruction
+  | PopInstruction
 
 export interface UnaryExpressionInstruction {
   type: 'UnaryExpression_i'
@@ -213,4 +214,8 @@ export interface DoWhileStatementInstruction {
   type: 'DoWhileStatement_i'
   test: Expression
   body: BlockStatement
+}
+
+export interface PopInstruction {
+  type: 'Pop_i'
 }
