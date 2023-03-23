@@ -2,7 +2,7 @@ import { uniqueId } from 'lodash'
 
 import { CallExpression, Identifier } from '../parser/types'
 import { Context, Environment, Frame, Value } from '../types'
-import { primitive } from '../utils/astCreator'
+import { primitive } from '../ast/astToJson'
 import Closure from './closure'
 
 export function createEnvironment(
