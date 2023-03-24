@@ -263,6 +263,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'IfStatement') {
       throw new Error('Not if statement')
     }
+
+    console.log(node)
     context.runtime.agenda.push(
       { type: 'IfStatement_i', consequent: node.consequent, alternate: node.alternate },
       node.test
@@ -328,6 +330,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.numberOfOuterEnvironments += 1
     pushEnvironment(context, env)
     pushTypeEnvironment(context, typeEnv)
+  },
+
+  EmptyStatement: function* (node: Node, context: Context) {
+    if (node.type != 'EmptyStatement') {
+      throw new Error('Not evaluating empty statement')
+    }
+    context.runtime.stash.push(undefined)
   },
 
   Program: function* (node: Node, context: Context) {
@@ -506,6 +515,7 @@ export function* evaluate(node: Node, context: Context) {
     yield* evaluators[command.type](command, context)
   }
 
+  // By right C programs don't return anything, this should be undefined.
   return stash.peek()
 }
 
