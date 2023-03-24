@@ -292,7 +292,14 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'ReturnStatement') {
       throw new Error('Not return statement')
     }
-    context.runtime.agenda.push({ type: 'ReturnStatement_i' }, node.argument)
+    if (node.argument != undefined || node.argument != null) {
+      context.runtime.agenda.push({ type: 'ReturnStatement_i' }, node.argument)
+    } else {
+      context.runtime.agenda.push(
+        { type: 'ReturnStatement_i' },
+        { type: 'Literal', value: node.argument }
+      )
+    }
   },
 
   WhileStatement: function* (node: Node, context: Context) {
@@ -455,11 +462,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.type != 'Pop_i') {
       throw new Error('Not pop instruction')
     }
-
     const stash = context.runtime.stash
     stash.pop()
   },
 
+  // TODO: return with no value.
   ReturnStatement_i: function* (command: Command, context: Context) {
     if (command.type != 'ReturnStatement_i') {
       throw new Error('Not pop instruction')
@@ -542,6 +549,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     })
   },
 
+  // TODO :
   CallExpression_i: function* (command: Command, context: Context) {
     if (command.type != 'CallExpression_i') {
       throw new Error('not call expression instr')
@@ -553,8 +561,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const args = []
     for (let i = arity - 1; i >= 0; i--) args[i] = stash.pop()
 
-    console.log(args)
-
     const lambda = stash.pop() as ClosureInstruction
     const agendaTop = agenda.peek() as Command
     if (agenda.length() === 0 || agendaTop.type === 'EnvironmentRestoration_i') {
@@ -562,9 +568,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     } else if (agendaTop.type === 'ReturnStatement_i') {
       agenda.pop()
     } else {
-      // general case:
-      // push current environment
-      agenda.push({ type: 'EnvironmentRestoration' }, { type: 'Mark_i' })
+      agenda.push({ type: 'EnvironmentRestoration_i' }, { type: 'Mark_i' })
     }
     agenda.push(lambda.body)
 
@@ -583,7 +587,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.type != 'Mark_i') {
       throw new Error('Not marker')
     }
-    console.log(context.runtime.environments)
+    throw new Error('Return is required, even with no expression.')
   }
 }
 
@@ -596,7 +600,6 @@ export function* evaluate(node: Node, context: Context) {
   const stash = context.runtime.stash
   while (agenda.length()) {
     const command = agenda.pop() as Node
-    console.log(command.type)
     yield* evaluators[command.type](command, context)
   }
 
