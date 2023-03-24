@@ -2,8 +2,15 @@
 import * as constants from '../constants'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
-import { BlockStatement, CallExpression, Identifier, Node, Statement } from '../parser/types'
-import { Command, Context, Value } from '../types'
+import {
+  BlockStatement,
+  CallExpression,
+  ExpressionStatement,
+  Identifier,
+  Node,
+  Statement
+} from '../parser/types'
+import { Command, Context, Value, WhileStatementInstruction } from '../types'
 import {
   evaluateBinaryExpression,
   evaluateLogicalExpression,
@@ -182,27 +189,33 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     )
   },
 
-  // TODO
   ForStatement: function* (node: Node, context: Context) {
     if (node.type != 'ForStatement') {
       throw new Error('Not for loop')
     }
-    const loopVariableEnvironment = createBlockEnvironment(context, 'forLoopEnvironment')
-    const loopTypeEnvironment = createBlockTypeEnvironment(context, 'forLoopTypeEnvironment')
-    pushEnvironment(context, loopVariableEnvironment)
-    pushTypeEnvironment(context, loopTypeEnvironment)
+    // Idea: Convert to while loop
+    const forLoopContent = node.body
 
-    const init = node.init
-    const test = node.test
-    const update = node.update
-    yield* evaluate(init, context)
-
-    let value
-    while (yield* evaluate(test, context)) {
-      value = yield* evaluate(node.body, context)
-      yield* evaluate(update, context)
+    // convert expression to statement using expressionStatement
+    const updateStatement: ExpressionStatement = {
+      type: 'ExpressionStatement',
+      expression: node.update
     }
-    return value
+    forLoopContent.body.push(updateStatement)
+
+    // wrap body in while loop instruction
+    const whileStatementInstruction: WhileStatementInstruction = {
+      type: 'WhileStatement_i',
+      test: node.test,
+      body: forLoopContent
+    }
+
+    context.runtime.agenda.push(
+      { type: 'Literal', value: undefined },
+      whileStatementInstruction,
+      node.test,
+      node.init
+    )
   },
 
   AssignmentExpression: function* (node: Node, context: Context) {
