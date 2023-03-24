@@ -23,4 +23,34 @@ describe('Programs', () => {
       expect(1).toBe(2)
     }
   })
+
+  it('While loop -- as condition', async () => {
+    const code = 'int i = 3; while (i--) {} i;'
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(0)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
+
+  it('While loop comparison as condition', async () => {
+    const code = 'int i = 3; while (i > 0) {i--;} i;'
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(0)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
+
+  it('While loop comparison as condition with update', async () => {
+    const code = 'int i = 3;int a = 0; while (i > 0) {a = a + i; i--;} a;'
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(6)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
 })

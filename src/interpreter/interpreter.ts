@@ -228,8 +228,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const binaryExpression = {
       type: 'BinaryExpression',
       operator: node.operator == '++' ? '+' : '-',
-      left: numberLiteral,
-      right: node.argument
+      left: node.argument,
+      right: numberLiteral
     }
     const assignmentExpression = {
       type: 'AssignmentExpression',
@@ -309,9 +309,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       A.push({ type: 'EnvironmentRestoration_i' })
     }
 
-    // reverse the order
-    node.body.reverse()
-    A.push(...node.body)
+    // make a copy of the body and then reverse it instead.
+    A.push(...node.body.slice().reverse())
 
     context.numberOfOuterEnvironments += 1
     pushEnvironment(context, env)
@@ -329,13 +328,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const type_env = createBlockTypeEnvironment(context, 'globalTypeEnvironment')
     pushEnvironment(context, environment)
     pushTypeEnvironment(context, type_env)
-
-    // // Create local environment
-    // const env = createBlockEnvironment(context, 'localEnvironment')
-    // const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment')
-    // context.numberOfOuterEnvironments += 1
-    // pushEnvironment(context, env)
-    // pushTypeEnvironment(context, typeEnv)
 
     // reverse the order
     node.body.reverse()
@@ -469,6 +461,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     popEnvironment(context)
     popTypeEnvironment(context)
+    context.numberOfOuterEnvironments -= 1
   },
 
   LogicalExpression_i: function* (command: Command, context: Context) {
