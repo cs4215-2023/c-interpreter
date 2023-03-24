@@ -358,7 +358,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw new Error('division by 0')
     }
 
-    const result = evaluateBinaryExpression(operator, left, right)
+    const result = evaluateBinaryExpression(operator, right, left)
     stash.push(result)
   },
 
