@@ -15,12 +15,10 @@ import {
   LogicalOperator,
   Node,
   Pattern,
-  PointerDeclarationExpression,
   SourceLocation,
   Statement,
-  UnaryOperator,
-  UpdateOperator,
-  VariableDeclarationExpression
+  Type,
+  UnaryOperator
 } from '../src/parser/types'
 import { EnvTree, TypeEnvTree } from './createContext'
 import { Stack } from './utils/stack'
@@ -178,6 +176,10 @@ export type Command =
   | PopInstruction
   | ReturnInstruction
   | EnvironmentRestorationInstruction
+  | FunctionDeclarationInstruction
+  | LambdaExpressionInstruction
+  | CallInstruction
+  | MarkInstruction
 
 export interface UnaryExpressionInstruction {
   type: 'UnaryExpression_i'
@@ -233,4 +235,33 @@ export interface ReturnInstruction {
 
 export interface EnvironmentRestorationInstruction {
   type: 'EnvironmentRestoration_i'
+}
+
+export interface FunctionDeclarationInstruction {
+  type: 'FunctionDeclaration_i'
+  id: Identifier
+  parameters: Pattern[]
+  body: BlockStatement
+  typeDeclaration: Type
+}
+
+export interface LambdaExpressionInstruction {
+  type: 'LambdaExpression_i'
+  parameters: Pattern[]
+  body: BlockStatement
+}
+
+export interface CallInstruction {
+  type: 'CallExpression_i'
+  arity: number
+}
+
+export interface MarkInstruction {
+  type: 'Mark_i'
+}
+
+export interface ClosureInstruction {
+  type: 'Closure_i'
+  parameters: Pattern[]
+  body: BlockStatement
 }

@@ -7,16 +7,14 @@ import {
   CallExpression,
   ExpressionStatement,
   Identifier,
-  Node,
-  Statement
+  Node
 } from '../parser/types'
-import { Command, Context, Value, WhileStatementInstruction } from '../types'
+import { ClosureInstruction, Command, Context, Value, WhileStatementInstruction } from '../types'
 import {
   evaluateBinaryExpression,
   evaluateLogicalExpression,
   evaluateUnaryExpression
 } from '../utils/operators'
-import * as rttc from '../utils/rttc'
 import Closure from './closure'
 import {
   createBlockEnvironment,
@@ -26,7 +24,7 @@ import {
   pushEnvironment,
   replaceEnvironment
 } from './environment'
-import { DivisionByZeroError, handleRuntimeError } from './errors'
+import { handleRuntimeError } from './errors'
 import {
   createBlockTypeEnvironment,
   popTypeEnvironment,
@@ -35,9 +33,7 @@ import {
 import {
   checkNumberOfArguments,
   declareIdentifier,
-  getIdentifierValueFromEnvironment,
   getVariable,
-  scanFrameVariables,
   setValueToIdentifier
 } from './utils'
 
@@ -107,11 +103,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
-  // TODO
-  FunctionExpression: function* (node: Node, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
-  },
-
   VariableDeclarationExpression: function* (node: Node, context: Context) {
     if (node.type != 'VariableDeclarationExpression') {
       throw new Error('not var declaration')
@@ -131,9 +122,17 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.runtime.stash.push(identifier)
   },
 
-  // TODO
   CallExpression: function* (node: Node, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+    if (node.type != 'CallExpression') {
+      throw new Error('Not call expression')
+    }
+
+    const agenda = context.runtime.agenda
+    agenda.push(
+      { type: 'CallExpression_i', arity: node.arguments.length },
+      ...node.arguments,
+      node.callee
+    )
   },
 
   UnaryExpression: function* (node: Node, context: Context) {
@@ -223,6 +222,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw new Error('Not assignment expression')
     }
 
+    console.log(node)
+    console.log(currentEnvironment(context))
+
     //Assignment here refers to =
     if (node.left.type == 'Identifier') {
       context.runtime.agenda.push({ type: 'AssignmentExpression_i', symbol: node.left }, node.right)
@@ -254,9 +256,17 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     agenda.push(assignmentExpression)
   },
 
-  // TODO
   FunctionDeclaration: function* (node: Node, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+    if (node.type != 'FunctionDeclaration') {
+      throw new Error('not function declaration')
+    }
+
+    context.runtime.agenda.push({
+      type: 'FunctionDeclaration_i',
+      id: node.id,
+      parameters: node.params,
+      body: node.body
+    })
   },
 
   IfStatement: function* (node: Node, context: Context) {
@@ -500,6 +510,80 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const result = evaluateLogicalExpression(operator, left, right)
     stash.push(result)
+  },
+
+  FunctionDeclaration_i: function* (command: Command, context: Context) {
+    if (command.type != 'FunctionDeclaration_i') {
+      throw new Error('Not logical expression')
+    }
+
+    const agenda = context.runtime.agenda
+    agenda.push(
+      { type: 'Literal', value: undefined },
+      { type: 'Pop_i' },
+      {
+        type: 'AssignmentExpression',
+        left: { type: 'VariableDeclarationExpression', identifier: command.id },
+        right: { type: 'LambdaExpression_i', parameters: command.parameters, body: command.body }
+      }
+    )
+  },
+
+  LambdaExpression_i: function* (command: Command, context: Context) {
+    if (command.type != 'LambdaExpression_i') {
+      throw new Error('Not lambda expression')
+    }
+
+    const stash = context.runtime.stash
+    stash.push({
+      type: 'Closure',
+      parameters: command.parameters,
+      body: command.body
+    })
+  },
+
+  CallExpression_i: function* (command: Command, context: Context) {
+    if (command.type != 'CallExpression_i') {
+      throw new Error('not call expression instr')
+    }
+
+    const stash = context.runtime.stash
+    const agenda = context.runtime.agenda
+    const arity = command.arity
+    const args = []
+    for (let i = arity - 1; i >= 0; i--) args[i] = stash.pop()
+
+    console.log(args)
+
+    const lambda = stash.pop() as ClosureInstruction
+    const agendaTop = agenda.peek() as Command
+    if (agenda.length() === 0 || agendaTop.type === 'EnvironmentRestoration_i') {
+      agenda.push({ type: 'Mark_i' })
+    } else if (agendaTop.type === 'ReturnStatement_i') {
+      agenda.pop()
+    } else {
+      // general case:
+      // push current environment
+      agenda.push({ type: 'EnvironmentRestoration' }, { type: 'Mark_i' })
+    }
+    agenda.push(lambda.body)
+
+    for (let i = 0; i < args.length; i++) {
+      agenda.push({
+        type: 'AssignmentExpression',
+        left: { type: 'VariableDeclarationExpression', identifier: lambda.parameters[i] },
+        right: { type: 'Literal', value: args[i] }
+      })
+    }
+    const functionEnvironment = createBlockEnvironment(context, 'FunctionEnvironment')
+    pushEnvironment(context, functionEnvironment)
+  },
+
+  Mark_i: function* (command: Command, context: Context) {
+    if (command.type != 'Mark_i') {
+      throw new Error('Not marker')
+    }
+    console.log(context.runtime.environments)
   }
 }
 
@@ -512,6 +596,7 @@ export function* evaluate(node: Node, context: Context) {
   const stash = context.runtime.stash
   while (agenda.length()) {
     const command = agenda.pop() as Node
+    console.log(command.type)
     yield* evaluators[command.type](command, context)
   }
 
