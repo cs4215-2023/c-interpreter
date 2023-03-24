@@ -31,7 +31,7 @@ describe('Parsable Values', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -67,7 +67,7 @@ describe('Parsable Values', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -102,7 +102,7 @@ describe('Parsable Values', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },

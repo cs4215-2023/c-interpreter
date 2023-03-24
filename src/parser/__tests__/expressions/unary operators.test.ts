@@ -36,7 +36,7 @@ describe('Unary Operations', () => {
                 operator: '+',
                 type: 'UnaryExpression'
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -76,7 +76,7 @@ describe('Unary Operations', () => {
                 operator: '-',
                 type: 'UnaryExpression'
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -101,8 +101,7 @@ describe('Unary Operations', () => {
                 argument: {
                   expressions: [
                     {
-                      expressions: [],
-                      type: 'SequenceExpression'
+                      type: 'EmptyExpression'
                     },
                     {
                       type: 'Literal',
@@ -120,8 +119,7 @@ describe('Unary Operations', () => {
                       }
                     },
                     {
-                      expressions: [],
-                      type: 'SequenceExpression'
+                      type: 'EmptyExpression'
                     }
                   ],
                   type: 'SequenceExpression'
@@ -129,7 +127,7 @@ describe('Unary Operations', () => {
                 operator: '!',
                 type: 'UnaryExpression'
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },

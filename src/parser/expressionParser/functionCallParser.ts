@@ -1,5 +1,5 @@
 import { FunctionCallContext, FunctionCallParametersContext } from '../../lang/ClangParser'
-import { Expression } from '../types'
+import { Expression, SequenceExpression } from '../types'
 import { Constructable, tokenToIdentifierWrapper } from '../util'
 
 export const parserFunctionCallExpression = <T extends Constructable>(
@@ -18,8 +18,8 @@ export const parserFunctionCallExpression = <T extends Constructable>(
     visitFunctionCallParameters(ctx: FunctionCallParametersContext): Expression[] {
       console.log('visitfunctionarguments')
       // only one child
-      const expressions: Expression[] = this.visit(ctx.getChild(0))
-      return expressions
+      const seqeuenceExpressions = this.visit(ctx.getChild(0)) as SequenceExpression
+      return seqeuenceExpressions.expressions
     }
   }
   return DerivedClass

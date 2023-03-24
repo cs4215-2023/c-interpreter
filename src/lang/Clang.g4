@@ -64,6 +64,8 @@ identifierWithTypeList:
 
 identifierList: IDENTIFIER (',' IDENTIFIER)*;
 
+expressionList: expression (',' expression)*;
+
 numberList: NUMBER (',' NUMBER)*;
 
 pointerList: pointer (',' pointer)*;
@@ -177,11 +179,7 @@ function:
 functionCall:
 	func = IDENTIFIER '(' args = functionCallParameters ')';
 
-functionCallParameters: (
-		stringLiteralList
-		| numberList
-		| identifierList
-	) (',' stringLiteralList | numberList | identifierList)*;
+functionCallParameters: expressionList;
 
 printf:
 	'printf(' (stringLiteral | FORMATSPECIFIERS)* ',' identifierList ')';

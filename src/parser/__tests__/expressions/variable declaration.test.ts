@@ -24,7 +24,7 @@ describe('Variable declarations', () => {
                 type: 'VariableDeclarationExpression',
                 identifierType: { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -63,7 +63,7 @@ describe('Variable declarations', () => {
                 type: 'VariableDeclarationExpression',
                 identifierType: intType
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -79,8 +79,7 @@ describe('Variable declarations', () => {
                 identifierType: intType
               },
               {
-                expressions: [],
-                type: 'SequenceExpression'
+                type: 'EmptyExpression'
               }
             ],
             type: 'SequenceExpression'

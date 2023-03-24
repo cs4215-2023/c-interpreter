@@ -28,8 +28,7 @@ describe('Conditional Statements', () => {
                       type: 'UpdateExpression'
                     },
                     {
-                      expressions: [],
-                      type: 'SequenceExpression'
+                      type: 'EmptyExpression'
                     }
                   ],
                   type: 'SequenceExpression'
@@ -54,8 +53,7 @@ describe('Conditional Statements', () => {
                       type: 'UpdateExpression'
                     },
                     {
-                      expressions: [],
-                      type: 'SequenceExpression'
+                      type: 'EmptyExpression'
                     }
                   ],
                   type: 'SequenceExpression'
@@ -113,8 +111,7 @@ describe('Conditional Statements', () => {
                         type: 'UpdateExpression'
                       },
                       {
-                        expressions: [],
-                        type: 'SequenceExpression'
+                        type: 'EmptyExpression'
                       }
                     ],
                     type: 'SequenceExpression'
@@ -156,8 +153,7 @@ describe('Conditional Statements', () => {
                       type: 'UpdateExpression'
                     },
                     {
-                      expressions: [],
-                      type: 'SequenceExpression'
+                      type: 'EmptyExpression'
                     }
                   ],
                   type: 'SequenceExpression'

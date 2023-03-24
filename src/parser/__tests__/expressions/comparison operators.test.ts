@@ -60,7 +60,7 @@ describe('Comparison Operators', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -125,7 +125,7 @@ describe('Comparison Operators', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -190,7 +190,7 @@ describe('Comparison Operators', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -255,7 +255,7 @@ describe('Comparison Operators', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -320,7 +320,7 @@ describe('Comparison Operators', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -385,7 +385,7 @@ describe('Comparison Operators', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },

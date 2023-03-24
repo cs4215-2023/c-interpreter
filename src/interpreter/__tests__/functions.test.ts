@@ -63,4 +63,18 @@ describe('Functions', () => {
       expect(1).toBe(2)
     }
   })
+
+  it('Multiple parameters in function ', async () => {
+    const code = `
+	int foo(int a, int b) {
+		return a + b;
+	}
+	foo(1,2);`
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(3)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
 })

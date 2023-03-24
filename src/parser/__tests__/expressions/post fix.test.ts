@@ -25,8 +25,7 @@ describe('Post fix notation', () => {
                 type: 'UpdateExpression'
               },
               {
-                expressions: [],
-                type: 'SequenceExpression'
+                type: 'EmptyExpression'
               }
             ],
             type: 'SequenceExpression'
@@ -57,8 +56,7 @@ describe('Post fix notation', () => {
                 type: 'UpdateExpression'
               },
               {
-                expressions: [],
-                type: 'SequenceExpression'
+                type: 'EmptyExpression'
               }
             ],
             type: 'SequenceExpression'

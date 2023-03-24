@@ -60,7 +60,7 @@ describe('Binary Operator Tests', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -126,7 +126,7 @@ describe('Binary Operator Tests', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -192,7 +192,7 @@ describe('Binary Operator Tests', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -258,7 +258,7 @@ describe('Binary Operator Tests', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -324,7 +324,7 @@ describe('Binary Operator Tests', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -390,7 +390,7 @@ describe('Binary Operator Tests', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -456,7 +456,7 @@ describe('Binary Operator Tests', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -522,7 +522,7 @@ describe('Binary Operator Tests', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -588,7 +588,7 @@ describe('Binary Operator Tests', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -654,7 +654,7 @@ describe('Binary Operator Tests', () => {
                   }
                 }
               },
-              { expressions: [], type: 'SequenceExpression' }
+              { type: 'EmptyExpression' }
             ],
             type: 'SequenceExpression'
           },
@@ -709,8 +709,7 @@ describe('Binary Operator Tests', () => {
                 type: 'AssignmentExpression'
               },
               {
-                expressions: [],
-                type: 'SequenceExpression'
+                type: 'EmptyExpression'
               }
             ],
             type: 'SequenceExpression'

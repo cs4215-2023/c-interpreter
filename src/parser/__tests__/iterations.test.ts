@@ -163,8 +163,7 @@ describe('Iterative Statements', () => {
                       type: 'AssignmentExpression'
                     },
                     {
-                      expressions: [],
-                      type: 'SequenceExpression'
+                      type: 'EmptyExpression'
                     }
                   ],
                   type: 'SequenceExpression'
@@ -211,8 +210,7 @@ describe('Iterative Statements', () => {
                       type: 'AssignmentExpression'
                     },
                     {
-                      expressions: [],
-                      type: 'SequenceExpression'
+                      type: 'EmptyExpression'
                     }
                   ],
                   type: 'SequenceExpression'
@@ -372,8 +370,7 @@ describe('Iterative Statements', () => {
                       type: 'AssignmentExpression'
                     },
                     {
-                      expressions: [],
-                      type: 'SequenceExpression'
+                      type: 'EmptyExpression'
                     }
                   ],
                   type: 'SequenceExpression'
@@ -434,8 +431,7 @@ describe('Iterative Statements', () => {
                       type: 'AssignmentExpression'
                     },
                     {
-                      expressions: [],
-                      type: 'SequenceExpression'
+                      type: 'EmptyExpression'
                     }
                   ],
                   type: 'SequenceExpression'
@@ -531,8 +527,7 @@ describe('Iterative Statements', () => {
                       type: 'AssignmentExpression'
                     },
                     {
-                      expressions: [],
-                      type: 'SequenceExpression'
+                      type: 'EmptyExpression'
                     }
                   ],
                   type: 'SequenceExpression'
@@ -593,8 +588,7 @@ describe('Iterative Statements', () => {
                       type: 'AssignmentExpression'
                     },
                     {
-                      expressions: [],
-                      type: 'SequenceExpression'
+                      type: 'EmptyExpression'
                     }
                   ],
                   type: 'SequenceExpression'

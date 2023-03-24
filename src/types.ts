@@ -247,7 +247,7 @@ export interface FunctionDeclarationInstruction {
 
 export interface LambdaExpressionInstruction {
   type: 'LambdaExpression_i'
-  parameters: Pattern[]
+  parameters: Array<Expression>
   body: BlockStatement
 }
 
@@ -262,6 +262,6 @@ export interface MarkInstruction {
 
 export interface ClosureInstruction {
   type: 'Closure_i'
-  parameters: Pattern[]
+  parameters: Array<Expression>
   body: BlockStatement
 }

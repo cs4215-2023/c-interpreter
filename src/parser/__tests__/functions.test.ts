@@ -105,8 +105,7 @@ describe('Function related tests', () => {
                       type: 'AssignmentExpression'
                     },
                     {
-                      expressions: [],
-                      type: 'SequenceExpression'
+                      type: 'EmptyExpression'
                     }
                   ],
                   type: 'SequenceExpression'
@@ -156,8 +155,7 @@ describe('Function related tests', () => {
                       type: 'AssignmentExpression'
                     },
                     {
-                      expressions: [],
-                      type: 'SequenceExpression'
+                      type: 'EmptyExpression'
                     }
                   ],
                   type: 'SequenceExpression'
@@ -222,8 +220,39 @@ describe('Function related tests', () => {
                 expressions: [
                   {
                     arguments: [
-                      { type: 'Literal', value: 1, valueType: 'int' },
-                      { type: 'Literal', value: 2, valueType: 'int' }
+                      {
+                        loc: {
+                          end: {
+                            column: 30,
+                            line: 1
+                          },
+                          start: {
+                            column: 30,
+                            line: 1
+                          }
+                        },
+                        type: 'Literal',
+                        value: 1,
+                        valueType: 'int'
+                      },
+                      {
+                        type: 'EmptyExpression'
+                      },
+                      {
+                        loc: {
+                          end: {
+                            column: 32,
+                            line: 1
+                          },
+                          start: {
+                            column: 32,
+                            line: 1
+                          }
+                        },
+                        type: 'Literal',
+                        value: 2,
+                        valueType: 'int'
+                      }
                     ],
                     callee: {
                       name: 'foo',
@@ -235,8 +264,7 @@ describe('Function related tests', () => {
                 type: 'SequenceExpression'
               },
               {
-                expressions: [],
-                type: 'SequenceExpression'
+                type: 'EmptyExpression'
               }
             ],
             type: 'SequenceExpression'

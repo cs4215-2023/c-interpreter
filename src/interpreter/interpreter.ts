@@ -19,7 +19,6 @@ import Closure from './closure'
 import {
   createBlockEnvironment,
   createEnvironment,
-  currentEnvironment,
   popEnvironment,
   pushEnvironment,
   replaceEnvironment
@@ -128,11 +127,25 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     const agenda = context.runtime.agenda
+
+    const callArguments = []
+    for (const expression of node.arguments) {
+      if (expression.type != 'EmptyExpression') {
+        callArguments.push(expression)
+      }
+    }
+
     agenda.push(
-      { type: 'CallExpression_i', arity: node.arguments.length },
-      ...node.arguments,
+      { type: 'CallExpression_i', arity: callArguments.length },
+      ...callArguments,
       node.callee
     )
+  },
+
+  EmptyExpression: function* (node: Node, context: Context) {
+    if (node.type != 'EmptyExpression') {
+      throw new Error('Not empty expression')
+    }
   },
 
   UnaryExpression: function* (node: Node, context: Context) {
@@ -222,9 +235,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw new Error('Not assignment expression')
     }
 
-    console.log(node)
-    console.log(currentEnvironment(context))
-
     //Assignment here refers to =
     if (node.left.type == 'Identifier') {
       context.runtime.agenda.push({ type: 'AssignmentExpression_i', symbol: node.left }, node.right)
@@ -274,7 +284,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw new Error('Not if statement')
     }
 
-    console.log(node)
     context.runtime.agenda.push(
       { type: 'IfStatement_i', consequent: node.consequent, alternate: node.alternate },
       node.test
@@ -543,13 +552,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const stash = context.runtime.stash
     stash.push({
-      type: 'Closure',
+      type: 'Closure_i',
       parameters: command.parameters,
       body: command.body
     })
   },
 
-  // TODO :
+  // TODO : recursive calls
   CallExpression_i: function* (command: Command, context: Context) {
     if (command.type != 'CallExpression_i') {
       throw new Error('not call expression instr')
@@ -600,8 +609,11 @@ export function* evaluate(node: Node, context: Context) {
   const stash = context.runtime.stash
   while (agenda.length()) {
     const command = agenda.pop() as Node
+    command.type
     yield* evaluators[command.type](command, context)
   }
+
+  stash.debug()
 
   // By right C programs don't return anything, this should be undefined.
   return stash.peek()
