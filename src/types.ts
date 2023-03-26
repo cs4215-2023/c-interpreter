@@ -181,63 +181,67 @@ export type Command =
   | CallInstruction
   | MarkInstruction
 
-export interface UnaryExpressionInstruction {
+type Instruction = {
+  loc?: SourceLocation
+}
+
+export interface UnaryExpressionInstruction extends Instruction {
   type: 'UnaryExpression_i'
   operator: UnaryOperator
 }
 
-export interface BinaryExpressionInstruction {
+export interface BinaryExpressionInstruction extends Instruction {
   type: 'BinaryExpression_i'
   operator: BinaryOperator
 }
 
-export interface ConditionalExpressionInstruction {
+export interface ConditionalExpressionInstruction extends Instruction {
   type: 'ConditionalExpression_i'
   alternate: Expression
   consequent: Expression
 }
 
-export interface LogicalExpressionInstruction {
+export interface LogicalExpressionInstruction extends Instruction {
   type: 'LogicalExpression_i'
   operator: LogicalOperator
 }
 
-export interface AssignmentExpressionInstruction {
+export interface AssignmentExpressionInstruction extends Instruction {
   type: 'AssignmentExpression_i'
   symbol?: Identifier
 }
 
-export interface IfStatementInstruction {
+export interface IfStatementInstruction extends Instruction {
   type: 'IfStatement_i'
   alternate: Statement
   consequent: Statement
 }
 
-export interface WhileStatementInstruction {
+export interface WhileStatementInstruction extends Instruction {
   type: 'WhileStatement_i'
   test: Expression
   body: BlockStatement
 }
 
-export interface DoWhileStatementInstruction {
+export interface DoWhileStatementInstruction extends Instruction {
   type: 'DoWhileStatement_i'
   test: Expression
   body: BlockStatement
 }
 
-export interface PopInstruction {
+export interface PopInstruction extends Instruction {
   type: 'Pop_i'
 }
 
-export interface ReturnInstruction {
+export interface ReturnInstruction extends Instruction {
   type: 'ReturnStatement_i'
 }
 
-export interface EnvironmentRestorationInstruction {
+export interface EnvironmentRestorationInstruction extends Instruction {
   type: 'EnvironmentRestoration_i'
 }
 
-export interface FunctionDeclarationInstruction {
+export interface FunctionDeclarationInstruction extends Instruction {
   type: 'FunctionDeclaration_i'
   id: Identifier
   parameters: Pattern[]
@@ -245,7 +249,7 @@ export interface FunctionDeclarationInstruction {
   typeDeclaration: Type
 }
 
-export interface LambdaExpressionInstruction {
+export interface LambdaExpressionInstruction extends Instruction {
   type: 'LambdaExpression_i'
   parameters: Array<Expression>
   body: BlockStatement
@@ -254,14 +258,17 @@ export interface LambdaExpressionInstruction {
 export interface CallInstruction {
   type: 'CallExpression_i'
   arity: number
+  loc?: SourceLocation
 }
 
 export interface MarkInstruction {
   type: 'Mark_i'
+  loc?: SourceLocation
 }
 
 export interface ClosureInstruction {
   type: 'Closure_i'
   parameters: Array<Expression>
   body: BlockStatement
+  loc?: SourceLocation
 }

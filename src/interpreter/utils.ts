@@ -7,7 +7,7 @@ import {
   Node,
   Statement
 } from '../parser/types'
-import { Context, Environment, Frame, Value } from '../types'
+import { Context, Environment, Frame, TypeEnvironment, Value } from '../types'
 import Closure from './closure'
 import { currentEnvironment } from './environment'
 import { handleRuntimeError } from './errors'

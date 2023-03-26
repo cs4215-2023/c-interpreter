@@ -1,14 +1,14 @@
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import { Node } from '../parser/types'
-import { Context } from '../types'
+import { Command, Context } from '../types'
 import { ErrorSeverity, ErrorType } from '../types'
 import Closure from './closure'
 
 export class InterpreterError extends RuntimeSourceError {
   public type = ErrorType.SYNTAX
   public severity = ErrorSeverity.ERROR
-  public constructor(public node: Node, public message = 'Unexpected evaluation') {
-    super(node)
+  public constructor(public command: Command, public message = 'Unexpected evaluation') {
+    super(command)
   }
 
   public explain(): string {
@@ -24,8 +24,8 @@ export class DivisionByZeroError extends RuntimeSourceError {
   public type = ErrorType.RUNTIME
   public severity = ErrorSeverity.ERROR
 
-  public constructor(public node: Node, public message = 'Division by zero') {
-    super(node)
+  public constructor(public command: Command, public message = 'Division by zero') {
+    super(command)
   }
 
   public explain(): string {

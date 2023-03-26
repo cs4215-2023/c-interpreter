@@ -15,6 +15,7 @@ import {
   evaluateLogicalExpression,
   evaluateUnaryExpression
 } from '../utils/operators'
+import { checkBinaryExpression, checkUnaryExpression } from '../utils/rttc'
 import Closure from './closure'
 import {
   createBlockEnvironment,
@@ -23,7 +24,7 @@ import {
   pushEnvironment,
   replaceEnvironment
 } from './environment'
-import { handleRuntimeError } from './errors'
+import { handleRuntimeError, InterpreterError } from './errors'
 import {
   createBlockTypeEnvironment,
   popTypeEnvironment,
@@ -83,7 +84,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
   // expressions and statements
   Literal: function* (node: Node, context: Context) {
     if (node.type != 'Literal') {
-      throw new Error('Not literal')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     context.runtime.stash.push(node.value)
@@ -91,7 +92,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   SequenceExpression: function* (node: Node, context: Context) {
     if (node.type != 'SequenceExpression') {
-      throw new Error('Not sequence expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     context.runtime.agenda.push(...node.expressions)
@@ -104,7 +105,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   VariableDeclarationExpression: function* (node: Node, context: Context) {
     if (node.type != 'VariableDeclarationExpression') {
-      throw new Error('not var declaration')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     const identifier = node.identifier as Identifier
@@ -114,7 +115,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   Identifier: function* (node: Node, context: Context) {
     if (node.type != 'Identifier') {
-      throw new Error('Not identifier')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     const identifier = getVariable(context, node.name)
@@ -123,7 +124,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   CallExpression: function* (node: Node, context: Context) {
     if (node.type != 'CallExpression') {
-      throw new Error('Not call expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     const agenda = context.runtime.agenda
@@ -144,13 +145,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   EmptyExpression: function* (node: Node, context: Context) {
     if (node.type != 'EmptyExpression') {
-      throw new Error('Not empty expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
   },
 
   UnaryExpression: function* (node: Node, context: Context) {
     if (node.type != 'UnaryExpression') {
-      throw new Error('Not unary expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     if (node.operator == '&' || node.operator == '*') {
@@ -165,7 +166,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   BinaryExpression: function* (node: Node, context: Context) {
     if (node.type != 'BinaryExpression') {
-      throw new Error('Not binary expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     context.runtime.agenda.push(
@@ -177,7 +178,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   ConditionalExpression: function* (node: Node, context: Context) {
     if (node.type != 'ConditionalExpression') {
-      throw new Error('Not conditional expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     context.runtime.agenda.push(
@@ -188,12 +189,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   LogicalExpression: function* (node: Node, context: Context) {
     if (node.type != 'LogicalExpression') {
-      throw new Error('Not logical expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
-    // const left = yield* evaluate(node.left, context)
-    // const right = yield* evaluate(node.right, context)
 
-    // return evaluateLogicalExpression(node.operator, left, right)
     context.runtime.agenda.push(
       { type: 'LogicalExpression_i', operator: node.operator },
       node.right,
@@ -203,7 +201,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   ForStatement: function* (node: Node, context: Context) {
     if (node.type != 'ForStatement') {
-      throw new Error('Not for loop')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
     // Idea: Convert to while loop
     const forLoopContent = node.body
@@ -232,7 +230,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   AssignmentExpression: function* (node: Node, context: Context) {
     if (node.type != 'AssignmentExpression') {
-      throw new Error('Not assignment expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     //Assignment here refers to =
@@ -254,7 +252,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   UpdateExpression: function* (node: Node, context: Context) {
     if (node.type != 'UpdateExpression') {
-      throw new Error('Not update expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     const agenda = context.runtime.agenda
@@ -278,7 +276,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   FunctionDeclaration: function* (node: Node, context: Context) {
     if (node.type != 'FunctionDeclaration') {
-      throw new Error('not function declaration')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     context.runtime.agenda.push({
@@ -291,7 +289,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   IfStatement: function* (node: Node, context: Context) {
     if (node.type != 'IfStatement') {
-      throw new Error('Not if statement')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     context.runtime.agenda.push(
@@ -302,14 +300,14 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   ExpressionStatement: function* (node: Node, context: Context) {
     if (node.type != 'ExpressionStatement') {
-      throw new Error('Not expression statement')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
     context.runtime.agenda.push(node.expression)
   },
 
   ReturnStatement: function* (node: Node, context: Context) {
     if (node.type != 'ReturnStatement') {
-      throw new Error('Not return statement')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     if (node.argument != undefined || node.argument != null) {
@@ -324,7 +322,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   WhileStatement: function* (node: Node, context: Context) {
     if (node.type != 'WhileStatement') {
-      throw new Error('Not for loop')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     context.runtime.agenda.push(
@@ -336,7 +334,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   DoWhileStatement: function* (node: Node, context: Context) {
     if (node.type != 'DoWhileStatement') {
-      throw handleRuntimeError(context, new RuntimeSourceError(node))
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     context.runtime.agenda.push(
@@ -349,7 +347,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   BlockStatement: function* (node: Node, context: Context) {
     if (node.type != 'BlockStatement') {
-      throw new Error('Not evaluating block statement')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     const A = context.runtime.agenda
@@ -371,13 +369,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   EmptyStatement: function* (node: Node, context: Context) {
     if (node.type != 'EmptyStatement') {
-      throw new Error('Not evaluating empty statement')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
   },
 
   Program: function* (node: Node, context: Context) {
     if (node.type !== 'Program') {
-      throw handleRuntimeError(context, new RuntimeSourceError(node))
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     // Create global environment
@@ -396,7 +394,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   BinaryExpression_i: function* (command: Command, context: Context) {
     if (command.type != 'BinaryExpression_i') {
-      throw new Error('not instruction')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
     const stash = context.runtime.stash
     const left = stash.pop()
@@ -414,7 +412,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   UnaryExpression_i: function* (command: Command, context: Context) {
     if (command.type != 'UnaryExpression_i') {
-      throw new Error('Not unary expression instruction')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
 
     const stash = context.runtime.stash
@@ -431,7 +429,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   ConditionalExpression_i: function* (command: Command, context: Context) {
     if (command.type != 'ConditionalExpression_i') {
-      throw new Error('Not conditional expression instruction')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
 
     const stash = context.runtime.stash
@@ -442,7 +440,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   IfStatement_i: function* (command: Command, context: Context) {
     if (command.type != 'IfStatement_i') {
-      throw new Error('Not conditional expression instruction')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
 
     const stash = context.runtime.stash
@@ -453,7 +451,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   WhileStatement_i: function* (command: Command, context: Context) {
     if (command.type != 'WhileStatement_i') {
-      throw new Error('Not while statement instruction')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
 
     const stash = context.runtime.stash
@@ -466,7 +464,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   DoWhileStatement_i: function* (command: Command, context: Context) {
     if (command.type != 'DoWhileStatement_i') {
-      throw new Error('Not while statement instruction')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
 
     const stash = context.runtime.stash
@@ -479,7 +477,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   Pop_i: function* (command: Command, context: Context) {
     if (command.type != 'Pop_i') {
-      throw new Error('Not pop instruction')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
     const stash = context.runtime.stash
     stash.pop()
@@ -487,7 +485,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   ReturnStatement_i: function* (command: Command, context: Context) {
     if (command.type != 'ReturnStatement_i') {
-      throw new Error('Not pop instruction')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
 
     const agenda = context.runtime.agenda
@@ -496,7 +494,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   AssignmentExpression_i: function* (command: Command, context: Context) {
     if (command.type != 'AssignmentExpression_i') {
-      throw new Error('Not assignment expression')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
 
     const stash = context.runtime.stash
@@ -513,7 +511,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   EnvironmentRestoration_i: function* (command: Command, context: Context) {
     if (command.type != 'EnvironmentRestoration_i') {
-      throw new Error('Not assignment expression')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
     console.log(context.runtime.environments)
     console.log('restoring env')
@@ -525,7 +523,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   LogicalExpression_i: function* (command: Command, context: Context) {
     if (command.type != 'LogicalExpression_i') {
-      throw new Error('Not logical expression')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
 
     const stash = context.runtime.stash
@@ -541,7 +539,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   FunctionDeclaration_i: function* (command: Command, context: Context) {
     if (command.type != 'FunctionDeclaration_i') {
-      throw new Error('Not logical expression')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
 
     const agenda = context.runtime.agenda
@@ -558,7 +556,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   LambdaExpression_i: function* (command: Command, context: Context) {
     if (command.type != 'LambdaExpression_i') {
-      throw new Error('Not lambda expression')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
 
     const stash = context.runtime.stash
@@ -571,7 +569,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   CallExpression_i: function* (command: Command, context: Context) {
     if (command.type != 'CallExpression_i') {
-      throw new Error('not call expression instr')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
 
     const stash = context.runtime.stash
@@ -611,7 +609,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
   Mark_i: function* (command: Command, context: Context) {
     if (command.type != 'Mark_i') {
-      throw new Error('Not marker')
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
     throw new Error('Return is required, even with no expression.')
   }
