@@ -8,13 +8,13 @@ import { checkIfStatement } from '../utils/runtime/statements/checkIf'
 import { checkLoop } from '../utils/runtime/statements/checkLoop'
 import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
 import { DivisionByZeroError, handleRuntimeError, InterpreterError } from './errors'
+import MemoryModel from './memory/memoryModel'
+import { TAG_TO_TYPE, TAGS } from './memory/tags'
 import {
   evaluateBinaryExpression,
   evaluateLogicalExpression,
   evaluateUnaryExpression
 } from './operators'
-import MemoryModel from './memory/memoryModel'
-import { TAG_TO_TYPE, TAGS } from './memory/tags'
 import {
   createBlockTypeEnvironment,
   popTypeEnvironment,
