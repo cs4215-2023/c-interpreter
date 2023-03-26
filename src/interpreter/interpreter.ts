@@ -36,13 +36,14 @@ import {
   getVariable,
   setValueToIdentifier
 } from './utils'
+import MemoryModel from './memory/memoryModel'
 
 class ReturnValue {
-  constructor(public value: Value) {}
+  constructor(public value: Value) { }
 }
 
 class TailCallReturnValue {
-  constructor(public callee: Closure, public args: Value[], public node: CallExpression) {}
+  constructor(public callee: Closure, public args: Value[], public node: CallExpression) { }
 }
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => IterableIterator<Value>
@@ -86,7 +87,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'Literal') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-
     context.runtime.stash.push(node.value)
   },
 

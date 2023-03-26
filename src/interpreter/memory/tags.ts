@@ -7,3 +7,8 @@ export enum TAGS {
   Unassigned_tag = 5,
   base_pointer_tag = 6
 }
+
+export enum MEM_TYPE {
+  STACK = 0,
+  HEAP = 1
+}
