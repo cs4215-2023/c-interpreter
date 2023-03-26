@@ -1,29 +1,12 @@
 /* tslint:disable:max-classes-per-file */
-import * as constants from '../constants'
-import * as errors from '../errors/errors'
-import { RuntimeSourceError } from '../errors/runtimeSourceError'
-import {
-  BlockStatement,
-  CallExpression,
-  ExpressionStatement,
-  Identifier,
-  Node
-} from '../parser/types'
+import { ExpressionStatement, Identifier, Node } from '../parser/types'
 import { ClosureInstruction, Command, Context, Value, WhileStatementInstruction } from '../types'
 import {
   evaluateBinaryExpression,
   evaluateLogicalExpression,
   evaluateUnaryExpression
 } from '../utils/operators'
-import { checkBinaryExpression, checkUnaryExpression } from '../utils/rttc'
-import Closure from './closure'
-import {
-  createBlockEnvironment,
-  createEnvironment,
-  popEnvironment,
-  pushEnvironment,
-  replaceEnvironment
-} from './environment'
+import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
 import { handleRuntimeError, InterpreterError } from './errors'
 import {
   createBlockTypeEnvironment,
@@ -37,36 +20,7 @@ import {
   setValueToIdentifier
 } from './utils'
 
-class ReturnValue {
-  constructor(public value: Value) {}
-}
-
-class TailCallReturnValue {
-  constructor(public callee: Closure, public args: Value[], public node: CallExpression) {}
-}
-
 export type Evaluator<T extends Node> = (node: T, context: Context) => IterableIterator<Value>
-
-function* evaluateBlockStatement(context: Context, node: Node) {
-  if (node.type != 'BlockStatement') {
-    throw new Error('Not evaluating block statement')
-  }
-  //scan block statement here
-  //   const [varFrame, typeFrame] = scanFrameVariables(node.body)
-  const env = createBlockEnvironment(context, 'blockEnvironment')
-  const typeEnv = createBlockTypeEnvironment(context, 'blockEnvironment')
-
-  pushEnvironment(context, env)
-  pushTypeEnvironment(context, typeEnv)
-  let result
-  for (const statement of node.body) {
-    result = yield* evaluate(statement, context)
-  }
-
-  popEnvironment(context)
-  popTypeEnvironment(context)
-  return result
-}
 
 /**
  * WARNING: Do not use object literal shorthands, e.g.
@@ -576,9 +530,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const agenda = context.runtime.agenda
     const arity = command.arity
     const args = []
+
     for (let i = arity - 1; i >= 0; i--) args[i] = stash.pop()
 
     const lambda = stash.pop() as ClosureInstruction
+
+    checkNumberOfArguments(context, command, lambda)
+
     const agendaTop = agenda.peek() as Command
     if (agenda.length() === 0 || agendaTop.type === 'EnvironmentRestoration_i') {
       agenda.push({ type: 'Mark_i' })
@@ -629,78 +587,4 @@ export function* evaluate(node: Node, context: Context) {
 
   // By right C programs don't return anything, this should be undefined.
   return stash.peek()
-}
-
-export function apply(
-  context: Context,
-  fun: Closure | Value,
-  args: Value[],
-  node: CallExpression,
-  thisContext?: Value
-) {
-  let result: Value
-  let total = 0
-
-  while (!(result instanceof ReturnValue)) {
-    if (fun instanceof Closure) {
-      checkNumberOfArguments(context, fun, args, node!)
-      const environment = createEnvironment(fun, args, node)
-      if (result instanceof TailCallReturnValue) {
-        replaceEnvironment(context, environment)
-      } else {
-        pushEnvironment(context, environment)
-        total++
-      }
-      const bodyEnvironment = createBlockEnvironment(context, 'functionBodyEnvironment')
-      bodyEnvironment.thisContext = thisContext
-      pushEnvironment(context, bodyEnvironment)
-      result = evaluateBlockStatement(context, fun.node.body as BlockStatement)
-      popEnvironment(context)
-      if (result instanceof TailCallReturnValue) {
-        fun = result.callee
-        node = result.node
-        args = result.args
-      } else if (!(result instanceof ReturnValue)) {
-        // No Return Value, set it as undefined
-        result = new ReturnValue(undefined)
-      }
-    } else if (typeof fun === 'function') {
-      checkNumberOfArguments(context, fun, args, node!)
-      try {
-        const forcedArgs = []
-
-        for (const arg of args) {
-          forcedArgs.push(arg)
-        }
-
-        result = fun.apply(thisContext, forcedArgs)
-        break
-      } catch (e) {
-        // Recover from exception
-        context.runtime.environments = context.runtime.environments.slice(
-          -context.numberOfOuterEnvironments
-        )
-
-        const loc = node ? node.loc! : constants.UNKNOWN_LOCATION
-        if (!(e instanceof RuntimeSourceError || e instanceof errors.ExceptionError)) {
-          // The error could've arisen when the builtin called a source function which errored.
-          // If the cause was a source error, we don't want to include the error.
-          // However if the error came from the builtin itself, we need to handle it.
-          return handleRuntimeError(context, new errors.ExceptionError(e, loc))
-        }
-        result = undefined
-        throw e
-      }
-    } else {
-      return handleRuntimeError(context, new errors.CallingNonFunctionValue(fun, node))
-    }
-  }
-  // Unwraps return value and release stack environment
-  if (result instanceof ReturnValue) {
-    result = result.value
-  }
-  for (let i = 1; i <= total; i++) {
-    popEnvironment(context)
-  }
-  return result
 }

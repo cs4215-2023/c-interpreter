@@ -1,46 +1,22 @@
 import * as errors from '../errors/errors'
-import {
-  CallExpression,
-  Expression,
-  ExpressionStatement,
-  Identifier,
-  Node,
-  Statement
-} from '../parser/types'
-import { Context, Environment, Frame, TypeEnvironment, Value } from '../types'
-import Closure from './closure'
+import { Expression, ExpressionStatement, Identifier, Node, Statement } from '../parser/types'
+import { CallInstruction, ClosureInstruction, Context, Environment, Frame } from '../types'
 import { currentEnvironment } from './environment'
 import { handleRuntimeError } from './errors'
 import { currentTypeEnvironment } from './typeEnvironment'
 
 export function checkNumberOfArguments(
   context: Context,
-  callee: Closure | Value,
-  args: Value[],
-  exp: CallExpression
+  command: CallInstruction,
+  lambda: ClosureInstruction
 ) {
-  if (callee instanceof Closure) {
-    const params = callee.node.params
-    if (params.length !== args.length) {
-      return handleRuntimeError(
-        context,
-        new errors.InvalidNumberOfArguments(exp, params.length, args.length)
-      )
-    }
-  } else {
-    const hasVarArgs = callee.minArgsNeeded != undefined
-    if (hasVarArgs ? callee.minArgsNeeded > args.length : callee.length !== args.length) {
-      return handleRuntimeError(
-        context,
-        new errors.InvalidNumberOfArguments(
-          exp,
-          hasVarArgs ? callee.minArgsNeeded : callee.length,
-          args.length,
-          hasVarArgs
-        )
-      )
-    }
+  if (lambda.parameters.length != command.arity) {
+    return handleRuntimeError(
+      context,
+      new errors.InvalidNumberOfArguments(command, lambda.parameters.length, command.arity)
+    )
   }
+
   return undefined
 }
 
