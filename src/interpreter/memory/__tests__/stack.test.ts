@@ -1,10 +1,11 @@
 import Stack from '../stack'
 import { TAGS } from '../tags'
 
-describe('Arithmetic', () => {
+const STACK_ADDR_BEGIN = 0
+describe('stack tests', () => {
   it('push and pop int test', () => {
     const stack_size = 20
-    const stack = new Stack(stack_size)
+    const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
 
     stack.push_int(50)
     expect(stack.pop()).toEqual([TAGS.int_tag, 50])
@@ -12,7 +13,7 @@ describe('Arithmetic', () => {
 
   it('push and pop pointer test', () => {
     const stack_size = 20
-    const stack = new Stack(stack_size)
+    const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
 
     stack.push_pointer(18)
     expect(stack.pop()).toEqual([TAGS.pointer_tag, 18])
@@ -20,7 +21,7 @@ describe('Arithmetic', () => {
 
   it('push and pop float test', () => {
     const stack_size = 20
-    const stack = new Stack(stack_size)
+    const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
 
     stack.push_float(12.1)
     expect(stack.pop()[1]).toBeCloseTo(12.1)
@@ -28,7 +29,7 @@ describe('Arithmetic', () => {
 
   it('push test', () => {
     const stack_size = 20
-    const stack = new Stack(stack_size)
+    const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
 
     stack.push_char('c')
     stack.push_int(3)
@@ -40,7 +41,7 @@ describe('Arithmetic', () => {
 
   it('pop test', () => {
     const stack_size = 20
-    const stack = new Stack(stack_size)
+    const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
 
     stack.push_char('c')
     stack.push_int(3)
@@ -55,7 +56,7 @@ describe('Arithmetic', () => {
 
   it('enter scope test', () => {
     const stack_size = 20
-    const stack = new Stack(stack_size)
+    const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
 
     stack.push_char('c')
     stack.push_int(3)
@@ -81,7 +82,7 @@ describe('Arithmetic', () => {
      * foo();
      */
     const stack_size = 20
-    const stack = new Stack(stack_size)
+    const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
 
     stack.push_char('c')
     stack.push_int(3)
@@ -113,7 +114,7 @@ describe('Arithmetic', () => {
      * int d = ret_3();
      */
     const stack_size = 20
-    const stack = new Stack(stack_size)
+    const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
 
     stack.push_char('c')
     stack.push_int(3)

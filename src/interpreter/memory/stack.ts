@@ -28,7 +28,7 @@ export default class Stack extends MemoryBuffer {
   public stack_get_tag_and_value(address: number): [number, number] {
     const type = this.stack_get(address)
     const val = this.stack_get(address + this.word_size / 2)
-    return [~~type, val]
+    return type !== TAGS.float_tag ? [~~type, ~~val] : [~~type, val]
   }
 
   public stack_set_tag_and_value(address: number, tag: number, x: number) {

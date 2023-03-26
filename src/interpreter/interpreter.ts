@@ -25,6 +25,8 @@ import {
   replaceEnvironment
 } from './environment'
 import { handleRuntimeError, InterpreterError } from './errors'
+import MemoryModel from './memory/memoryModel'
+import { TAGS, TAG_TO_TYPE } from './memory/tags'
 import {
   createBlockTypeEnvironment,
   popTypeEnvironment,
@@ -36,7 +38,6 @@ import {
   getVariable,
   setValueToIdentifier
 } from './utils'
-import MemoryModel from './memory/memoryModel'
 
 class ReturnValue {
   constructor(public value: Value) { }
@@ -47,6 +48,12 @@ class TailCallReturnValue {
 }
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => IterableIterator<Value>
+
+const STACK_SIZE = 100
+const STACK_BEGIN = 0
+const HEAP_SIZE = 100
+const HEAP_BEGIN = STACK_BEGIN + STACK_SIZE + 1
+const memory = new MemoryModel(STACK_SIZE, STACK_BEGIN, HEAP_SIZE, HEAP_BEGIN)
 
 function* evaluateBlockStatement(context: Context, node: Node) {
   if (node.type != 'BlockStatement') {
@@ -87,7 +94,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'Literal') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    context.runtime.stash.push(node.value)
+    console.log("loaded literal " + node.value)
+    const address = memory.mem_stack_push(TAG_TO_TYPE[node.valueType], node.value)
+    context.runtime.stash.push(address) //replace with address
   },
 
   SequenceExpression: function* (node: Node, context: Context) {
@@ -118,8 +127,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    const identifier = getVariable(context, node.name)
-    context.runtime.stash.push(identifier)
+    const value = getVariable(context, node.name)
+    context.runtime.stash.push(value)
   },
 
   CallExpression: function* (node: Node, context: Context) {
@@ -157,7 +166,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.operator == '&' || node.operator == '*') {
       throw new Error('Pointer not implemented yet')
     }
-
     context.runtime.agenda.push(
       { type: 'UnaryExpression_i', operator: node.operator },
       node.argument
@@ -168,7 +176,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'BinaryExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-
     context.runtime.agenda.push(
       { type: 'BinaryExpression_i', operator: node.operator },
       node.right,
@@ -254,7 +261,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'UpdateExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-
     const agenda = context.runtime.agenda
     const numberLiteral = { type: 'Literal', value: 1, valueType: 'int' }
     const binaryExpression = {
@@ -365,6 +371,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.numberOfOuterEnvironments += 1
     pushEnvironment(context, env)
     pushTypeEnvironment(context, typeEnv)
+    memory.enter_scope()
   },
 
   EmptyStatement: function* (node: Node, context: Context) {
@@ -397,17 +404,19 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
     const stash = context.runtime.stash
-    const left = stash.pop()
-    const right = stash.pop()
+    const left_addr = stash.pop()
+    const right_addr = stash.pop()
+    const [type_left, left] = memory.mem_read(left_addr)
+    const [type_right, right] = memory.mem_read(right_addr)
     const operator = command.operator
-
     // TODO: error handling with rttc
     if (operator === '/' && right === 0) {
       throw new Error('division by 0')
     }
 
-    const result = evaluateBinaryExpression(operator, right, left)
-    stash.push(result)
+    const result = evaluateBinaryExpression(operator, right, left) //need to reintroduce divisionbyzero error here
+    const push_addr = memory.mem_stack_push(type_left, result)
+    stash.push(push_addr)
   },
 
   UnaryExpression_i: function* (command: Command, context: Context) {
@@ -417,14 +426,17 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const stash = context.runtime.stash
     const operator = command.operator
-    const value = stash.pop()
-
+    const address = stash.pop()
+    //get address here
+    const [type, value] = memory.mem_read(address)
     // TODO: error handling with rttc
     if (operator == '&' || operator == '*') {
       throw new Error('Pointer not implemented yet')
     }
 
-    stash.push(evaluateUnaryExpression(operator, value))
+    const result = evaluateUnaryExpression(operator, value)
+    const push_addr = memory.mem_stack_push(type, result)
+    stash.push(push_addr)
   },
 
   ConditionalExpression_i: function* (command: Command, context: Context) {
@@ -445,8 +457,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const stash = context.runtime.stash
     const agenda = context.runtime.agenda
-
-    agenda.push(stash.pop() ? command.consequent : command.alternate)
+    const bool_addr = stash.pop()
+    const [type, bool] = memory.mem_read(bool_addr)
+    agenda.push(bool ? command.consequent : command.alternate)
   },
 
   WhileStatement_i: function* (command: Command, context: Context) {
@@ -487,7 +500,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.type != 'ReturnStatement_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
-
+    console.log(command)
     const agenda = context.runtime.agenda
     agenda.pop().type === 'Mark_i' ? null : agenda.push(command)
   },
@@ -496,7 +509,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.type != 'AssignmentExpression_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
-
     const stash = context.runtime.stash
     let identifier = command.symbol
 
@@ -505,8 +517,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       identifier = stash.pop()
     }
 
-    const value = stash.peek()
-    setValueToIdentifier(context, identifier!.name, value)
+    const addr = stash.peek()
+    setValueToIdentifier(context, identifier!.name, addr)
+
   },
 
   EnvironmentRestoration_i: function* (command: Command, context: Context) {
@@ -527,14 +540,16 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     const stash = context.runtime.stash
-    const left = stash.pop()
-    const right = stash.pop()
+    const left_addr = stash.pop()
+    const right_addr = stash.pop()
+    const [type_left, left] = memory.mem_read(left_addr)
+    const [type_right, right] = memory.mem_read(right_addr)
     const operator = command.operator
 
     // TODO: error handling with rttc
-
     const result = evaluateLogicalExpression(operator, left, right)
-    stash.push(result)
+    const push_addr = memory.mem_stack_push(type_left, result) //type checking kinda?
+    stash.push(push_addr)
   },
 
   FunctionDeclaration_i: function* (command: Command, context: Context) {
@@ -605,6 +620,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
     const functionEnvironment = createBlockEnvironment(context, 'FunctionEnvironment')
     pushEnvironment(context, functionEnvironment)
+    memory.enter_scope()
   },
 
   Mark_i: function* (command: Command, context: Context) {
@@ -628,7 +644,8 @@ export function* evaluate(node: Node, context: Context) {
   }
 
   // By right C programs don't return anything, this should be undefined.
-  return stash.peek()
+  const [type, value] = memory.mem_read(stash.peek())
+  return value
 }
 
 export function apply(

@@ -70,7 +70,7 @@ export function unaryOp(operator: UnaryOperator, argument: any, line: number, co
 
 export function evaluateUnaryExpression(operator: UnaryOperator, value: any) {
   if (operator === '!') {
-    return !value
+    return !value ? 1 : 0
   } else if (operator === '-') {
     return -value
   } else if (operator === '+') {
