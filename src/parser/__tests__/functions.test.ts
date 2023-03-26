@@ -1,20 +1,22 @@
 import createContext from '../../createContext'
 import { Variant } from '../../types'
 import { parse } from '../parser'
-import { PrimitiveType, Program } from '../types'
+import { PrimitiveType, Program, TypedIdentifier } from '../types'
 import { Identifier } from '../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
 
-const parameterA: Identifier = {
+const parameterA: TypedIdentifier = {
+  type: 'TypedIdentifier',
   name: 'a',
-  type: 'Identifier'
+  typeDeclaration: { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
 }
 
-const parameterB: Identifier = {
+const parameterB: TypedIdentifier = {
+  type: 'TypedIdentifier',
   name: 'b',
-  type: 'Identifier'
+  typeDeclaration: { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
 }
 
 const id: Identifier = {

@@ -512,6 +512,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
 
+    console.log(command.parameters)
+
     const agenda = context.runtime.agenda
     agenda.push(
       { type: 'Literal', value: undefined },
@@ -560,6 +562,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     for (let i = arity - 1; i >= 0; i--) args[i] = stash.pop()
 
     const lambda = stash.pop() as ClosureInstruction
+    console.log(lambda.parameters)
 
     checkNumberOfArguments(context, command, lambda)
 

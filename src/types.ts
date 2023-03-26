@@ -179,6 +179,7 @@ export type Command =
   | LambdaExpressionInstruction
   | CallInstruction
   | MarkInstruction
+  | ClosureInstruction
 
 type Instruction = {
   loc?: SourceLocation

@@ -7,7 +7,14 @@ import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
 import { StatementParser } from './statementParser'
 import { TypeParser } from './typeParser'
-import { Pattern, Statement } from './types'
+import {
+  ArrayDeclarationExpression,
+  Pattern,
+  PointerDeclarationExpression,
+  Statement,
+  TypedIdentifier,
+  VariableDeclarationExpression
+} from './types'
 import { tokenToIdentifierWrapper } from './util'
 
 export class FunctionParser
@@ -37,11 +44,11 @@ export class FunctionParser
     }
   }
 
-  paramsWrapper(ctx: FunctionContext): Pattern[] {
+  paramsWrapper(ctx: FunctionContext): TypedIdentifier[] {
     console.log(ctx._params.text)
     const params = ctx._params
     const expressionParser = new ExpressionParser()
-    const patterns: Pattern[] = []
+    const patterns: TypedIdentifier[] = []
 
     for (let i = 0; i < params.childCount; i++) {
       const child = params.getChild(i)
@@ -50,7 +57,7 @@ export class FunctionParser
         patterns.push(expressionParser.visit(child))
       }
     }
-    console.log(patterns)
+    console.log('parameters are: ', patterns)
     return patterns
   }
 
