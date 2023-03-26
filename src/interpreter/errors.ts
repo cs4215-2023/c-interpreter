@@ -1,5 +1,4 @@
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
-import { Node } from '../parser/types'
 import { Command, Context } from '../types'
 import { ErrorSeverity, ErrorType } from '../types'
 

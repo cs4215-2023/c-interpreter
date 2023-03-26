@@ -1,13 +1,17 @@
 /* tslint:disable:max-classes-per-file */
 import { ExpressionStatement, Identifier, Node } from '../parser/types'
 import { ClosureInstruction, Command, Context, Value, WhileStatementInstruction } from '../types'
+import { checkBinaryExpression } from '../utils/runtime/checkBinaryExp'
+import { checkIdentifier } from '../utils/runtime/checkIdentifier'
+import { checkUnaryExpression } from '../utils/runtime/checkUnaryExp'
+import { checkIfStatement } from '../utils/runtime/statements/checkIf'
+import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
+import { DivisionByZeroError, handleRuntimeError, InterpreterError } from './errors'
 import {
   evaluateBinaryExpression,
   evaluateLogicalExpression,
   evaluateUnaryExpression
-} from '../utils/operators'
-import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
-import { handleRuntimeError, InterpreterError } from './errors'
+} from './operators'
 import {
   createBlockTypeEnvironment,
   popTypeEnvironment,
@@ -71,6 +75,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'Identifier') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
+
+    checkIdentifier(node)
 
     const identifier = getVariable(context, node.name)
     context.runtime.stash.push(identifier)
@@ -355,10 +361,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const right = stash.pop()
     const operator = command.operator
 
-    // TODO: error handling with rttc
     if (operator === '/' && right === 0) {
-      throw new Error('division by 0')
+      throw new DivisionByZeroError(command)
     }
+
+    checkBinaryExpression(command, operator, left, right)
 
     const result = evaluateBinaryExpression(operator, right, left)
     stash.push(result)
@@ -373,7 +380,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const operator = command.operator
     const value = stash.pop()
 
-    // TODO: error handling with rttc
+    checkUnaryExpression(command, operator, value, context)
+
     if (operator == '&' || operator == '*') {
       throw new Error('Pointer not implemented yet')
     }
@@ -399,8 +407,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const stash = context.runtime.stash
     const agenda = context.runtime.agenda
+    const test = stash.pop()
 
-    agenda.push(stash.pop() ? command.consequent : command.alternate)
+    checkIfStatement(command, test, context)
+
+    agenda.push(test ? command.consequent : command.alternate)
   },
 
   WhileStatement_i: function* (command: Command, context: Context) {
