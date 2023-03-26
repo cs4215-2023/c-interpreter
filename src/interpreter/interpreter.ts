@@ -237,9 +237,18 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     //Assignment here refers to =
     if (node.left.type == 'Identifier') {
-      context.runtime.agenda.push({ type: 'AssignmentExpression_i', symbol: node.left }, node.right)
+      context.runtime.agenda.push(
+        { type: 'Pop_i' },
+        { type: 'AssignmentExpression_i', symbol: node.left },
+        node.right
+      )
     } else {
-      context.runtime.agenda.push({ type: 'AssignmentExpression_i' }, node.left, node.right)
+      context.runtime.agenda.push(
+        { type: 'Pop_i' },
+        { type: 'AssignmentExpression_i' },
+        node.left,
+        node.right
+      )
     }
   },
 
@@ -263,7 +272,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       right: binaryExpression
     }
 
-    agenda.push(assignmentExpression)
+    // call the argument
+    agenda.push(node.argument, assignmentExpression)
   },
 
   FunctionDeclaration: function* (node: Node, context: Context) {
@@ -301,6 +311,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'ReturnStatement') {
       throw new Error('Not return statement')
     }
+
     if (node.argument != undefined || node.argument != null) {
       context.runtime.agenda.push({ type: 'ReturnStatement_i' }, node.argument)
     } else {
@@ -362,7 +373,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'EmptyStatement') {
       throw new Error('Not evaluating empty statement')
     }
-    context.runtime.stash.push(undefined)
   },
 
   Program: function* (node: Node, context: Context) {
@@ -475,7 +485,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     stash.pop()
   },
 
-  // TODO: return with no value.
   ReturnStatement_i: function* (command: Command, context: Context) {
     if (command.type != 'ReturnStatement_i') {
       throw new Error('Not pop instruction')
@@ -558,7 +567,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     })
   },
 
-  // TODO : recursive calls
   CallExpression_i: function* (command: Command, context: Context) {
     if (command.type != 'CallExpression_i') {
       throw new Error('not call expression instr')
@@ -579,7 +587,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     } else {
       agenda.push({ type: 'EnvironmentRestoration_i' }, { type: 'Mark_i' })
     }
-    agenda.push(lambda.body)
+
+    const bodyStatements = lambda.body
+    agenda.push(...bodyStatements.body.slice().reverse())
 
     for (let i = 0; i < args.length; i++) {
       agenda.push({
@@ -609,11 +619,8 @@ export function* evaluate(node: Node, context: Context) {
   const stash = context.runtime.stash
   while (agenda.length()) {
     const command = agenda.pop() as Node
-    command.type
     yield* evaluators[command.type](command, context)
   }
-
-  stash.debug()
 
   // By right C programs don't return anything, this should be undefined.
   return stash.peek()

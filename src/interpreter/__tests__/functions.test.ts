@@ -77,4 +77,21 @@ describe('Functions', () => {
       expect(1).toBe(2)
     }
   })
+
+  it('Recursive function ', async () => {
+    const code = `
+	int foo(int a) {
+		if (a == 0) {
+			return a;
+		}
+		return a + foo(a-1);
+	}
+	foo(2);`
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(3)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
 })

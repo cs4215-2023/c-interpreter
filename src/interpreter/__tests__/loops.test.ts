@@ -54,6 +54,16 @@ describe('Loops', () => {
     }
   })
 
+  it('Do while loop declaration in body', async () => {
+    const code = `int i = 3; do {int a = 0;a = a + i; i--;} while (i > 0);  a;`
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(6)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
+
   it('For loop test termination', async () => {
     const code = `
 	for (int i = 0; i < 5; i++) {}
