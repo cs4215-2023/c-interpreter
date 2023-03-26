@@ -67,6 +67,10 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
+    if (node.identifier.type == 'TypedIdentifier') {
+      node.identifierType = node.identifier.typeDeclaration
+    }
+
     const identifier = node.identifier as Identifier
     declareIdentifier(context, identifier.name, node)
     context.runtime.stash.push(identifier)
@@ -474,6 +478,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.symbol == undefined) {
       identifier = stash.pop()
     }
+
+    console.log('identifier to be assigned: ', identifier)
 
     const value = stash.peek()
     setValueToIdentifier(command, context, identifier!.name, value)

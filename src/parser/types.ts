@@ -138,7 +138,7 @@ export interface ArrayDeclarationExpression extends BaseExpression {
 
 export interface VariableDeclarationExpression extends BaseExpression {
   type: 'VariableDeclarationExpression'
-  identifier: Identifier
+  identifier: Identifier | TypedIdentifier
   identifierType: Type
 }
 
