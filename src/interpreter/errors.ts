@@ -1,8 +1,6 @@
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
-import { Node } from '../parser/types'
 import { Command, Context } from '../types'
 import { ErrorSeverity, ErrorType } from '../types'
-import Closure from './closure'
 
 export class InterpreterError extends RuntimeSourceError {
   public type = ErrorType.SYNTAX
@@ -43,17 +41,4 @@ export function handleRuntimeError(context: Context, error: RuntimeSourceError):
     -context.numberOfOuterEnvironments
   )
   throw error
-}
-
-export function assertClosure(closure: any, node: Node, context: Context): closure is Closure {
-  if (!(closure instanceof Closure)) {
-    return handleRuntimeError(
-      context,
-      new InterpreterError(
-        node,
-        'A non-function was called, which should have been caught by the type checker'
-      )
-    )
-  }
-  return true
 }

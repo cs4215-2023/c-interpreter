@@ -4,7 +4,7 @@ import {
   VariableDeclarationExpressionContext
 } from '../../lang/ClangParser'
 import { TypeParser } from '../typeParser'
-import { Expression, Identifier } from '../types'
+import { Expression, Identifier, TypedIdentifier } from '../types'
 import { Constructable } from '../util'
 
 export const parserIdentifierExpression = <T extends Constructable>(
@@ -13,21 +13,21 @@ export const parserIdentifierExpression = <T extends Constructable>(
   const DerivedClass = class extends BaseClass {
     visitVariableDeclarationExpression(ctx: VariableDeclarationExpressionContext): Expression {
       console.log('visitTypedIdentifierExpression')
-      const idWithType = ctx.identifierWithType()
-      const type = new TypeParser().visit(idWithType._idType)
-      console.log('type is ' + type.valueType)
+      const idWithType = this.visitIdentifierWithType(ctx.identifierWithType())
       return {
-        identifier: this.visitIdentifierWithType(ctx.identifierWithType()),
-        identifierType: type,
+        identifier: { type: 'Identifier', name: idWithType.name },
+        identifierType: idWithType.typeDeclaration,
         type: 'VariableDeclarationExpression'
       }
     }
 
-    visitIdentifierWithType(ctx: IdentifierWithTypeContext): Identifier {
+    visitIdentifierWithType(ctx: IdentifierWithTypeContext): TypedIdentifier {
       console.log('visitIdentifierWithType')
+      const type = new TypeParser().visit(ctx._idType)
       return {
-        type: 'Identifier',
-        name: ctx.IDENTIFIER().text
+        type: 'TypedIdentifier',
+        name: ctx.IDENTIFIER().text,
+        typeDeclaration: type
       }
     }
 

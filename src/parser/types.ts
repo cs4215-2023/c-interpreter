@@ -22,7 +22,7 @@ export interface Program extends BaseNode {
 }
 
 interface BaseFunction extends BaseNode {
-  params: Array<Pattern>
+  params: Array<TypedIdentifier>
   body: BlockStatement
 }
 
@@ -97,7 +97,6 @@ export interface FunctionDeclaration extends BaseFunction, BaseExpression {
   type: 'FunctionDeclaration'
   id: Identifier
   body: BlockStatement
-  params: Pattern[]
   typeDeclaration: Type
 }
 
@@ -139,7 +138,7 @@ export interface ArrayDeclarationExpression extends BaseExpression {
 
 export interface VariableDeclarationExpression extends BaseExpression {
   type: 'VariableDeclarationExpression'
-  identifier: Identifier
+  identifier: Identifier | TypedIdentifier
   identifierType: Type
 }
 
@@ -208,6 +207,12 @@ export type Pattern = Identifier | PointerIdentifier
 export interface Identifier extends BaseExpression {
   type: 'Identifier'
   name: string
+}
+
+export interface TypedIdentifier extends BaseExpression {
+  type: 'TypedIdentifier'
+  name: string
+  typeDeclaration: Type
 }
 
 // Have to be the same type as Identifier otherwise an error is thrown by acorn

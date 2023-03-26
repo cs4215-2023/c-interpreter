@@ -5,13 +5,12 @@
 
 /* tslint:disable:max-classes-per-file */
 
-import { Identifier } from 'estree'
-
 import {
   BinaryOperator,
   BlockStatement,
   CallExpression,
   Expression,
+  Identifier,
   LogicalOperator,
   Node,
   Pattern,
@@ -180,6 +179,7 @@ export type Command =
   | LambdaExpressionInstruction
   | CallInstruction
   | MarkInstruction
+  | ClosureInstruction
 
 type Instruction = {
   loc?: SourceLocation
@@ -253,6 +253,7 @@ export interface LambdaExpressionInstruction extends Instruction {
   type: 'LambdaExpression_i'
   parameters: Array<Expression>
   body: BlockStatement
+  typeDeclaration: Type
 }
 
 export interface CallInstruction {
@@ -271,4 +272,5 @@ export interface ClosureInstruction {
   parameters: Array<Expression>
   body: BlockStatement
   loc?: SourceLocation
+  typeDeclaration: Type
 }
