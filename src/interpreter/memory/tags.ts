@@ -9,11 +9,11 @@ export enum TAGS {
   base_pointer_tag = 7
 }
 export const TAG_TO_TYPE = {
-  "void": TAGS.void_tag,
-  "float": TAGS.float_tag,
-  "char": TAGS.char_tag,
-  "int": TAGS.int_tag,
-  "pointer": TAGS.pointer_tag
+  void: TAGS.void_tag,
+  float: TAGS.float_tag,
+  char: TAGS.char_tag,
+  int: TAGS.int_tag,
+  pointer: TAGS.pointer_tag
 }
 
 export enum MEM_TYPE {

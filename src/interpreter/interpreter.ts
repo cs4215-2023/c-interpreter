@@ -26,7 +26,7 @@ import {
 } from './environment'
 import { handleRuntimeError, InterpreterError } from './errors'
 import MemoryModel from './memory/memoryModel'
-import { TAGS, TAG_TO_TYPE } from './memory/tags'
+import { TAG_TO_TYPE, TAGS } from './memory/tags'
 import {
   createBlockTypeEnvironment,
   popTypeEnvironment,
@@ -40,11 +40,11 @@ import {
 } from './utils'
 
 class ReturnValue {
-  constructor(public value: Value) { }
+  constructor(public value: Value) {}
 }
 
 class TailCallReturnValue {
-  constructor(public callee: Closure, public args: Value[], public node: CallExpression) { }
+  constructor(public callee: Closure, public args: Value[], public node: CallExpression) {}
 }
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => IterableIterator<Value>
@@ -94,7 +94,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'Literal') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    console.log("loaded literal " + node.value)
+    console.log('loaded literal ' + node.value)
     const address = memory.mem_stack_push(TAG_TO_TYPE[node.valueType], node.value)
     context.runtime.stash.push(address) //replace with address
   },
@@ -519,7 +519,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const addr = stash.peek()
     setValueToIdentifier(context, identifier!.name, addr)
-
   },
 
   EnvironmentRestoration_i: function* (command: Command, context: Context) {

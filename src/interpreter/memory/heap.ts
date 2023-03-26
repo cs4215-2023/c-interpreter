@@ -35,7 +35,6 @@ export default class Heap extends MemoryBuffer {
     this.unassigned = this.heap_allocate(TAGS.Unassigned_tag, 1)
   }
 
-
   public heap_allocate_int = (n: number) => {
     const number_address = this.heap_allocate(TAGS.int_tag, 2)
     this.mem_set(number_address + 1, n)

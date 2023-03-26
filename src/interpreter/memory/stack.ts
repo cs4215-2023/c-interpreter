@@ -83,10 +83,10 @@ export default class Stack extends MemoryBuffer {
     tag === TAGS.int_tag || tag === TAGS.pointer_tag
       ? ~~x
       : tag === TAGS.char_tag
-        ? String.fromCharCode(x as number)
-        : tag === TAGS.float_tag
-          ? x
-          : Error('Tag is undefined')
+      ? String.fromCharCode(x as number)
+      : tag === TAGS.float_tag
+      ? x
+      : Error('Tag is undefined')
 
   //END DATA TYPES
 
