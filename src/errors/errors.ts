@@ -91,12 +91,15 @@ export class InvalidNumberOfArguments extends RuntimeSourceError {
 }
 
 export class TypeMismatch extends RuntimeSourceError {
-  constructor(node: Node, private expected: Type, private got: Type) {
-    super(node)
+  constructor(command: Command, private expected: Type, private got: string | undefined) {
+    super(command)
   }
 
   public explain() {
-    return `Expected ${this.expected.valueType} but got ${this.got.valueType}`
+    if (this.got == undefined) {
+      return `Unable to detect type, please specify a primitive type: int, float, void or char.`
+    }
+    return `Expected ${this.expected.valueType} but got ${this.got}`
   }
 
   public elaborate() {

@@ -1,6 +1,15 @@
 import * as errors from '../errors/errors'
 import { Expression, ExpressionStatement, Identifier, Node, Statement } from '../parser/types'
-import { CallInstruction, ClosureInstruction, Context, Environment, Frame } from '../types'
+import {
+  CallInstruction,
+  ClosureInstruction,
+  Command,
+  Context,
+  Environment,
+  Frame,
+  TypeEnvironment
+} from '../types'
+import { checkType } from '../utils/runtime/checkType'
 import { currentEnvironment } from './environment'
 import { handleRuntimeError } from './errors'
 import { currentTypeEnvironment } from './typeEnvironment'
@@ -90,11 +99,18 @@ export const getIdentifierValueFromEnvironment = (context: Context, name: string
   return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
 }
 
-// TODO: add type checking
-export const setValueToIdentifier = (context: Context, name: string, value: any) => {
+export const setValueToIdentifier = (
+  command: Command,
+  context: Context,
+  name: string,
+  value: any
+) => {
   let environment: Environment | null = currentEnvironment(context)
   while (environment) {
     if (environment.head.hasOwnProperty(name)) {
+      const type = getType(context, name)
+      console.log(type, value)
+      checkType(context, type, value, command)
       environment.head[name] = value
       return value
     } else {
@@ -136,6 +152,18 @@ export function getVariable(context: Context, name: string) {
       } else {
         return environment.head[name]
       }
+    } else {
+      environment = environment.tail
+    }
+  }
+  return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
+}
+
+export function getType(context: Context, name: string) {
+  let environment: TypeEnvironment | null = currentTypeEnvironment(context)
+  while (environment) {
+    if (environment.head.hasOwnProperty(name)) {
+      return environment.head[name]
     } else {
       environment = environment.tail
     }

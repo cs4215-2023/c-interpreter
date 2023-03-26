@@ -5,6 +5,7 @@ import { checkBinaryExpression } from '../utils/runtime/checkBinaryExp'
 import { checkIdentifier } from '../utils/runtime/checkIdentifier'
 import { checkUnaryExpression } from '../utils/runtime/checkUnaryExp'
 import { checkIfStatement } from '../utils/runtime/statements/checkIf'
+import { checkLoop } from '../utils/runtime/statements/checkLoop'
 import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
 import { DivisionByZeroError, handleRuntimeError, InterpreterError } from './errors'
 import {
@@ -243,7 +244,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       type: 'FunctionDeclaration_i',
       id: node.id,
       parameters: node.params,
-      body: node.body
+      body: node.body,
+      typeDeclaration: node.typeDeclaration
     })
   },
 
@@ -422,6 +424,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const stash = context.runtime.stash
     const agenda = context.runtime.agenda
 
+    checkLoop(command, command.test, context)
+
     if (stash.pop()) {
       agenda.push(command, command.test, { type: 'Pop_i' }, command.body)
     }
@@ -434,6 +438,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const stash = context.runtime.stash
     const agenda = context.runtime.agenda
+    checkLoop(command, command.test, context)
 
     if (stash.pop()) {
       agenda.push(command, command.test, { type: 'Pop_i' }, command.body)
@@ -471,7 +476,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     const value = stash.peek()
-    setValueToIdentifier(context, identifier!.name, value)
+    setValueToIdentifier(command, context, identifier!.name, value)
   },
 
   EnvironmentRestoration_i: function* (command: Command, context: Context) {
@@ -513,8 +518,17 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       { type: 'Pop_i' },
       {
         type: 'AssignmentExpression',
-        left: { type: 'VariableDeclarationExpression', identifier: command.id },
-        right: { type: 'LambdaExpression_i', parameters: command.parameters, body: command.body }
+        left: {
+          type: 'VariableDeclarationExpression',
+          identifier: command.id,
+          identifierType: command.typeDeclaration
+        },
+        right: {
+          type: 'LambdaExpression_i',
+          parameters: command.parameters,
+          body: command.body,
+          typeDeclaration: command.typeDeclaration
+        }
       }
     )
   },
@@ -528,7 +542,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     stash.push({
       type: 'Closure_i',
       parameters: command.parameters,
-      body: command.body
+      body: command.body,
+      typeDeclaration: command.typeDeclaration
     })
   },
 

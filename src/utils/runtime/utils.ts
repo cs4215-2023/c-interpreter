@@ -12,6 +12,10 @@ export const typeOf = (v: Value) => {
 
 export const isNumber = (v: Value) => typeOf(v) === 'number'
 
+export const isInt = (v: Value) => isNumber(v) && Number.isInteger(v)
+
+export const isFloat = (v: Value) => isNumber(v) && !Number.isInteger(v)
+
 export const isString = (v: Value) => typeOf(v) === 'string'
 
 export const isBool = (v: Value) => typeOf(v) === 'boolean'
