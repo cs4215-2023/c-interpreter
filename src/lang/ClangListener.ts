@@ -47,6 +47,7 @@ import { IdentifierWithTypeContext } from './ClangParser'
 import { TypeContext } from './ClangParser'
 import { IdentifierWithTypeListContext } from './ClangParser'
 import { IdentifierListContext } from './ClangParser'
+import { ExpressionListContext } from './ClangParser'
 import { NumberListContext } from './ClangParser'
 import { PointerListContext } from './ClangParser'
 import { StatementContext } from './ClangParser'
@@ -650,6 +651,17 @@ export interface ClangListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitIdentifierList?: (ctx: IdentifierListContext) => void
+
+  /**
+   * Enter a parse tree produced by `ClangParser.expressionList`.
+   * @param ctx the parse tree
+   */
+  enterExpressionList?: (ctx: ExpressionListContext) => void
+  /**
+   * Exit a parse tree produced by `ClangParser.expressionList`.
+   * @param ctx the parse tree
+   */
+  exitExpressionList?: (ctx: ExpressionListContext) => void
 
   /**
    * Enter a parse tree produced by `ClangParser.numberList`.

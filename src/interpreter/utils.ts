@@ -1,6 +1,13 @@
 import * as errors from '../errors/errors'
-import { CallExpression, Node } from '../parser/types'
-import { Context, Environment, Value } from '../types'
+import {
+  CallExpression,
+  Expression,
+  ExpressionStatement,
+  Identifier,
+  Node,
+  Statement
+} from '../parser/types'
+import { Context, Environment, Frame, TypeEnvironment, Value } from '../types'
 import Closure from './closure'
 import { currentEnvironment } from './environment'
 import { handleRuntimeError } from './errors'
@@ -35,6 +42,60 @@ export function checkNumberOfArguments(
     }
   }
   return undefined
+}
+
+export function scanFrameVariables(nodes: Statement[]): [Frame, Frame] {
+  let var_arr = {}
+  let type_arr = {}
+  for (let node of nodes) {
+    node = node as ExpressionStatement
+    const values = makeVariableDeclarations(node)
+    const types = getFrameTypes(node)
+    var_arr = { ...var_arr, ...values }
+    type_arr = { ...type_arr, ...types }
+  }
+  // var_arr = var_arr.filter((item, pos) => var_arr.indexOf(item) === pos)
+  return [var_arr, type_arr]
+}
+
+// TODO: Add identifier type to type environment
+export function makeVariableDeclarations(node: Statement | Expression): Frame {
+  let arr = {}
+  if (node.type == 'SequenceExpression') {
+    for (const expr of node.expressions) {
+      const res = makeVariableDeclarations(expr)
+      arr = { ...arr, ...res }
+    }
+  } else if (node.type == 'ExpressionStatement') {
+    return makeVariableDeclarations(node.expression)
+  } else if (node.type == 'AssignmentExpression') {
+    const left = node.left as Identifier
+
+    arr[left.name] = DECLARED_BUT_NOT_YET_ASSIGNED
+  } else if (node.type == 'Identifier') {
+    arr[node.name] = DECLARED_BUT_NOT_YET_ASSIGNED
+  }
+  return arr
+}
+
+export function getFrameTypes(node: Statement | Expression): Frame {
+  let arr = {}
+  if (node.type == 'SequenceExpression') {
+    for (const expr of node.expressions) {
+      const res = getFrameTypes(expr)
+      arr = { ...arr, ...res }
+    }
+  } else if (node.type == 'ExpressionStatement') {
+    return getFrameTypes(node.expression)
+  } else if (node.type == 'AssignmentExpression') {
+    return getFrameTypes(node.left)
+  } else if (node.type == 'VariableDeclarationExpression') {
+    //might want to do for functions soon)
+    arr[node.identifier.name] = node.identifierType
+  } else if (node.type == 'ArrayDeclarationExpression') {
+    arr[node.identifier.name] = node.arrayType //maybe should just combine w vardeclaration lmao
+  }
+  return arr
 }
 
 /* 

@@ -7,7 +7,7 @@ import {
   SourceLocation,
   UnaryOperator
 } from '../parser/types'
-import { ErrorSeverity, ErrorType, Value } from '../types'
+import { Command, ErrorSeverity, ErrorType, Value } from '../types'
 
 const LHS = ' on left hand side of operation'
 const RHS = ' on right hand side of operation'
@@ -17,8 +17,8 @@ export class TypeError extends RuntimeSourceError {
   public severity = ErrorSeverity.ERROR
   public location: SourceLocation
 
-  constructor(node: Node, public side: string, public expected: string, public got: string) {
-    super(node)
+  constructor(command: Command, public side: string, public expected: string, public got: string) {
+    super(command)
   }
 
   public explain() {
@@ -49,18 +49,18 @@ const isNumber = (v: Value) => typeOf(v) === 'number'
 const isString = (v: Value) => typeOf(v) === 'string'
 const isBool = (v: Value) => typeOf(v) === 'boolean'
 
-export const checkUnaryExpression = (node: Node, operator: UnaryOperator, value: Value) => {
+export const checkUnaryExpression = (command: Command, operator: UnaryOperator, value: Value) => {
   if ((operator === '+' || operator === '-') && !isNumber(value)) {
-    return new TypeError(node, '', 'number', typeOf(value))
+    return new TypeError(command, '', 'number', typeOf(value))
   } else if (operator === '!' && !isBool(value)) {
-    return new TypeError(node, '', 'boolean', typeOf(value))
+    return new TypeError(command, '', 'boolean', typeOf(value))
   } else {
     return undefined
   }
 }
 
 export const checkBinaryExpression = (
-  node: Node,
+  command: Command,
   operator: BinaryOperator,
   left: Value,
   right: Value
@@ -71,9 +71,9 @@ export const checkBinaryExpression = (
     case '/':
     case '%':
       if (!isNumber(left)) {
-        return new TypeError(node, LHS, 'number', typeOf(left))
+        return new TypeError(command, LHS, 'number', typeOf(left))
       } else if (!isNumber(right)) {
-        return new TypeError(node, RHS, 'number', typeOf(right))
+        return new TypeError(command, RHS, 'number', typeOf(right))
       } else {
         return
       }
@@ -85,11 +85,11 @@ export const checkBinaryExpression = (
     case '!=':
     case '==':
       if (isNumber(left)) {
-        return isNumber(right) ? undefined : new TypeError(node, RHS, 'number', typeOf(right))
+        return isNumber(right) ? undefined : new TypeError(command, RHS, 'number', typeOf(right))
       } else if (isString(left)) {
-        return isString(right) ? undefined : new TypeError(node, RHS, 'string', typeOf(right))
+        return isString(right) ? undefined : new TypeError(command, RHS, 'string', typeOf(right))
       } else {
-        return new TypeError(node, LHS, 'string or number', typeOf(left))
+        return new TypeError(command, LHS, 'string or number', typeOf(left))
       }
     default:
       return
@@ -97,7 +97,7 @@ export const checkBinaryExpression = (
 }
 
 export const checkLogicalExpression = (
-  node: Node,
+  command: Command,
   operator: LogicalOperator,
   left: Value,
   right: Value

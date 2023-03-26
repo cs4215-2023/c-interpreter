@@ -27,8 +27,7 @@ describe('  declarations', () => {
                 }
               },
               {
-                expressions: [],
-                type: 'SequenceExpression'
+                type: 'EmptyExpression'
               }
             ],
             type: 'SequenceExpression'
@@ -75,8 +74,7 @@ describe('  declarations', () => {
                 }
               },
               {
-                expressions: [],
-                type: 'SequenceExpression'
+                type: 'EmptyExpression'
               }
             ],
             type: 'SequenceExpression'
@@ -115,8 +113,7 @@ describe('  declarations', () => {
                 }
               },
               {
-                expressions: [],
-                type: 'SequenceExpression'
+                type: 'EmptyExpression'
               }
             ],
             type: 'SequenceExpression'

@@ -1,14 +1,14 @@
 import { UNKNOWN_LOCATION } from '../constants'
-import { Node, SourceLocation } from '../parser/types'
-import { ErrorSeverity, ErrorType, SourceError } from '../types'
+import { SourceLocation } from '../parser/types'
+import { Command, ErrorSeverity, ErrorType, SourceError } from '../types'
 
 export class RuntimeSourceError implements SourceError {
   public type = ErrorType.RUNTIME
   public severity = ErrorSeverity.ERROR
   public location: SourceLocation
 
-  constructor(node?: Node) {
-    this.location = node?.loc! ?? UNKNOWN_LOCATION
+  constructor(command?: Command) {
+    this.location = command?.loc ?? UNKNOWN_LOCATION
   }
 
   public explain() {

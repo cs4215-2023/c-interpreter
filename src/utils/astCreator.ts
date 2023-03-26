@@ -23,6 +23,11 @@ export const literal = (value: string | number | null, loc?: SourceLocation | nu
   }
 }
 
+// primitive: undefined is a possible value
+export const primitive = (value: any): Expression => {
+  return value === undefined ? identifier('undefined') : literal(value)
+}
+
 export const callExpression = (
   callee: Expression,
   args: Expression[],
@@ -33,8 +38,3 @@ export const callExpression = (
   arguments: args,
   loc
 })
-
-// primitive: undefined is a possible value
-export const primitive = (value: any): Expression => {
-  return value === undefined ? identifier('undefined') : literal(value)
-}

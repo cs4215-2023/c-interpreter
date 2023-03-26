@@ -23,8 +23,7 @@ import { parserUnaryOpExpression } from './unaryOpParser'
 class BaseParser extends AbstractParseTreeVisitor<Expression> implements ClangVisitor<Expression> {
   protected defaultResult(): Expression {
     return {
-      type: 'SequenceExpression',
-      expressions: []
+      type: 'EmptyExpression'
     }
   }
 

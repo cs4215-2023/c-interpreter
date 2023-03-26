@@ -5,8 +5,23 @@
 
 /* tslint:disable:max-classes-per-file */
 
-import { CallExpression, Node, SourceLocation } from '../src/parser/types'
+import { Identifier } from 'estree'
+
+import {
+  BinaryOperator,
+  BlockStatement,
+  CallExpression,
+  Expression,
+  LogicalOperator,
+  Node,
+  Pattern,
+  SourceLocation,
+  Statement,
+  Type,
+  UnaryOperator
+} from '../src/parser/types'
 import { EnvTree, TypeEnvTree } from './createContext'
+import { Stack } from './utils/stack'
 
 /**
  * Defines functions that act as built-ins, but might rely on
@@ -65,6 +80,8 @@ export interface Context<T = any> {
     typeEnv: TypeEnvironment[]
     typeEnvTree: TypeEnvTree
     nodes: Node[]
+    agenda: Stack<T>
+    stash: Stack<T>
   }
 
   numberOfOuterEnvironments: number
@@ -144,4 +161,114 @@ export type TypeEnvironment = {
   callExpression?: CallExpression
   head: Frame
   thisContext?: Value
+}
+
+export type Command =
+  | Node
+  | UnaryExpressionInstruction
+  | BinaryExpressionInstruction
+  | ConditionalExpressionInstruction
+  | LogicalExpressionInstruction
+  | AssignmentExpressionInstruction
+  | IfStatementInstruction
+  | WhileStatementInstruction
+  | DoWhileStatementInstruction
+  | PopInstruction
+  | ReturnInstruction
+  | EnvironmentRestorationInstruction
+  | FunctionDeclarationInstruction
+  | LambdaExpressionInstruction
+  | CallInstruction
+  | MarkInstruction
+
+type Instruction = {
+  loc?: SourceLocation
+}
+
+export interface UnaryExpressionInstruction extends Instruction {
+  type: 'UnaryExpression_i'
+  operator: UnaryOperator
+}
+
+export interface BinaryExpressionInstruction extends Instruction {
+  type: 'BinaryExpression_i'
+  operator: BinaryOperator
+}
+
+export interface ConditionalExpressionInstruction extends Instruction {
+  type: 'ConditionalExpression_i'
+  alternate: Expression
+  consequent: Expression
+}
+
+export interface LogicalExpressionInstruction extends Instruction {
+  type: 'LogicalExpression_i'
+  operator: LogicalOperator
+}
+
+export interface AssignmentExpressionInstruction extends Instruction {
+  type: 'AssignmentExpression_i'
+  symbol?: Identifier
+}
+
+export interface IfStatementInstruction extends Instruction {
+  type: 'IfStatement_i'
+  alternate: Statement
+  consequent: Statement
+}
+
+export interface WhileStatementInstruction extends Instruction {
+  type: 'WhileStatement_i'
+  test: Expression
+  body: BlockStatement
+}
+
+export interface DoWhileStatementInstruction extends Instruction {
+  type: 'DoWhileStatement_i'
+  test: Expression
+  body: BlockStatement
+}
+
+export interface PopInstruction extends Instruction {
+  type: 'Pop_i'
+}
+
+export interface ReturnInstruction extends Instruction {
+  type: 'ReturnStatement_i'
+}
+
+export interface EnvironmentRestorationInstruction extends Instruction {
+  type: 'EnvironmentRestoration_i'
+}
+
+export interface FunctionDeclarationInstruction extends Instruction {
+  type: 'FunctionDeclaration_i'
+  id: Identifier
+  parameters: Pattern[]
+  body: BlockStatement
+  typeDeclaration: Type
+}
+
+export interface LambdaExpressionInstruction extends Instruction {
+  type: 'LambdaExpression_i'
+  parameters: Array<Expression>
+  body: BlockStatement
+}
+
+export interface CallInstruction {
+  type: 'CallExpression_i'
+  arity: number
+  loc?: SourceLocation
+}
+
+export interface MarkInstruction {
+  type: 'Mark_i'
+  loc?: SourceLocation
+}
+
+export interface ClosureInstruction {
+  type: 'Closure_i'
+  parameters: Array<Expression>
+  body: BlockStatement
+  loc?: SourceLocation
 }

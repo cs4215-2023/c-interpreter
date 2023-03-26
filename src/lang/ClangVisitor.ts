@@ -47,6 +47,7 @@ import { IdentifierWithTypeContext } from './ClangParser'
 import { TypeContext } from './ClangParser'
 import { IdentifierWithTypeListContext } from './ClangParser'
 import { IdentifierListContext } from './ClangParser'
+import { ExpressionListContext } from './ClangParser'
 import { NumberListContext } from './ClangParser'
 import { PointerListContext } from './ClangParser'
 import { StatementContext } from './ClangParser'
@@ -435,6 +436,13 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
    * @return the visitor result
    */
   visitIdentifierList?: (ctx: IdentifierListContext) => Result
+
+  /**
+   * Visit a parse tree produced by `ClangParser.expressionList`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitExpressionList?: (ctx: ExpressionListContext) => Result
 
   /**
    * Visit a parse tree produced by `ClangParser.numberList`.

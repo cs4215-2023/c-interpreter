@@ -56,8 +56,7 @@ describe('Pointer', () => {
                 type: 'PointerDeclarationExpression'
               },
               {
-                expressions: [],
-                type: 'SequenceExpression'
+                type: 'EmptyExpression'
               }
             ],
             type: 'SequenceExpression'
@@ -97,8 +96,7 @@ describe('Pointer', () => {
                 type: 'AssignmentExpression'
               },
               {
-                expressions: [],
-                type: 'SequenceExpression'
+                type: 'EmptyExpression'
               }
             ],
             type: 'SequenceExpression'
@@ -138,8 +136,7 @@ describe('Pointer', () => {
                 type: 'AssignmentExpression'
               },
               {
-                expressions: [],
-                type: 'SequenceExpression'
+                type: 'EmptyExpression'
               }
             ],
             type: 'SequenceExpression'

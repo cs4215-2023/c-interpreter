@@ -1,4 +1,5 @@
 import { Context, Environment, TypeEnvironment, Variant } from './types'
+import { Stack } from './utils/stack'
 
 export class EnvTree {
   private _root: EnvTreeNode | null = null
@@ -127,7 +128,9 @@ const createEmptyRuntime = () => ({
   typeEnv: [],
   typeEnvTree: new TypeEnvTree(),
   value: undefined,
-  nodes: []
+  nodes: [],
+  stash: new Stack<any>(),
+  agenda: new Stack<any>()
 })
 
 export const createEmptyContext = <T>(

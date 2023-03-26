@@ -2,24 +2,29 @@
 import * as constants from '../constants'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
-import { BlockStatement, CallExpression, Identifier, Node } from '../parser/types'
-import { Context, Value } from '../types'
+import {
+  BlockStatement,
+  CallExpression,
+  ExpressionStatement,
+  Identifier,
+  Node
+} from '../parser/types'
+import { ClosureInstruction, Command, Context, Value, WhileStatementInstruction } from '../types'
 import {
   evaluateBinaryExpression,
   evaluateLogicalExpression,
   evaluateUnaryExpression
 } from '../utils/operators'
-import * as rttc from '../utils/rttc'
+import { checkBinaryExpression, checkUnaryExpression } from '../utils/rttc'
 import Closure from './closure'
 import {
   createBlockEnvironment,
   createEnvironment,
-  currentEnvironment,
   popEnvironment,
   pushEnvironment,
   replaceEnvironment
 } from './environment'
-import { DivisionByZeroError, handleRuntimeError } from './errors'
+import { handleRuntimeError, InterpreterError } from './errors'
 import {
   createBlockTypeEnvironment,
   popTypeEnvironment,
@@ -28,7 +33,6 @@ import {
 import {
   checkNumberOfArguments,
   declareIdentifier,
-  getIdentifierValueFromEnvironment,
   getVariable,
   setValueToIdentifier
 } from './utils'
@@ -58,7 +62,7 @@ function* evaluateBlockStatement(context: Context, node: Node) {
   for (const statement of node.body) {
     result = yield* evaluate(statement, context)
   }
-  console.log(result)
+
   popEnvironment(context)
   popTypeEnvironment(context)
   return result
@@ -75,292 +79,556 @@ function* evaluateBlockStatement(context: Context, node: Node) {
  * See: https://github.com/webpack/webpack/issues/7566
  */
 // tslint:disable:object-literal-shorthand
-// prettier-ignore
+
 export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
-  /** Simple Values */
-  Literal: function* (node: Node, _context: Context) {
+  // expressions and statements
+  Literal: function* (node: Node, context: Context) {
     if (node.type != 'Literal') {
-      throw new Error('Not literal')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
-    return node.value
+
+    context.runtime.stash.push(node.value)
   },
 
   SequenceExpression: function* (node: Node, context: Context) {
     if (node.type != 'SequenceExpression') {
-      throw new Error('Not sequence expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
-    let result
-    for (const expr of node.expressions) {
-      if (expr.type === 'SequenceExpression' && expr.expressions.length === 0) { continue }
-      result = yield* evaluate(expr, context)
-    }
-    return result
+
+    context.runtime.agenda.push(...node.expressions)
   },
 
+  // TODO
   ArrayExpression: function* (node: Node, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
-  },
-
-  FunctionExpression: function* (node: Node, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
 
   VariableDeclarationExpression: function* (node: Node, context: Context) {
     if (node.type != 'VariableDeclarationExpression') {
-      throw new Error('not var declaration')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
-	const identifier = node.identifier as Identifier
-	declareIdentifier(context, identifier.name, node)
+
+    const identifier = node.identifier as Identifier
+    declareIdentifier(context, identifier.name, node)
+    context.runtime.stash.push(identifier)
   },
 
   Identifier: function* (node: Node, context: Context) {
     if (node.type != 'Identifier') {
-      throw new Error('Not identifier')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
+
     const identifier = getVariable(context, node.name)
-    return identifier
+    context.runtime.stash.push(identifier)
   },
 
   CallExpression: function* (node: Node, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+    if (node.type != 'CallExpression') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+
+    const agenda = context.runtime.agenda
+
+    const callArguments = []
+    for (const expression of node.arguments) {
+      if (expression.type != 'EmptyExpression') {
+        callArguments.push(expression)
+      }
+    }
+
+    agenda.push(
+      { type: 'CallExpression_i', arity: callArguments.length },
+      ...callArguments,
+      node.callee
+    )
+  },
+
+  EmptyExpression: function* (node: Node, context: Context) {
+    if (node.type != 'EmptyExpression') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
   },
 
   UnaryExpression: function* (node: Node, context: Context) {
     if (node.type != 'UnaryExpression') {
-      throw new Error('Not unary expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
-    const value = yield* evaluate(node.argument, context)
 
-    const error = rttc.checkUnaryExpression(node, node.operator, value)
-    if (error) {
-      return handleRuntimeError(context, error)
-    }
     if (node.operator == '&' || node.operator == '*') {
       throw new Error('Pointer not implemented yet')
     }
-    return evaluateUnaryExpression(node.operator, value)
+
+    context.runtime.agenda.push(
+      { type: 'UnaryExpression_i', operator: node.operator },
+      node.argument
+    )
   },
 
   BinaryExpression: function* (node: Node, context: Context) {
     if (node.type != 'BinaryExpression') {
-      throw new Error('Not binary expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
-    const left = yield* evaluate(node.left, context)
-    const right = yield* evaluate(node.right, context)
-    const error = rttc.checkBinaryExpression(node, node.operator, left, right)
-    if (error) {
-      return handleRuntimeError(context, error)
-    }
-    if (node.operator === '/' && right === 0) {
-      return handleRuntimeError(context, new DivisionByZeroError(node));
-    }
-    return evaluateBinaryExpression(node.operator, left, right)
+
+    context.runtime.agenda.push(
+      { type: 'BinaryExpression_i', operator: node.operator },
+      node.right,
+      node.left
+    )
   },
 
-  //need to verify this once loops are implemented
   ConditionalExpression: function* (node: Node, context: Context) {
     if (node.type != 'ConditionalExpression') {
-      throw new Error('Not conditional expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
-    const result = yield* evaluate(node.test, context)
-    //not sure if pushenv is needed here, depending on the definition of conditional expr
-    if (result) {
-      return yield* evaluate(node.consequent, context)
-    }
-    else {
-      return yield* evaluate(node.alternate, context)
-    }
+
+    context.runtime.agenda.push(
+      { type: 'ConditionalExpression_i', consequent: node.consequent, alternate: node.alternate },
+      node.test
+    )
   },
 
   LogicalExpression: function* (node: Node, context: Context) {
     if (node.type != 'LogicalExpression') {
-      throw new Error('Not logical expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
-    const left = yield* evaluate(node.left, context)
-    const right = yield* evaluate(node.right, context)
 
-    return evaluateLogicalExpression(node.operator, left, right)
+    context.runtime.agenda.push(
+      { type: 'LogicalExpression_i', operator: node.operator },
+      node.right,
+      node.left
+    )
   },
 
   ForStatement: function* (node: Node, context: Context) {
     if (node.type != 'ForStatement') {
-      throw new Error('Not for loop')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
-    const loopVariableEnvironment = createBlockEnvironment(context, 'forLoopEnvironment')
-	const loopTypeEnvironment = createBlockTypeEnvironment(context, 'forLoopTypeEnvironment')
-    pushEnvironment(context, loopVariableEnvironment)
-	pushTypeEnvironment(context, loopTypeEnvironment)
+    // Idea: Convert to while loop
+    const forLoopContent = node.body
 
-    const init = node.init
-	const test = node.test
-	const update = node.update
-    yield* evaluate(init, context)
+    // convert expression to statement using expressionStatement
+    const updateStatement: ExpressionStatement = {
+      type: 'ExpressionStatement',
+      expression: node.update
+    }
+    forLoopContent.body.push(updateStatement)
 
-	let value
-	while (yield *evaluate(test, context)) {
-		value = yield* evaluate(node.body, context)
-		yield* evaluate(update, context)
-	}
-	return value
-	
+    // wrap body in while loop instruction
+    const whileStatementInstruction: WhileStatementInstruction = {
+      type: 'WhileStatement_i',
+      test: node.test,
+      body: forLoopContent
+    }
+
+    context.runtime.agenda.push(
+      { type: 'Literal', value: undefined },
+      whileStatementInstruction,
+      node.test,
+      node.init
+    )
   },
 
   AssignmentExpression: function* (node: Node, context: Context) {
     if (node.type != 'AssignmentExpression') {
-      throw new Error('Not assignment expression')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    let id = node.left as Identifier
-    if (node.left.type == 'VariableDeclarationExpression') {
-      yield* evaluate(node.left, context)
-      id = node.left.identifier
+    //Assignment here refers to =
+    if (node.left.type == 'Identifier') {
+      context.runtime.agenda.push(
+        { type: 'Pop_i' },
+        { type: 'AssignmentExpression_i', symbol: node.left },
+        node.right
+      )
+    } else {
+      context.runtime.agenda.push(
+        { type: 'Pop_i' },
+        { type: 'AssignmentExpression_i' },
+        node.left,
+        node.right
+      )
     }
-    const value = yield* evaluate(node.right, context)
-    setValueToIdentifier(context, id.name, value)
-    return value;
   },
 
   UpdateExpression: function* (node: Node, context: Context) {
-	if (node.type != 'UpdateExpression') {
-		throw new Error('Not update expression')
-	}
+    if (node.type != 'UpdateExpression') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
 
-	const identifier = node.argument as Identifier
+    const agenda = context.runtime.agenda
+    const numberLiteral = { type: 'Literal', value: 1, valueType: 'int' }
+    const binaryExpression = {
+      type: 'BinaryExpression',
+      operator: node.operator == '++' ? '+' : '-',
+      left: node.argument,
+      right: numberLiteral
+    }
+    const assignmentExpression = {
+      type: 'AssignmentExpression',
+      operator: '=',
+      left: node.argument,
+      right: binaryExpression
+    }
 
-	let value = getIdentifierValueFromEnvironment(context, identifier.name)
-	if (node.operator == '++') {
-		value += 1
-	} else {
-		value -= 1
-	}
-
-	setValueToIdentifier(context, identifier.name, value)
-  return value
+    // call the argument
+    agenda.push(node.argument, assignmentExpression)
   },
 
   FunctionDeclaration: function* (node: Node, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+    if (node.type != 'FunctionDeclaration') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+
+    context.runtime.agenda.push({
+      type: 'FunctionDeclaration_i',
+      id: node.id,
+      parameters: node.params,
+      body: node.body
+    })
   },
 
   IfStatement: function* (node: Node, context: Context) {
     if (node.type != 'IfStatement') {
-      throw new Error('Not if statement')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
-    const result = yield* evaluate(node.test, context)
-    if (result) {
-      const consequent = node.consequent as BlockStatement
-      return yield* evaluate(consequent, context)
-    }
-    else {
-      if (node.alternate == null || node.alternate == undefined) { return undefined }
-      else {
-        const alternate = node.alternate as BlockStatement
-        return yield* evaluate(alternate, context)
-      }
-    }
+
+    context.runtime.agenda.push(
+      { type: 'IfStatement_i', consequent: node.consequent, alternate: node.alternate },
+      node.test
+    )
   },
 
   ExpressionStatement: function* (node: Node, context: Context) {
     if (node.type != 'ExpressionStatement') {
-      throw new Error('Not expression statement')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
-    return yield* evaluate(node.expression, context)
+    context.runtime.agenda.push(node.expression)
   },
 
   ReturnStatement: function* (node: Node, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
+    if (node.type != 'ReturnStatement') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+
+    if (node.argument != undefined || node.argument != null) {
+      context.runtime.agenda.push({ type: 'ReturnStatement_i' }, node.argument)
+    } else {
+      context.runtime.agenda.push(
+        { type: 'ReturnStatement_i' },
+        { type: 'Literal', value: node.argument }
+      )
+    }
   },
 
   WhileStatement: function* (node: Node, context: Context) {
     if (node.type != 'WhileStatement') {
-      throw new Error('Not for loop')
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
-    const loopVariableEnvironment = createBlockEnvironment(context, 'whileLoopEnvironment')
-    const loopTypeEnvironment = createBlockTypeEnvironment(context, 'whileLoopTypeEnvironment')
-    pushEnvironment(context, loopVariableEnvironment)
-    pushTypeEnvironment(context, loopTypeEnvironment)
 
-    const test = node.test
-    let value
-    while (yield *evaluate(test, context)) {
-      value = yield* evaluate(node.body, context)
-      console.log(value)
-    }
-    return value
+    context.runtime.agenda.push(
+      { type: 'Literal', value: undefined },
+      { type: 'WhileStatement_i', test: node.test, body: node.body },
+      node.test
+    )
   },
 
   DoWhileStatement: function* (node: Node, context: Context) {
     if (node.type != 'DoWhileStatement') {
-      return handleRuntimeError(context, new RuntimeSourceError(node));
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    const loopVariableEnvironment = createBlockEnvironment(context, 'doWhileLoopEnvironment')
-    const loopTypeEnvironment = createBlockTypeEnvironment(context, 'doWhileLoopTypeEnvironment')
-    pushEnvironment(context, loopVariableEnvironment)
-    pushTypeEnvironment(context, loopTypeEnvironment)
-
-    // perform statements in do first
-    let value
-    value = yield* evaluate(node.body, context)
-    
-    const test = node.test
-    while (yield *evaluate(test, context)) {
-      value = yield* evaluate(node.body, context)
-    }
-    return value
+    context.runtime.agenda.push(
+      { type: 'Literal', value: undefined },
+      { type: 'DoWhileStatement_i', test: node.test, body: node.body },
+      node.test,
+      node.body
+    )
   },
 
-
   BlockStatement: function* (node: Node, context: Context) {
-    return yield* evaluateBlockStatement(context, node)
+    if (node.type != 'BlockStatement') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+
+    const A = context.runtime.agenda
+
+    const env = createBlockEnvironment(context, 'localEnvironment')
+    const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment')
+
+    if (!(A.length() === 0)) {
+      A.push({ type: 'EnvironmentRestoration_i' })
+    }
+
+    // make a copy of the body and then reverse it instead.
+    A.push(...node.body.slice().reverse())
+
+    context.numberOfOuterEnvironments += 1
+    pushEnvironment(context, env)
+    pushTypeEnvironment(context, typeEnv)
+  },
+
+  EmptyStatement: function* (node: Node, context: Context) {
+    if (node.type != 'EmptyStatement') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
   },
 
   Program: function* (node: Node, context: Context) {
     if (node.type !== 'Program') {
-      return handleRuntimeError(context, new RuntimeSourceError(node));
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    // Create global environment 
-    console.log(currentEnvironment(context)) //this is a null env
-    context.numberOfOuterEnvironments += 1;
-    const environment = createBlockEnvironment(context, 'globalEnvironment');
-    const type_env = createBlockTypeEnvironment(context, 'globalTypeEnvironment');
-    pushEnvironment(context, environment);
+    // Create global environment
+    context.numberOfOuterEnvironments += 1
+    const environment = createBlockEnvironment(context, 'globalEnvironment')
+    const type_env = createBlockTypeEnvironment(context, 'globalTypeEnvironment')
+    pushEnvironment(context, environment)
     pushTypeEnvironment(context, type_env)
-    console.log(currentEnvironment(context)) //this is the 'global' env
 
+    // reverse the order
+    node.body.reverse()
+    context.runtime.agenda.push(...node.body)
+  },
 
-    // Create local environment
-    const env = createBlockEnvironment(context, 'localEnvironment')
-    const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment')
-    context.numberOfOuterEnvironments += 1;
-    pushEnvironment(context, env)
-    pushTypeEnvironment(context, typeEnv)
-    let result
-    for (const statement of node.body) {
-      result = yield* evaluate(statement, context)
+  // INSTRUCTIONS
+
+  BinaryExpression_i: function* (command: Command, context: Context) {
+    if (command.type != 'BinaryExpression_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
-    return result
+    const stash = context.runtime.stash
+    const left = stash.pop()
+    const right = stash.pop()
+    const operator = command.operator
+
+    // TODO: error handling with rttc
+    if (operator === '/' && right === 0) {
+      throw new Error('division by 0')
+    }
+
+    const result = evaluateBinaryExpression(operator, right, left)
+    stash.push(result)
+  },
+
+  UnaryExpression_i: function* (command: Command, context: Context) {
+    if (command.type != 'UnaryExpression_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+
+    const stash = context.runtime.stash
+    const operator = command.operator
+    const value = stash.pop()
+
+    // TODO: error handling with rttc
+    if (operator == '&' || operator == '*') {
+      throw new Error('Pointer not implemented yet')
+    }
+
+    stash.push(evaluateUnaryExpression(operator, value))
+  },
+
+  ConditionalExpression_i: function* (command: Command, context: Context) {
+    if (command.type != 'ConditionalExpression_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+
+    const stash = context.runtime.stash
+    const agenda = context.runtime.agenda
+
+    agenda.push(stash.pop() ? command.consequent : command.alternate)
+  },
+
+  IfStatement_i: function* (command: Command, context: Context) {
+    if (command.type != 'IfStatement_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+
+    const stash = context.runtime.stash
+    const agenda = context.runtime.agenda
+
+    agenda.push(stash.pop() ? command.consequent : command.alternate)
+  },
+
+  WhileStatement_i: function* (command: Command, context: Context) {
+    if (command.type != 'WhileStatement_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+
+    const stash = context.runtime.stash
+    const agenda = context.runtime.agenda
+
+    if (stash.pop()) {
+      agenda.push(command, command.test, { type: 'Pop_i' }, command.body)
+    }
+  },
+
+  DoWhileStatement_i: function* (command: Command, context: Context) {
+    if (command.type != 'DoWhileStatement_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+
+    const stash = context.runtime.stash
+    const agenda = context.runtime.agenda
+
+    if (stash.pop()) {
+      agenda.push(command, command.test, { type: 'Pop_i' }, command.body)
+    }
+  },
+
+  Pop_i: function* (command: Command, context: Context) {
+    if (command.type != 'Pop_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+    const stash = context.runtime.stash
+    stash.pop()
+  },
+
+  ReturnStatement_i: function* (command: Command, context: Context) {
+    if (command.type != 'ReturnStatement_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+
+    const agenda = context.runtime.agenda
+    agenda.pop().type === 'Mark_i' ? null : agenda.push(command)
+  },
+
+  AssignmentExpression_i: function* (command: Command, context: Context) {
+    if (command.type != 'AssignmentExpression_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+
+    const stash = context.runtime.stash
+    let identifier = command.symbol
+
+    // we are assigning to variable
+    if (command.symbol == undefined) {
+      identifier = stash.pop()
+    }
+
+    const value = stash.peek()
+    setValueToIdentifier(context, identifier!.name, value)
+  },
+
+  EnvironmentRestoration_i: function* (command: Command, context: Context) {
+    if (command.type != 'EnvironmentRestoration_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+    console.log(context.runtime.environments)
+    console.log('restoring env')
+    popEnvironment(context)
+    popTypeEnvironment(context)
+    context.numberOfOuterEnvironments -= 1
+    console.log(context.runtime.environments)
+  },
+
+  LogicalExpression_i: function* (command: Command, context: Context) {
+    if (command.type != 'LogicalExpression_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+
+    const stash = context.runtime.stash
+    const left = stash.pop()
+    const right = stash.pop()
+    const operator = command.operator
+
+    // TODO: error handling with rttc
+
+    const result = evaluateLogicalExpression(operator, left, right)
+    stash.push(result)
+  },
+
+  FunctionDeclaration_i: function* (command: Command, context: Context) {
+    if (command.type != 'FunctionDeclaration_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+
+    const agenda = context.runtime.agenda
+    agenda.push(
+      { type: 'Literal', value: undefined },
+      { type: 'Pop_i' },
+      {
+        type: 'AssignmentExpression',
+        left: { type: 'VariableDeclarationExpression', identifier: command.id },
+        right: { type: 'LambdaExpression_i', parameters: command.parameters, body: command.body }
+      }
+    )
+  },
+
+  LambdaExpression_i: function* (command: Command, context: Context) {
+    if (command.type != 'LambdaExpression_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+
+    const stash = context.runtime.stash
+    stash.push({
+      type: 'Closure_i',
+      parameters: command.parameters,
+      body: command.body
+    })
+  },
+
+  CallExpression_i: function* (command: Command, context: Context) {
+    if (command.type != 'CallExpression_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+
+    const stash = context.runtime.stash
+    const agenda = context.runtime.agenda
+    const arity = command.arity
+    const args = []
+    for (let i = arity - 1; i >= 0; i--) args[i] = stash.pop()
+
+    const lambda = stash.pop() as ClosureInstruction
+    const agendaTop = agenda.peek() as Command
+    if (agenda.length() === 0 || agendaTop.type === 'EnvironmentRestoration_i') {
+      agenda.push({ type: 'Mark_i' })
+    } else if (agendaTop.type === 'ReturnStatement_i') {
+      agenda.pop()
+    } else {
+      // restore 2 envs here because the block has an environment as well.
+      agenda.push(
+        { type: 'EnvironmentRestoration_i' },
+        { type: 'EnvironmentRestoration_i' },
+        { type: 'Mark_i' }
+      )
+    }
+
+    const bodyStatements = lambda.body
+    agenda.push(...bodyStatements.body.slice().reverse())
+
+    for (let i = 0; i < args.length; i++) {
+      agenda.push({
+        type: 'AssignmentExpression',
+        left: { type: 'VariableDeclarationExpression', identifier: lambda.parameters[i] },
+        right: { type: 'Literal', value: args[i] }
+      })
+    }
+    const functionEnvironment = createBlockEnvironment(context, 'FunctionEnvironment')
+    pushEnvironment(context, functionEnvironment)
+  },
+
+  Mark_i: function* (command: Command, context: Context) {
+    if (command.type != 'Mark_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+    throw new Error('Return is required, even with no expression.')
   }
 }
+
 // tslint:enable:object-literal-shorthand
 
 export function* evaluate(node: Node, context: Context) {
-  console.log(node.type)
-  const result = yield* evaluators[node.type](node, context)
-  yield* leave(context)
-  return result
-}
+  // compile the program to instructions
+  yield* evaluators[node.type](node, context)
+  const agenda = context.runtime.agenda
+  const stash = context.runtime.stash
+  while (agenda.length()) {
+    const command = agenda.pop() as Node
+    yield* evaluators[command.type](command, context)
+  }
 
-function* visit(context: Context, node: Node) {
-  context.runtime.nodes.unshift(node)
-  yield context
-}
-
-function* leave(context: Context) {
-  context.runtime.break = false
-  context.runtime.nodes.shift()
-  yield context
+  // By right C programs don't return anything, this should be undefined.
+  return stash.peek()
 }
 
 export function apply(
