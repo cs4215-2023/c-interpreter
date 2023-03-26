@@ -515,10 +515,12 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.type != 'EnvironmentRestoration_i') {
       throw new Error('Not assignment expression')
     }
-
+    console.log(context.runtime.environments)
+    console.log('restoring env')
     popEnvironment(context)
     popTypeEnvironment(context)
     context.numberOfOuterEnvironments -= 1
+    console.log(context.runtime.environments)
   },
 
   LogicalExpression_i: function* (command: Command, context: Context) {
@@ -585,7 +587,12 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     } else if (agendaTop.type === 'ReturnStatement_i') {
       agenda.pop()
     } else {
-      agenda.push({ type: 'EnvironmentRestoration_i' }, { type: 'Mark_i' })
+      // restore 2 envs here because the block has an environment as well.
+      agenda.push(
+        { type: 'EnvironmentRestoration_i' },
+        { type: 'EnvironmentRestoration_i' },
+        { type: 'Mark_i' }
+      )
     }
 
     const bodyStatements = lambda.body

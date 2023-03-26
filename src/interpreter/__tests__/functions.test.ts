@@ -80,13 +80,14 @@ describe('Functions', () => {
 
   it('Recursive function ', async () => {
     const code = `
+	int a = 2;
 	int foo(int a) {
 		if (a == 0) {
 			return a;
 		}
 		return a + foo(a-1);
 	}
-	foo(2);`
+	foo(a);`
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(3)
