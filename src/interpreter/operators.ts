@@ -1,6 +1,7 @@
 import { FLOAT_PRECISION } from '../constants'
 import { TypeMismatch } from '../errors/errors'
 import { BinaryOperator, Literal, LogicalOperator, UnaryOperator } from '../parser/types'
+import { RuntimeLiteral } from '../utils/runtime/types'
 import { typeCastCharToAscii } from '../utils/runtime/utils'
 import { InterpreterError } from './errors'
 
@@ -90,12 +91,12 @@ export function evaluateLogicalExpression(
 }
 
 export function evaluateBinaryExpression(operator: BinaryOperator, left: Literal, right: Literal) {
+  left = typeCastCharToAscii(left) as RuntimeLiteral
+  right = typeCastCharToAscii(right) as RuntimeLiteral
+
   if (left.value == null || right.value == null) {
     throw new InterpreterError(left, 'this should have been caught by the parser')
   }
-
-  left = typeCastCharToAscii(left) as Literal
-  right = typeCastCharToAscii(right) as Literal
 
   const resultLiteral = { type: 'Literal', value: null, valueType: 'void' } as Literal
   let result

@@ -1,5 +1,6 @@
 import { Character, Literal } from '../../parser/types'
 import { Value } from '../../types'
+import { RuntimeLiteral } from './types'
 
 export const typeOf = (v: Value) => {
   if (v === null) {
@@ -25,7 +26,7 @@ export const LHS = ' on left hand side of operation'
 
 export const RHS = ' on right hand side of operation'
 
-export const typeCastCharToAscii = (literal: Literal) => {
+export const typeCastCharToAscii = (literal: Literal): RuntimeLiteral => {
   if (literal.valueType == 'char') {
     return { type: 'Literal', value: literal.value.codePointAt(0)!, valueType: 'int' }
   }
