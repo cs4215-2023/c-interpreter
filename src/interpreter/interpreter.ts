@@ -7,7 +7,6 @@ import { checkLogicalExpression } from '../utils/runtime/checkLogicalExp'
 import { checkUnaryExpression } from '../utils/runtime/checkUnaryExp'
 import { checkIfStatement } from '../utils/runtime/statements/checkIf'
 import { checkLoop } from '../utils/runtime/statements/checkLoop'
-import { checkReturnType } from '../utils/runtime/statements/checkReturnType'
 import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
 import { DivisionByZeroError, handleRuntimeError, InterpreterError } from './errors'
 import {
