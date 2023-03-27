@@ -5,9 +5,7 @@ import { PrimitiveType } from '../../../parser/types'
 import { sourceRunner } from '../../../runner'
 import { Variant } from '../../../types'
 import { locationDummyNode } from '../../../utils/astCreator'
-import { handleRuntimeError } from '../../errors'
 
-const context = createContext(Variant.DEFAULT, undefined, undefined)
 const location = UNKNOWN_LOCATION
 const dummyNode = locationDummyNode(location.start.line, location.start.column)
 
@@ -39,6 +37,7 @@ describe('Type checking', () => {
   it('Int to float assignment throws error ', async () => {
     const code = 'int a = 1.5;'
     try {
+      const context = createContext(Variant.DEFAULT, undefined, undefined)
       await sourceRunner(code, context)
     } catch (e) {
       expect(e).toStrictEqual(new TypeMismatch(dummyNode, intType, 'float'))
@@ -47,9 +46,10 @@ describe('Type checking', () => {
 
   it('Floating point division leads to float ', async () => {
     const code = '2.0 / 4.0;'
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe(0.5)
+      expect(result.value).toBe('0.500000')
     } else {
       expect(1).toBe(2)
     }

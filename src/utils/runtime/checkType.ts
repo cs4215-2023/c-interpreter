@@ -1,51 +1,25 @@
 import { TypeMismatch } from '../../errors/errors'
 import { handleRuntimeError } from '../../interpreter/errors'
-import { Type } from '../../parser/types'
-import { Command, Context, Value } from '../../types'
-import { isFloat, isInt, isString } from './utils'
+import { Literal, Type } from '../../parser/types'
+import { Command, Context } from '../../types'
 
-export function checkType(context: Context, type: Type, value: Value, command: Command) {
-  if (typeof value == 'object') {
-    const commandValue = value as Command
+export function checkType(context: Context, type: Type, literal: Literal, command: Command) {
+  const commandValue = literal as Command
+  let typeGot: Type | string | undefined
 
-    if (commandValue.type == 'Closure_i') {
-      value = commandValue.typeDeclaration
-    } else if (commandValue.type == 'Literal') {
-      value = commandValue.valueType
-    }
-
-    console.log(type, value)
-
-    if (value == type || value == type.valueType) {
-      return
-    }
+  if (commandValue.type == 'Closure_i') {
+    typeGot = commandValue.typeDeclaration
+  } else if (commandValue.type == 'Literal') {
+    typeGot = commandValue.valueType
   }
 
-  if (isInt(value) && type.valueType == 'int') {
-    return
-  } else if (isFloat(value) && type.valueType == 'float') {
-    return
-  } else if (isString(value) && type.valueType == 'char') {
-    const value_s = value as string
-    if (value_s.length == 1) {
-      return
-    }
-    throw handleRuntimeError(context, new TypeMismatch(command, type, undefined))
-  } else if (value == undefined && type.valueType == 'void') {
+  if (typeGot == type || typeGot == type.valueType) {
     return
   }
 
-  let primitiveType = undefined
-
-  if (isInt(value)) {
-    primitiveType = 'int'
-  } else if (isFloat(value)) {
-    primitiveType = 'float'
-  } else if (isString(value) && value.length == 1) {
-    primitiveType = 'char'
-  } else if (value == undefined) {
-    primitiveType = 'void'
+  if (typeof typeGot == 'object') {
+    typeGot = typeGot.valueType
   }
 
-  throw handleRuntimeError(context, new TypeMismatch(command, type, primitiveType))
+  throw handleRuntimeError(context, new TypeMismatch(command, type, typeGot))
 }
