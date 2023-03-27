@@ -3,9 +3,11 @@ import { ExpressionStatement, Identifier, Literal, Node } from '../parser/types'
 import { ClosureInstruction, Command, Context, Value, WhileStatementInstruction } from '../types'
 import { checkBinaryExpression } from '../utils/runtime/checkBinaryExp'
 import { checkIdentifier } from '../utils/runtime/checkIdentifier'
+import { checkLogicalExpression } from '../utils/runtime/checkLogicalExp'
 import { checkUnaryExpression } from '../utils/runtime/checkUnaryExp'
 import { checkIfStatement } from '../utils/runtime/statements/checkIf'
 import { checkLoop } from '../utils/runtime/statements/checkLoop'
+import { checkReturnType } from '../utils/runtime/statements/checkReturnType'
 import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
 import { DivisionByZeroError, handleRuntimeError, InterpreterError } from './errors'
 import {
@@ -15,6 +17,7 @@ import {
 } from './operators'
 import {
   createBlockTypeEnvironment,
+  currentTypeEnvironment,
   popTypeEnvironment,
   pushTypeEnvironment
 } from './typeEnvironment'
@@ -488,8 +491,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       identifier = stash.pop()
     }
 
-    console.log('identifier to be assigned: ', identifier)
-
     const value = stash.peek()
     setValueToIdentifier(command, context, identifier!.name, value)
   },
@@ -498,12 +499,10 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.type != 'EnvironmentRestoration_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
-    console.log(context.runtime.environments)
-    console.log('restoring env')
+
     popEnvironment(context)
     popTypeEnvironment(context)
     context.numberOfOuterEnvironments -= 1
-    console.log(context.runtime.environments)
   },
 
   LogicalExpression_i: function* (command: Command, context: Context) {
@@ -516,7 +515,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const right = stash.pop()
     const operator = command.operator
 
-    // TODO: error handling with rttc
+    checkLogicalExpression(command, operator, left, right, context)
 
     const result = evaluateLogicalExpression(operator, left, right)
     stash.push(result)
@@ -526,8 +525,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.type != 'FunctionDeclaration_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
-
-    console.log(command.parameters)
 
     const agenda = context.runtime.agenda
     agenda.push(
@@ -577,7 +574,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     for (let i = arity - 1; i >= 0; i--) args[i] = stash.pop()
 
     const lambda = stash.pop() as ClosureInstruction
-    console.log(lambda.parameters)
 
     checkNumberOfArguments(context, command, lambda)
 
@@ -588,11 +584,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       agenda.pop()
     } else {
       // restore 2 envs here because the block has an environment as well.
-      agenda.push(
-        { type: 'EnvironmentRestoration_i' },
-        { type: 'EnvironmentRestoration_i' },
-        { type: 'Mark_i' }
-      )
+      agenda.push({ type: 'EnvironmentRestoration_i' }, { type: 'Mark_i' })
     }
 
     const bodyStatements = lambda.body
@@ -606,7 +598,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       })
     }
     const functionEnvironment = createBlockEnvironment(context, 'FunctionEnvironment')
+    const functionTypeEnvironment = createBlockTypeEnvironment(context, 'FunctionTypeEnvironment', {
+      ...currentTypeEnvironment(context).head
+    })
     pushEnvironment(context, functionEnvironment)
+    pushTypeEnvironment(context, functionTypeEnvironment)
   },
 
   Mark_i: function* (command: Command, context: Context) {
@@ -628,6 +624,8 @@ export function* evaluate(node: Node, context: Context) {
     const command = agenda.pop() as Node
     yield* evaluators[command.type](command, context)
   }
+
+  console.log('type env at the end: ', currentTypeEnvironment(context))
 
   // By right C programs don't return anything, this should be undefined.
   const result = stash.peek()

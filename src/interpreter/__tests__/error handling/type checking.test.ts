@@ -54,4 +54,15 @@ describe('Type checking', () => {
       expect(1).toBe(2)
     }
   })
+
+  it('Mismatch function type and return value ', async () => {
+    const code = 'void f(int a) {return a;} f(1);'
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(1)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
 })
