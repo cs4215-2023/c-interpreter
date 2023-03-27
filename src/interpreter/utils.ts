@@ -1,5 +1,5 @@
 import * as errors from '../errors/errors'
-import { Expression, ExpressionStatement, Identifier, Node, Statement } from '../parser/types'
+import { Expression, ExpressionStatement, Identifier, Node, Statement, Type } from '../parser/types'
 import {
   CallInstruction,
   ClosureInstruction,
@@ -159,7 +159,7 @@ export function getVariable(context: Context, name: string) {
   return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
 }
 
-export function getType(context: Context, name: string) {
+export function getType(context: Context, name: string): Type {
   let environment: TypeEnvironment | null = currentTypeEnvironment(context)
   while (environment) {
     if (environment.head.hasOwnProperty(name)) {

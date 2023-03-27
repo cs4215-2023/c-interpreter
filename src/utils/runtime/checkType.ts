@@ -10,13 +10,15 @@ export function checkType(context: Context, type: Type, value: Value, command: C
 
     if (commandValue.type == 'Closure_i') {
       value = commandValue.typeDeclaration
+    } else if (commandValue.type == 'Literal') {
+      value = commandValue.valueType
     }
-  }
 
-  console.log(type, value)
+    console.log(type, value)
 
-  if (value == type) {
-    return
+    if (value == type || value == type.valueType) {
+      return
+    }
   }
 
   if (isInt(value) && type.valueType == 'int') {

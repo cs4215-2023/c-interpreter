@@ -116,6 +116,7 @@ export type Expression =
   | SequenceExpression
   | CallExpression
   | AssignmentExpression
+  | TypedIdentifier
 
 export type BaseExpression = BaseNode
 

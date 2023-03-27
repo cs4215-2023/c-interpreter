@@ -48,7 +48,7 @@ import { InterpreterError } from './errors'
 // }
 
 export function evaluateUnaryExpression(operator: UnaryOperator, literal: Literal) {
-  literal = typeCastCharToAscii(literal) as Literal
+  literal = typeCastCharToAscii(literal) as RuntimeLiteral
   if (literal.value == null) {
     throw new InterpreterError(literal, 'this should have been caught by the parser')
   }
@@ -77,8 +77,8 @@ export function evaluateLogicalExpression(
     throw new InterpreterError(left, 'this should have been caught by the parser')
   }
 
-  left = typeCastCharToAscii(left) as Literal
-  right = typeCastCharToAscii(right) as Literal
+  left = typeCastCharToAscii(left) as RuntimeLiteral
+  right = typeCastCharToAscii(right) as RuntimeLiteral
 
   switch (operator) {
     case '&&':

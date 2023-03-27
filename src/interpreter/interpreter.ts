@@ -87,6 +87,15 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.runtime.stash.push(identifier)
   },
 
+  TypedIdentifier: function* (command: Command, context: Context) {
+    if (command.type != 'TypedIdentifier') {
+      throw handleRuntimeError(context, new InterpreterError(command))
+    }
+    checkIdentifier(command)
+    const identifier = getVariable(context, command.name)
+    context.runtime.stash.push(identifier)
+  },
+
   CallExpression: function* (node: Node, context: Context) {
     if (node.type != 'CallExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
@@ -403,7 +412,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const stash = context.runtime.stash
     const agenda = context.runtime.agenda
 
-    agenda.push(stash.pop() ? command.consequent : command.alternate)
+    agenda.push(stash.pop().value ? command.consequent : command.alternate)
   },
 
   IfStatement_i: function* (command: Command, context: Context) {
@@ -417,7 +426,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     checkIfStatement(command, test, context)
 
-    agenda.push(test ? command.consequent : command.alternate)
+    agenda.push(test.value ? command.consequent : command.alternate)
   },
 
   WhileStatement_i: function* (command: Command, context: Context) {
@@ -430,7 +439,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     checkLoop(command, command.test, context)
 
-    if (stash.pop()) {
+    if (stash.pop().value) {
       agenda.push(command, command.test, { type: 'Pop_i' }, command.body)
     }
   },
@@ -444,7 +453,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const agenda = context.runtime.agenda
     checkLoop(command, command.test, context)
 
-    if (stash.pop()) {
+    if (stash.pop().value) {
       agenda.push(command, command.test, { type: 'Pop_i' }, command.body)
     }
   },
@@ -593,7 +602,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       agenda.push({
         type: 'AssignmentExpression',
         left: { type: 'VariableDeclarationExpression', identifier: lambda.parameters[i] },
-        right: { type: 'Literal', value: args[i] }
+        right: args[i]
       })
     }
     const functionEnvironment = createBlockEnvironment(context, 'FunctionEnvironment')
@@ -621,5 +630,10 @@ export function* evaluate(node: Node, context: Context) {
   }
 
   // By right C programs don't return anything, this should be undefined.
-  return stash.peek()
+  const result = stash.peek()
+  if (result != undefined) {
+    return result.value
+  }
+
+  return result
 }
