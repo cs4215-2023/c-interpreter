@@ -1,25 +1,25 @@
 import { isNumber, isString } from 'lodash'
 
-import { BinaryOperator } from '../../parser/types'
-import { Command, Value } from '../../types'
+import { BinaryOperator, Literal } from '../../parser/types'
+import { Command } from '../../types'
 import { TypeError } from './errors'
 import { LHS, RHS, typeOf } from './utils'
 
 export const checkBinaryExpression = (
   command: Command,
   operator: BinaryOperator,
-  left: Value,
-  right: Value
+  left: Literal,
+  right: Literal
 ) => {
   switch (operator) {
     case '-':
     case '*':
     case '/':
     case '%':
-      if (!isNumber(left)) {
-        return new TypeError(command, LHS, 'number', typeOf(left))
-      } else if (!isNumber(right)) {
-        return new TypeError(command, RHS, 'number', typeOf(right))
+      if (!isNumber(left.value)) {
+        return new TypeError(command, LHS, 'number', typeOf(left.value))
+      } else if (!isNumber(right.value)) {
+        return new TypeError(command, RHS, 'number', typeOf(right.value))
       } else {
         return
       }
@@ -30,12 +30,16 @@ export const checkBinaryExpression = (
     case '>=':
     case '!=':
     case '==':
-      if (isNumber(left)) {
-        return isNumber(right) ? undefined : new TypeError(command, RHS, 'number', typeOf(right))
-      } else if (isString(left)) {
-        return isString(right) ? undefined : new TypeError(command, RHS, 'string', typeOf(right))
+      if (isNumber(left.value)) {
+        return isNumber(right.value)
+          ? undefined
+          : new TypeError(command, RHS, 'number', typeOf(right.value))
+      } else if (isString(left.value)) {
+        return isString(right.value)
+          ? undefined
+          : new TypeError(command, RHS, 'string', typeOf(right.value))
       } else {
-        return new TypeError(command, LHS, 'string or number', typeOf(left))
+        return new TypeError(command, LHS, 'string or number', typeOf(left.value))
       }
     default:
       return

@@ -10,3 +10,5 @@ export const UNKNOWN_LOCATION: SourceLocation = {
     column: -1
   }
 }
+
+export const FLOAT_PRECISION: number = 6

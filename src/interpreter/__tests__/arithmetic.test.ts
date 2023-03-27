@@ -37,7 +37,7 @@ describe('Arithmetic', () => {
     const code = '2 / 4;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe(0.5)
+      expect(result.value).toBe(0)
     } else {
       expect(1).toBe(2)
     }
@@ -47,7 +47,7 @@ describe('Arithmetic', () => {
     const code = '1 < 3;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe(true)
+      expect(result.value).toBe(1)
     } else {
       expect(1).toBe(2)
     }
@@ -57,7 +57,7 @@ describe('Arithmetic', () => {
     const code = '1 > 3;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe(false)
+      expect(result.value).toBe(0)
     } else {
       expect(1).toBe(2)
     }
@@ -67,7 +67,7 @@ describe('Arithmetic', () => {
     const code = '3 <= 3;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe(true)
+      expect(result.value).toBe(1)
     } else {
       expect(1).toBe(2)
     }
@@ -77,7 +77,7 @@ describe('Arithmetic', () => {
     const code = 'int a = 1; a < 3;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe(true)
+      expect(result.value).toBe(1)
     } else {
       expect(1).toBe(2)
     }

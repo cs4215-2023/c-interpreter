@@ -8,7 +8,7 @@ describe('Programs', () => {
     const code = '1 + 2; 2 - 1; 3 * 4; 2 / 1; 5 < 2; 1 > 2;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe(false)
+      expect(result.value).toBe(0)
     } else {
       expect(1).toBe(2)
     }

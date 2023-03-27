@@ -1,5 +1,5 @@
 /* tslint:disable:max-classes-per-file */
-import { ExpressionStatement, Identifier, Node } from '../parser/types'
+import { ExpressionStatement, Identifier, Literal, Node } from '../parser/types'
 import { ClosureInstruction, Command, Context, Value, WhileStatementInstruction } from '../types'
 import { checkBinaryExpression } from '../utils/runtime/checkBinaryExp'
 import { checkIdentifier } from '../utils/runtime/checkIdentifier'
@@ -46,7 +46,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    context.runtime.stash.push(node.value)
+    context.runtime.stash.push(node)
   },
 
   SequenceExpression: function* (node: Node, context: Context) {
@@ -363,11 +363,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
     const stash = context.runtime.stash
-    const left = stash.pop()
-    const right = stash.pop()
+    const left = stash.pop() as Literal
+    const right = stash.pop() as Literal
     const operator = command.operator
 
-    if (operator === '/' && right === 0) {
+    if (operator === '/' && right.value === 0) {
       throw new DivisionByZeroError(command)
     }
 
@@ -384,7 +384,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const stash = context.runtime.stash
     const operator = command.operator
-    const value = stash.pop()
+    const value = stash.pop() as Literal
 
     checkUnaryExpression(command, operator, value, context)
 
