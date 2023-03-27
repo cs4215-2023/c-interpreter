@@ -5,7 +5,7 @@ import { Variant } from '../../types'
 const context = createContext(Variant.DEFAULT, undefined, undefined)
 describe('Arithmetic', () => {
   it('Simple addition ', async () => {
-    const code = '1+2;'
+    const code = 'void main() {1+2;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(3)
@@ -15,7 +15,7 @@ describe('Arithmetic', () => {
   })
 
   it('Simple subtraction ', async () => {
-    const code = '2-1;'
+    const code = 'void main() {2-1;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(1)
@@ -24,7 +24,7 @@ describe('Arithmetic', () => {
     }
   })
   it('Subtraction to negative value ', async () => {
-    const code = '1-2;'
+    const code = 'void main() {1-2;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(-1)
@@ -34,7 +34,7 @@ describe('Arithmetic', () => {
   })
 
   it('Division ', async () => {
-    const code = '2 / 4;'
+    const code = 'void main() {2 / 4;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(0)
@@ -44,7 +44,7 @@ describe('Arithmetic', () => {
   })
 
   it('Lesser than ', async () => {
-    const code = '1 < 3;'
+    const code = 'void main() {1 < 3;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(1)
@@ -54,7 +54,7 @@ describe('Arithmetic', () => {
   })
 
   it('Greater than ', async () => {
-    const code = '1 > 3;'
+    const code = 'void main() {1 > 3;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(0)
@@ -64,7 +64,7 @@ describe('Arithmetic', () => {
   })
 
   it('Lesser than or equal', async () => {
-    const code = '3 <= 3;'
+    const code = 'void main() {3 <= 3;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(1)
@@ -74,7 +74,7 @@ describe('Arithmetic', () => {
   })
 
   it('Less than with identifier', async () => {
-    const code = 'int a = 1; a < 3;'
+    const code = 'void main() {int a = 1; a < 3;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(1)
@@ -84,7 +84,7 @@ describe('Arithmetic', () => {
   })
 
   it('Unary expression', async () => {
-    const code = '!(1);'
+    const code = 'void main() {!(1);}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(0)
@@ -94,7 +94,7 @@ describe('Arithmetic', () => {
   })
 
   it('Logical and expression', async () => {
-    const code = '1 && 2;'
+    const code = 'void main() {1 && 2;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(1)
@@ -104,7 +104,7 @@ describe('Arithmetic', () => {
   })
 
   it('Logical or expression', async () => {
-    const code = '1 || 2;'
+    const code = 'void main() {1 || 2;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(1)

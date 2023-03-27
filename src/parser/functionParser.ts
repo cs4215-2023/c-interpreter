@@ -45,6 +45,9 @@ export class FunctionParser
   }
 
   paramsWrapper(ctx: FunctionContext): TypedIdentifier[] {
+    if (ctx._params == undefined) {
+      return []
+    }
     console.log(ctx._params.text)
     const params = ctx._params
     const expressionParser = new ExpressionParser()

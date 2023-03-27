@@ -22,8 +22,8 @@ export class ExceptionError implements SourceError {
 }
 
 export class CallingNonFunctionValue extends RuntimeSourceError {
-  constructor(private callee: Value, private node: Node) {
-    super(node)
+  constructor(private callee: Value, private command: Command) {
+    super(command)
   }
 
   public explain() {

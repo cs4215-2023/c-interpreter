@@ -173,7 +173,7 @@ functionDeclaration: function;
 
 function:
 	idType = type id = IDENTIFIER (
-		'(' params = identifierWithTypeList ')'
+		'(' params = identifierWithTypeList? ')'
 	) '{' body = statementBlock '}';
 
 functionCall:

@@ -19,6 +19,9 @@ export function checkNumberOfArguments(
   command: CallInstruction,
   lambda: ClosureInstruction
 ) {
+  if (lambda.parameters == undefined) {
+    return handleRuntimeError(context, new errors.CallingNonFunctionValue(undefined, command))
+  }
   if (lambda.parameters.length != command.arity) {
     return handleRuntimeError(
       context,

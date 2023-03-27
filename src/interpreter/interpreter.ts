@@ -362,6 +362,16 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     pushEnvironment(context, environment)
     pushTypeEnvironment(context, type_env)
 
+    // calls main at the end
+    node.body.push({
+      type: 'ExpressionStatement',
+      expression: {
+        type: 'CallExpression',
+        callee: { type: 'Identifier', name: 'main' },
+        arguments: []
+      }
+    })
+
     // reverse the order
     node.body.reverse()
     context.runtime.agenda.push(...node.body)
@@ -582,7 +592,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     } else if (agendaTop.type === 'ReturnStatement_i') {
       agenda.pop()
     } else {
-      // restore 2 envs here because the block has an environment as well.
       agenda.push({ type: 'EnvironmentRestoration_i' }, { type: 'Mark_i' })
     }
 
@@ -608,7 +617,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.type != 'Mark_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
-    throw new Error('Return is required, even with no expression.')
+    // do nothing, since mark_i is already popped from agenda, its similar to return statement.
   }
 }
 

@@ -6,10 +6,10 @@ const context = createContext(Variant.DEFAULT, undefined, undefined)
 describe('Functions', () => {
   it('Empty function returns undefined', async () => {
     const code = `
-	void foo(int a) {
+	void main() {
 		return ;
 	}
-	foo(1);`
+	`
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBeUndefined()
@@ -23,7 +23,11 @@ describe('Functions', () => {
 	int foo(int a) {
 		return 1;
 	}
-	foo(1);`
+
+	void main() {
+		return foo(3);
+	}
+ 	`
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(1)
@@ -37,7 +41,10 @@ describe('Functions', () => {
 	int foo(int a) {
 		return a;
 	}
-	foo(2);`
+
+	void main() {
+		return foo(2);
+	}`
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(2)
@@ -55,7 +62,9 @@ describe('Functions', () => {
 			return 3;
 		}
 	}
-	foo(2);`
+	int main() {
+		return foo(2);
+	}`
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(2)
@@ -69,7 +78,10 @@ describe('Functions', () => {
 	int foo(int a, int b) {
 		return a + b;
 	}
-	foo(1,2);`
+	int main() {
+		return foo(1,2);
+	}
+	`
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(3)
@@ -87,7 +99,9 @@ describe('Functions', () => {
 		}
 		return a + foo(a-1);
 	}
-	foo(a);`
+	int main() {
+		return foo(a);
+	}`
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(3)

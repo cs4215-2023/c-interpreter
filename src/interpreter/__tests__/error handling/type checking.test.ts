@@ -45,7 +45,7 @@ describe('Type checking', () => {
   })
 
   it('Floating point division leads to float ', async () => {
-    const code = '2.0 / 4.0;'
+    const code = 'float main() {return 2.0 / 4.0;}'
     const context = createContext(Variant.DEFAULT, undefined, undefined)
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
@@ -56,7 +56,13 @@ describe('Type checking', () => {
   })
 
   it('Mismatch function type and return value ', async () => {
-    const code = 'void f(int a) {return a;} f(1);'
+    const code = `
+	void f(int a) {
+		return a;
+	}
+	void main() {
+		return f(1);
+	}`
     const context = createContext(Variant.DEFAULT, undefined, undefined)
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
