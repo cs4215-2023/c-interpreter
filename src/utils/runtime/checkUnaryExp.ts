@@ -12,7 +12,7 @@ export const checkUnaryExpression = (
 ) => {
   if ((operator === '+' || operator === '-') && !isNumber(literal.value)) {
     throw handleRuntimeError(context, new TypeError(command, '', 'number', typeOf(literal.value)))
-  } else if (operator === '!' && !isBool(literal.value)) {
+  } else if (operator === '!' && !isNumber(literal.value)) {
     throw handleRuntimeError(context, new TypeError(command, '', 'number', typeOf(literal.value)))
   }
 }

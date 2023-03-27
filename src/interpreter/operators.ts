@@ -82,9 +82,9 @@ export function evaluateLogicalExpression(
 
   switch (operator) {
     case '&&':
-      return { type: 'Literal', value: left.value && right.value, valueType: 'int' }
+      return { type: 'Literal', value: left.value && right.value ? 1 : 0, valueType: 'int' }
     case '||':
-      return { type: 'Literal', value: left.value || right.value, valueType: 'int' }
+      return { type: 'Literal', value: left.value || right.value ? 1 : 0, valueType: 'int' }
     default:
       throw new InterpreterError(left, 'this should have been caught by the parser')
   }

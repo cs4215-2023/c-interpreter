@@ -516,7 +516,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     checkLogicalExpression(command, operator, left, right, context)
 
-    const result = evaluateLogicalExpression(operator, left, right)
+    const result = evaluateLogicalExpression(operator, right, left)
     stash.push(result)
   },
 

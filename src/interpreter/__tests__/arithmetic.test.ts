@@ -82,4 +82,34 @@ describe('Arithmetic', () => {
       expect(1).toBe(2)
     }
   })
+
+  it('Unary expression', async () => {
+    const code = '!(1);'
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(0)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
+
+  it('Logical and expression', async () => {
+    const code = '1 && 2;'
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(1)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
+
+  it('Logical or expression', async () => {
+    const code = '1 || 2;'
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(1)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
 })
