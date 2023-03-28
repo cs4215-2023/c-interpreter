@@ -2,9 +2,9 @@ import createContext from '../../createContext'
 import { sourceRunner } from '../../runner'
 import { Variant } from '../../types'
 
-const context = createContext(Variant.DEFAULT, undefined, undefined)
 describe('Assignment', () => {
   it('Assignment check ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = 'void main() {int a = 1; a;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
@@ -15,6 +15,7 @@ describe('Assignment', () => {
   })
 
   it('Update positive ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = 'void main() {int a = 1; a++; a;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
@@ -25,6 +26,7 @@ describe('Assignment', () => {
   })
 
   it('Update negative', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = 'void main() {int a = 1; a--; a;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {

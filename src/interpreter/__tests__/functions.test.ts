@@ -2,9 +2,9 @@ import createContext from '../../createContext'
 import { sourceRunner } from '../../runner'
 import { Variant } from '../../types'
 
-const context = createContext(Variant.DEFAULT, undefined, undefined)
 describe('Functions', () => {
   it('Empty function returns undefined', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = `
 	void main() {
 		return ;
@@ -19,6 +19,7 @@ describe('Functions', () => {
   })
 
   it('Function call returns value ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = `
 	int foo(int a) {
 		return 1;
@@ -37,6 +38,7 @@ describe('Functions', () => {
   })
 
   it('Function reads parameter ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = `
 	int foo(int a) {
 		return a;
@@ -54,6 +56,7 @@ describe('Functions', () => {
   })
 
   it('Multiple returns in function ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = `
 	int foo(int a) {
 		if (1) {
@@ -67,6 +70,7 @@ describe('Functions', () => {
 	}`
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
+      const context = createContext(Variant.DEFAULT, undefined, undefined)
       expect(result.value).toBe(2)
     } else {
       expect(1).toBe(2)
@@ -74,6 +78,7 @@ describe('Functions', () => {
   })
 
   it('Multiple parameters in function ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = `
 	int foo(int a, int b) {
 		return a + b;
@@ -91,6 +96,7 @@ describe('Functions', () => {
   })
 
   it('Recursive function ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = `
 	int a = 2;
 	int foo(int a) {
