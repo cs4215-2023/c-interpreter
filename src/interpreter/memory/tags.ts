@@ -17,13 +17,12 @@ export const TYPE_TO_TAG = {
 }
 
 export const TAG_TO_TYPE = {
-  "0": "void",
-  "1": "float",
-  "2": "int",
-  "3": "char",
-  "4": "pointer",
+  '0': 'void',
+  '1': 'float',
+  '2': 'int',
+  '3': 'char',
+  '4': 'pointer'
 }
-
 
 export enum MEM_TYPE {
   STACK = 0,

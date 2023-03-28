@@ -40,7 +40,7 @@ export default class Stack extends MemoryBuffer {
 
   public push(tag: number, x: number) {
     if ((this.stack_pointer - this.stack_addr_begin) / this.word_size >= this.stack_size) {
-      console.log("stack overflow,replacing top of stack")
+      console.log('stack overflow,replacing top of stack')
       this.stack_set_tag_and_value(this.stack_pointer - this.word_size, tag, x)
       return this.stack_pointer - this.word_size
     }
@@ -49,7 +49,6 @@ export default class Stack extends MemoryBuffer {
     this.stack_set(address, tag)
     //second is the value
     this.stack_set(address + this.word_size / 2, x)
-
 
     this.stack_pointer += this.word_size
     return address
@@ -88,10 +87,10 @@ export default class Stack extends MemoryBuffer {
     tag === TAGS.int_tag || tag === TAGS.pointer_tag
       ? ~~x
       : tag === TAGS.char_tag
-        ? String.fromCharCode(x as number)
-        : tag === TAGS.float_tag
-          ? x
-          : Error('Tag is undefined')
+      ? String.fromCharCode(x as number)
+      : tag === TAGS.float_tag
+      ? x
+      : Error('Tag is undefined')
 
   //END DATA TYPES
 

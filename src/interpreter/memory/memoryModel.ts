@@ -18,8 +18,14 @@ export default class MemoryModel {
     heap_addr_begin: number
   ) {
     this.stack = new Stack(stack_size, stack_addr_begin)
-    this.stack_addr_range = [stack_addr_begin * this.stack.word_size, (stack_size + stack_addr_begin) * this.stack.word_size]
-    this.heap_addr_range = [heap_addr_begin * this.stack.word_size, (heap_addr_begin + heap_size) * this.stack.word_size]
+    this.stack_addr_range = [
+      stack_addr_begin * this.stack.word_size,
+      (stack_size + stack_addr_begin) * this.stack.word_size
+    ]
+    this.heap_addr_range = [
+      heap_addr_begin * this.stack.word_size,
+      (heap_addr_begin + heap_size) * this.stack.word_size
+    ]
     //heap goes here
   }
 
@@ -40,12 +46,12 @@ export default class MemoryModel {
     return tag === TAGS.int_tag || tag === TAGS.float_tag
       ? this.stack.push_int(x as number)
       : tag === TAGS.char_tag
-        ? this.stack.push_char(x as string)
-        : tag === TAGS.pointer_tag
-          ? this.stack.push_pointer(x as number)
-          : tag === TAGS.void_tag
-            ? this.stack.push(TAGS.void_tag, 0)
-            : null
+      ? this.stack.push_char(x as string)
+      : tag === TAGS.pointer_tag
+      ? this.stack.push_pointer(x as number)
+      : tag === TAGS.void_tag
+      ? this.stack.push(TAGS.void_tag, 0)
+      : null
   }
 
   public mem_read(address: number): [number, number] {
