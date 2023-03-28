@@ -1,19 +1,19 @@
-export class Stack<Literal> {
-  private items: Literal[]
+export class Stack<T> {
+  private items: T[]
 
   constructor() {
     this.items = []
   }
 
-  push(...items: Literal[]): void {
+  push(...items: T[]): void {
     this.items.push(...items)
   }
 
-  pop(): Literal | undefined {
+  pop(): T | undefined {
     return this.items.pop()
   }
 
-  peek(): Literal | undefined {
+  peek(): T | undefined {
     return this.items[this.items.length - 1]
   }
 

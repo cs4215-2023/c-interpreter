@@ -1,18 +1,14 @@
 import { handleRuntimeError } from '../../interpreter/errors'
-import { Literal, UnaryOperator } from '../../parser/types'
-import { Command, Context, Value } from '../../types'
+import { TAG_TO_TYPE } from '../../interpreter/memory/tags'
+import { Command, Context } from '../../types'
 import { TypeError } from './errors'
-import { isBool, isNumber, typeOf } from './utils'
 
-export const checkUnaryExpression = (
-  command: Command,
-  operator: UnaryOperator,
-  literal: Literal,
-  context: Context
-) => {
-  if ((operator === '+' || operator === '-') && !isNumber(literal.value)) {
-    throw handleRuntimeError(context, new TypeError(command, '', 'number', typeOf(literal.value)))
-  } else if (operator === '!' && !isNumber(literal.value)) {
-    throw handleRuntimeError(context, new TypeError(command, '', 'number', typeOf(literal.value)))
+export const checkUnaryExpression = (command: Command, type: number, context: Context) => {
+  const expressionType = TAG_TO_TYPE[type]
+  if (expressionType == 'void') {
+    throw handleRuntimeError(
+      context,
+      new TypeError(command, '', 'int, float or char', expressionType)
+    )
   }
 }

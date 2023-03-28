@@ -106,14 +106,14 @@ export const setValueToIdentifier = (
   command: Command,
   context: Context,
   name: string,
-  value: any
+  value: any,
+  type: Type
 ) => {
   let environment: Environment | null = currentEnvironment(context)
   while (environment) {
     if (environment.head.hasOwnProperty(name)) {
-      const type = getType(context, name)
-      console.log(type)
-      checkType(context, type, value, command)
+      const typeExpected = getType(context, name) as Type
+      checkType(context, typeExpected, type, command)
       environment.head[name] = value
       return value
     } else {

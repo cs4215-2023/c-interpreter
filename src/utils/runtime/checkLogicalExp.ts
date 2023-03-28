@@ -1,19 +1,20 @@
 import { handleRuntimeError } from '../../interpreter/errors'
-import { Literal, LogicalOperator } from '../../parser/types'
+import { TAG_TO_TYPE } from '../../interpreter/memory/tags'
+import { LogicalOperator } from '../../parser/types'
 import { Command, Context } from '../../types'
 import { TypeError } from './errors'
-import { isNumber, LHS, RHS } from './utils'
+import { LHS, RHS } from './utils'
 
 export const checkLogicalExpression = (
   command: Command,
   operator: LogicalOperator,
-  left: Literal,
-  right: Literal,
+  left_type: number,
+  right_type: number,
   context: Context
 ) => {
-  if (!isNumber(left.value)) {
-    throw handleRuntimeError(context, new TypeError(command, LHS, 'number', left.valueType))
-  } else if (!isNumber(right.value)) {
-    throw handleRuntimeError(context, new TypeError(command, RHS, 'number', right.valueType))
+  if (TAG_TO_TYPE[left_type] == 'void') {
+    throw handleRuntimeError(context, new TypeError(command, LHS, 'number, float or char', 'void'))
+  } else if (TAG_TO_TYPE[right_type] == 'void') {
+    throw handleRuntimeError(context, new TypeError(command, RHS, 'number, float or char', 'void'))
   }
 }

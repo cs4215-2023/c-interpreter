@@ -91,7 +91,7 @@ export class InvalidNumberOfArguments extends RuntimeSourceError {
 }
 
 export class TypeMismatch extends RuntimeSourceError {
-  constructor(command: Command, private expected: Type, private got: string | undefined) {
+  constructor(command: Command, private expected: Type, private got: Type) {
     super(command)
   }
 

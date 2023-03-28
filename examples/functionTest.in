@@ -6,6 +6,7 @@ int foo(int a, int b) {
 	} else {
 		b++;
 	}
+	return c;
 }
 
 foo(1,2);

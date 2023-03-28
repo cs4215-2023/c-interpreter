@@ -1,9 +1,10 @@
-import { FLOAT_PRECISION } from '../constants'
-import { TypeMismatch } from '../errors/errors'
+import { result } from 'lodash'
+
 import { BinaryOperator, Literal, LogicalOperator, UnaryOperator } from '../parser/types'
+import { Command } from '../types'
 import { RuntimeLiteral } from '../utils/runtime/types'
 import { typeCastCharToAscii } from '../utils/runtime/utils'
-import { InterpreterError } from './errors'
+import { DivisionByZeroError, InterpreterError } from './errors'
 
 // export function callIfFuncAndRightArgs(
 //   candidate: any,
@@ -47,111 +48,73 @@ import { InterpreterError } from './errors'
 //   }
 // }
 
-export function evaluateUnaryExpression(operator: UnaryOperator, literal: Literal) {
-  literal = typeCastCharToAscii(literal) as RuntimeLiteral
-  if (literal.value == null) {
-    throw new InterpreterError(literal, 'this should have been caught by the parser')
-  }
-
-  const result = literal
+export function evaluateUnaryExpression(operator: UnaryOperator, value: number) {
   if (operator === '!') {
-    result.value = !result.value ? 1 : 0
-    result.valueType = 'int'
-    return result
+    return !value ? 1 : 0
   } else if (operator === '-') {
-    result.value = -result.value
-    return result
+    return -value
   } else if (operator === '+') {
-    result.value = +result.value
-    return result
+    return +value
   }
   throw new Error('Pointer not implemented yet')
 }
 
-export function evaluateLogicalExpression(
-  operator: LogicalOperator,
-  left: Literal,
-  right: Literal
-) {
-  if (left.value == null || right.value == null) {
-    throw new InterpreterError(left, 'this should have been caught by the parser')
-  }
-
-  left = typeCastCharToAscii(left) as RuntimeLiteral
-  right = typeCastCharToAscii(right) as RuntimeLiteral
-
+export function evaluateLogicalExpression(operator: LogicalOperator, left: number, right: number) {
   switch (operator) {
     case '&&':
-      return { type: 'Literal', value: left.value && right.value ? 1 : 0, valueType: 'int' }
+      return left && right ? 1 : 0
     case '||':
-      return { type: 'Literal', value: left.value || right.value ? 1 : 0, valueType: 'int' }
-    default:
-      throw new InterpreterError(left, 'this should have been caught by the parser')
+      return left || right ? 1 : 0
   }
 }
 
-export function evaluateBinaryExpression(operator: BinaryOperator, left: Literal, right: Literal) {
-  left = typeCastCharToAscii(left) as RuntimeLiteral
-  right = typeCastCharToAscii(right) as RuntimeLiteral
-
-  if (left.value == null || right.value == null) {
-    throw new InterpreterError(left, 'this should have been caught by the parser')
-  }
-
-  const resultLiteral = { type: 'Literal', value: null, valueType: 'void' } as Literal
-  let result
-
+export function evaluateBinaryExpression(
+  command: Command,
+  operator: BinaryOperator,
+  left: number,
+  right: number
+) {
   switch (operator) {
     case '+':
-      result = left.value + right.value
-      break
+      return left + right
+
     case '-':
-      result = left.value - right.value
-      break
+      return left - right
+
     case '*':
-      result = left.value * right.value
-      break
+      return left * right
+
     case '/':
-      result = left.value / right.value
-      break
+      if (right == 0) {
+        throw new DivisionByZeroError(command)
+      }
+      return left / right
+
     case '%':
-      result = left.value % right.value
-      break
+      if (right == 0) {
+        throw new DivisionByZeroError(command)
+      }
+      return left % right
+
     case '==':
-      return left.value === right.value
-        ? { type: 'Literal', value: 1, valueType: 'int' }
-        : { type: 'Literal', value: 0, valueType: 'int' }
+      return left === right ? 1 : 0
     case '!=':
-      return left.value !== right.value
-        ? { type: 'Literal', value: 1, valueType: 'int' }
-        : { type: 'Literal', value: 0, valueType: 'int' }
+      return left !== right ? 1 : 0
     case '<=':
-      return left.value <= right.value
-        ? { type: 'Literal', value: 1, valueType: 'int' }
-        : { type: 'Literal', value: 0, valueType: 'int' }
+      return left <= right ? 1 : 0
     case '<':
-      return left.value < right.value
-        ? { type: 'Literal', value: 1, valueType: 'int' }
-        : { type: 'Literal', value: 0, valueType: 'int' }
+      return left < right ? 1 : 0
     case '>':
-      return left.value > right.value
-        ? { type: 'Literal', value: 1, valueType: 'int' }
-        : { type: 'Literal', value: 0, valueType: 'int' }
+      return left > right ? 1 : 0
     case '>=':
-      return left.value >= right.value
-        ? { type: 'Literal', value: 1, valueType: 'int' }
-        : { type: 'Literal', value: 0, valueType: 'int' }
-
+      return left >= right ? 1 : 0
+    case '>>':
+      return left >> right
+    case '<<':
+      return left << right
+    case '^':
+      return left ^ right
     default:
-      throw new InterpreterError(left, 'this should have been caught by the parser')
+      throw new InterpreterError(command, 'this should have been caught by the parser')
   }
-  if (left.valueType == right.valueType && left.valueType == 'int') {
-    resultLiteral.valueType = 'int'
-    resultLiteral.value = Math.floor(result)
-    return resultLiteral
-  }
-
-  resultLiteral.valueType = 'float'
-  resultLiteral.value = result.toPrecision(FLOAT_PRECISION)
-  return resultLiteral
 }

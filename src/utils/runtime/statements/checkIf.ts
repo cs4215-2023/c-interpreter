@@ -1,11 +1,10 @@
 import { handleRuntimeError } from '../../../interpreter/errors'
-import { Literal } from '../../../parser/types'
-import { Command, Context, Value } from '../../../types'
+import { Command, Context } from '../../../types'
 import { TypeError } from '../errors'
-import { isBool, isNumber, typeOf } from '../utils'
+import { isNumber, typeOf } from '../utils'
 
-export const checkIfStatement = (command: Command, test: Literal, context: Context) => {
-  if (isNumber(test.value)) {
+export const checkIfStatement = (command: Command, bool: number, context: Context) => {
+  if (isNumber(bool)) {
     return undefined
   }
   throw handleRuntimeError(

@@ -40,7 +40,7 @@ describe('Type checking', () => {
       const context = createContext(Variant.DEFAULT, undefined, undefined)
       await sourceRunner(code, context)
     } catch (e) {
-      expect(e).toStrictEqual(new TypeMismatch(dummyNode, intType, 'float'))
+      expect(e).toStrictEqual(new TypeMismatch(dummyNode, intType, floatType))
     }
   })
 
