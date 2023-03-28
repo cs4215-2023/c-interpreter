@@ -82,7 +82,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       context.runtime.stash.push(node)
     } else {
       const address = memory.mem_stack_push(TYPE_TO_TAG[node.valueType], node.value)
-      console.log('storing literal ' + node.value + ' with address ' + address)
+      console.log('storing literal ' + node.value + ' with address ' + address + ' as ' + node.valueType + "(" + TYPE_TO_TAG[node.valueType] + ")")
       context.runtime.stash.push(address) //replace with address
     }
   },
@@ -108,9 +108,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.identifier.type == 'TypedIdentifier') {
       node.identifierType = node.identifier.typeDeclaration
     }
-
     const identifier = node.identifier as Identifier
-    declareIdentifier(context, identifier.name, node)
+    const address = memory.mem_stack_allocate_one()
+    declareIdentifier(context, identifier.name, node, address)
 
     context.runtime.stash.push(identifier)
   },
@@ -424,9 +424,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const [type_left, left] = memory.mem_read(left_addr)
     const [type_right, right] = memory.mem_read(right_addr)
     const operator = command.operator
-
+    console.log(right, operator, left)
+    console.log(command)
     checkBinaryExpression(command, type_left, type_right)
     const result = evaluateBinaryExpression(command, operator, right, left)
+    console.log(result)
     const push_addr = memory.mem_stack_push(type_left, result)
     stash.push(push_addr)
   },
@@ -532,27 +534,17 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const addr = stash.peek()
     if (addr.type != 'Closure_i') {
-      try {
-        const var_addr = getVariable(context, identifier!.name) //get addr
-        const [valueType, newVal] = memory.mem_read(addr)
-        memory.mem_write_to_address(var_addr, valueType, newVal)
-        console.log(
-          'setting ' + newVal + ' to identifier ' + identifier!.name + ' at addr ' + var_addr
-        )
-        setValueToIdentifier(command, context, identifier!.name, var_addr, {
-          type: 'PrimitiveType',
-          valueType: TAG_TO_TYPE[valueType],
-          signed: undefined
-        } as Type)
-      } catch (error) {
-        const [type, val] = memory.mem_read(addr)
-        console.log('setting ' + val + ' to address ' + addr + ' to identifier ' + identifier!.name)
-        setValueToIdentifier(command, context, identifier!.name, addr, {
-          type: 'PrimitiveType',
-          valueType: TAG_TO_TYPE[type],
-          signed: undefined
-        } as Type)
-      }
+      const var_addr = getVariable(context, identifier!.name) //get addr
+      const [valueType, newVal] = memory.mem_read(addr)
+      memory.mem_write_to_address(var_addr, valueType, newVal)
+      console.log(
+        'setting ' + newVal + ' to identifier ' + identifier!.name + ' at addr ' + var_addr
+      )
+      setValueToIdentifier(command, context, identifier!.name, var_addr, {
+        type: 'PrimitiveType',
+        valueType: TAG_TO_TYPE[valueType],
+        signed: undefined
+      } as Type)
     } else {
       setValueToIdentifier(command, context, identifier!.name, addr, addr.typeDeclaration)
     }

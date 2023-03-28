@@ -125,7 +125,7 @@ export const setValueToIdentifier = (
 
 const DECLARED_BUT_NOT_YET_ASSIGNED = Symbol('Used to implement hoisting')
 
-export function declareIdentifier(context: Context, name: string, node: Node) {
+export function declareIdentifier(context: Context, name: string, node: Node, addr: number) {
   const environment = currentEnvironment(context)
   const typeEnvironment = currentTypeEnvironment(context)
   if (environment.head.hasOwnProperty(name)) {
@@ -134,7 +134,7 @@ export function declareIdentifier(context: Context, name: string, node: Node) {
       new errors.ExceptionError(new Error('Redeclared'), node.loc!)
     )
   }
-  environment.head[name] = DECLARED_BUT_NOT_YET_ASSIGNED
+  environment.head[name] = addr
   if (node.type == 'VariableDeclarationExpression') {
     typeEnvironment.head[name] = node.identifierType
   } else if (node.type == 'ArrayDeclarationExpression') {

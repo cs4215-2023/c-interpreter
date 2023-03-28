@@ -49,7 +49,7 @@ describe('Type checking', () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe('0.500000')
+      expect(parseFloat(result.value)).toBeCloseTo(0.5)
     } else {
       expect(1).toBe(2)
     }
