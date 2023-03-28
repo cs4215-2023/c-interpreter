@@ -35,7 +35,7 @@ const charType: PrimitiveType = {
 
 describe('Type checking', () => {
   it('Int to float assignment throws error ', async () => {
-    const code = 'int a = 1.5;'
+    const code = 'void main() {int a = 1.5;}'
     try {
       const context = createContext(Variant.DEFAULT, undefined, undefined)
       await sourceRunner(code, context)
