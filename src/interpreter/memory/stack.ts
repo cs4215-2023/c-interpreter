@@ -1,4 +1,5 @@
 import { assert } from 'console'
+import { StackOverflowError } from '../../errors/errors'
 
 import MemoryBuffer from './memoryBuffer'
 import { TAGS } from './tags'
@@ -38,7 +39,8 @@ export default class Stack extends MemoryBuffer {
     this.stack_set(address + this.word_size / 2, x)
   }
 
-  public allocate_one() { //allocate one slot of data
+  public allocate_one() {
+    //allocate one slot of data
     const address = this.stack_pointer
     this.stack_pointer += this.word_size
     return address
@@ -47,8 +49,7 @@ export default class Stack extends MemoryBuffer {
   public push(tag: number, x: number) {
     if ((this.stack_pointer - this.stack_addr_begin) / this.word_size >= this.stack_size) {
       console.log('stack overflow,replacing top of stack')
-      this.stack_set_tag_and_value(this.stack_pointer - this.word_size, tag, x)
-      return this.stack_pointer - this.word_size
+      throw StackOverflowError
     }
     const address = this.stack_pointer
     //first is the type
@@ -81,7 +82,7 @@ export default class Stack extends MemoryBuffer {
   }
 
   public push_float(x: number) {
-    console.log("pushing " + x + " as float")
+    console.log('pushing ' + x + ' as float')
     return this.push(TAGS.float_tag, x)
   }
 

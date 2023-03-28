@@ -33,7 +33,7 @@ import {
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => IterableIterator<Value>
 
-const STACK_SIZE = 50
+const STACK_SIZE = 500
 const STACK_BEGIN = 0
 const HEAP_SIZE = 100
 const HEAP_BEGIN = STACK_BEGIN + STACK_SIZE + 1
@@ -82,7 +82,17 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       context.runtime.stash.push(node)
     } else {
       const address = memory.mem_stack_push(TYPE_TO_TAG[node.valueType], node.value)
-      console.log('storing literal ' + node.value + ' with address ' + address + ' as ' + node.valueType + "(" + TYPE_TO_TAG[node.valueType] + ")")
+      console.log(
+        'storing literal ' +
+        node.value +
+        ' with address ' +
+        address +
+        ' as ' +
+        node.valueType +
+        '(' +
+        TYPE_TO_TAG[node.valueType] +
+        ')'
+      )
       context.runtime.stash.push(address) //replace with address
     }
   },

@@ -1,3 +1,4 @@
+import { StackOverflowError } from '../../../errors/errors'
 import Stack from '../stack'
 import { TAGS } from '../tags'
 
@@ -74,9 +75,12 @@ describe('stack tests', () => {
     stack.push_pointer(18) //technically pointing to 18 on the stack
     stack.push_float(12.1)
 
-    expect(stack.push_pointer(18)).toBe(16)
-    expect(stack.size()).toBe(5)
-    expect(stack.pop()).toEqual([TAGS.pointer_tag, 18])
+    try {
+      stack.push_pointer(18)
+    } catch (e) {
+      expect(e).toStrictEqual(StackOverflowError)
+    }
+
   })
 
   it('big stack overflow test', () => {
@@ -86,9 +90,11 @@ describe('stack tests', () => {
     for (let i = 0; i < stack_size; i++) {
       stack.push_int(5)
     }
-    expect(stack.push_int(6)).toBe(stack_size * 4 - stack.word_size)
-    expect(stack.size()).toBe(30)
-    expect(stack.pop()).toEqual([TAGS.int_tag, 6])
+    try {
+      stack.push_int(12)
+    } catch (e) {
+      expect(e).toStrictEqual(StackOverflowError)
+    }
   })
 
   it('specific addr test', () => {

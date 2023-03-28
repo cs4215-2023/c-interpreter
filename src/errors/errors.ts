@@ -10,7 +10,7 @@ export class ExceptionError implements SourceError {
   public type = ErrorType.RUNTIME
   public severity = ErrorSeverity.ERROR
 
-  constructor(public error: Error, public location: SourceLocation) {}
+  constructor(public error: Error, public location: SourceLocation) { }
 
   public explain() {
     return this.error.toString()
@@ -49,6 +49,20 @@ export class UndefinedVariable extends RuntimeSourceError {
   }
 }
 
+export class StackOverflowError extends RuntimeSourceError {
+  constructor(public name: string, node: Node) {
+    super(node)
+  }
+
+  public explain() {
+    return `Stack memory is fully utilized`
+  }
+
+  public elaborate() {
+    return `Stack memory is fully utilized. Consider increasing the stack size.`
+  }
+}
+
 export class UnassignedVariable extends RuntimeSourceError {
   constructor(public name: string, node: Node) {
     super(node)
@@ -77,9 +91,8 @@ export class InvalidNumberOfArguments extends RuntimeSourceError {
   }
 
   public explain() {
-    return `Expected ${this.expected} ${this.hasVarArgs ? 'or more ' : ''}arguments, but got ${
-      this.got
-    }.`
+    return `Expected ${this.expected} ${this.hasVarArgs ? 'or more ' : ''}arguments, but got ${this.got
+      }.`
   }
 
   public elaborate() {
