@@ -8,13 +8,22 @@ export enum TAGS {
   Unassigned_tag = 6,
   base_pointer_tag = 7
 }
-export const TAG_TO_TYPE = {
+export const TYPE_TO_TAG = {
   void: TAGS.void_tag,
   float: TAGS.float_tag,
   char: TAGS.char_tag,
   int: TAGS.int_tag,
   pointer: TAGS.pointer_tag
 }
+
+export const TAG_TO_TYPE = {
+  "0": "void",
+  "1": "float",
+  "2": "int",
+  "3": "char",
+  "4": "pointer",
+}
+
 
 export enum MEM_TYPE {
   STACK = 0,

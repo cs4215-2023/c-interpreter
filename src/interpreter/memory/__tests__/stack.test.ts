@@ -54,6 +54,57 @@ describe('stack tests', () => {
     expect(stack.size()).toBe(0)
   })
 
+  it('simple stack overflow test', () => {
+    const stack_size = 5
+    const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
+
+    stack.push_char('c')
+    stack.push_int(3)
+    stack.push_float(12.1)
+    stack.push_pointer(18) //technically pointing to 18 on the stack
+    stack.push_float(12.1)
+
+    expect(stack.push_pointer(18)).toBe(16)
+    expect(stack.size()).toBe(5)
+    expect(stack.pop()).toEqual([TAGS.pointer_tag, 18])
+  })
+
+  it('big stack overflow test', () => {
+    const stack_size = 30
+    const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
+
+    for (let i = 0; i < stack_size; i++) {
+      stack.push_int(5)
+    }
+    expect(stack.push_int(6)).toBe(stack_size * 4 - stack.word_size)
+    expect(stack.size()).toBe(30)
+    expect(stack.pop()).toEqual([TAGS.int_tag, 6])
+  })
+
+  it('specific addr test', () => {
+    const stack_size = 50
+    const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
+    for (let i = 0; i < 13; i++) {
+      stack.push_int(1)
+    }
+    expect(stack.size()).toBe(13)
+    const [type, val] = stack.stack_get_tag_and_value(12)
+    expect(val).toBe(1)
+    expect(type).toBe(2)
+  })
+
+  it('specific addr test 2', () => {
+    const stack_size = 50
+    const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
+    for (let i = 0; i < 14; i++) {
+      stack.push_int(1)
+    }
+    expect(stack.size()).toBe(14)
+    const [type, val] = stack.stack_get_tag_and_value(52)
+    expect(val).toBe(1)
+    expect(type).toBe(2)
+  })
+
   it('enter scope test', () => {
     const stack_size = 20
     const stack = new Stack(stack_size, STACK_ADDR_BEGIN)

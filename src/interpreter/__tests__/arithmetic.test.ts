@@ -2,9 +2,9 @@ import createContext from '../../createContext'
 import { sourceRunner } from '../../runner'
 import { Variant } from '../../types'
 
-const context = createContext(Variant.DEFAULT, undefined, undefined)
 describe('Arithmetic', () => {
   it('Simple addition ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = '1+2;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
@@ -15,6 +15,7 @@ describe('Arithmetic', () => {
   })
 
   it('Simple subtraction ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = '2-1;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
@@ -24,6 +25,7 @@ describe('Arithmetic', () => {
     }
   })
   it('Subtraction to negative value ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = '1-2;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
@@ -34,6 +36,7 @@ describe('Arithmetic', () => {
   })
 
   it('Division ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = '2 / 4;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
@@ -44,6 +47,7 @@ describe('Arithmetic', () => {
   })
 
   it('Lesser than ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = '1 < 3;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
@@ -54,6 +58,7 @@ describe('Arithmetic', () => {
   })
 
   it('Greater than ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = '1 > 3;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
@@ -64,6 +69,7 @@ describe('Arithmetic', () => {
   })
 
   it('Lesser than or equal', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = '3 <= 3;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
@@ -74,6 +80,7 @@ describe('Arithmetic', () => {
   })
 
   it('Less than with identifier', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = 'int a = 1; a < 3;'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {

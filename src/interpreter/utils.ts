@@ -109,7 +109,6 @@ export const setValueToIdentifier = (
   while (environment) {
     if (environment.head.hasOwnProperty(name)) {
       const type = getType(context, name)
-      console.log(type)
       checkType(context, type, value, command)
       environment.head[name] = value
       return value

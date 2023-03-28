@@ -11,7 +11,6 @@ export default class MemoryModel {
   public heap: Heap
   public stack_addr_range: [number, number]
   public heap_addr_range: [number, number] //heap address should be after stack addresses
-
   constructor(
     stack_size: number,
     stack_addr_begin: number,
@@ -19,8 +18,8 @@ export default class MemoryModel {
     heap_addr_begin: number
   ) {
     this.stack = new Stack(stack_size, stack_addr_begin)
-    this.stack_addr_range = [stack_addr_begin, stack_size + stack_addr_begin]
-    this.heap_addr_range = [heap_addr_begin, heap_addr_begin + heap_size]
+    this.stack_addr_range = [stack_addr_begin * this.stack.word_size, (stack_size + stack_addr_begin) * this.stack.word_size]
+    this.heap_addr_range = [heap_addr_begin * this.stack.word_size, (heap_addr_begin + heap_size) * this.stack.word_size]
     //heap goes here
   }
 
@@ -41,16 +40,18 @@ export default class MemoryModel {
     return tag === TAGS.int_tag || tag === TAGS.float_tag
       ? this.stack.push_int(x as number)
       : tag === TAGS.char_tag
-      ? this.stack.push_char(x as string)
-      : tag === TAGS.pointer_tag
-      ? this.stack.push_pointer(x as number)
-      : null
+        ? this.stack.push_char(x as string)
+        : tag === TAGS.pointer_tag
+          ? this.stack.push_pointer(x as number)
+          : tag === TAGS.void_tag
+            ? this.stack.push(TAGS.void_tag, 0)
+            : null
   }
 
   public mem_read(address: number): [number, number] {
     const heap_addr_begin = this.heap_addr_range[0]
     const heap_addr_end = this.heap_addr_range[1]
-    const stack_addr_start = this.stack_addr_range[0]
+    const stack_addr_start = this.stack.stack_addr_begin
     if (address < heap_addr_begin) {
       assert(address >= stack_addr_start) //or maybe include a runtime error
       return this.stack.stack_get_tag_and_value(address)

@@ -1,4 +1,6 @@
 /* tslint:disable:max-classes-per-file */
+import { ConsoleErrorListener } from 'antlr4ts'
+import { Agent } from 'http'
 import { ExpressionStatement, Identifier, Node } from '../parser/types'
 import { ClosureInstruction, Command, Context, Value, WhileStatementInstruction } from '../types'
 import { checkBinaryExpression } from '../utils/runtime/checkBinaryExp'
@@ -6,10 +8,11 @@ import { checkIdentifier } from '../utils/runtime/checkIdentifier'
 import { checkUnaryExpression } from '../utils/runtime/checkUnaryExp'
 import { checkIfStatement } from '../utils/runtime/statements/checkIf'
 import { checkLoop } from '../utils/runtime/statements/checkLoop'
+import { isNumber } from '../utils/runtime/utils'
 import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
 import { DivisionByZeroError, handleRuntimeError, InterpreterError } from './errors'
 import MemoryModel from './memory/memoryModel'
-import { TAG_TO_TYPE, TAGS } from './memory/tags'
+import { TYPE_TO_TAG, TAGS, TAG_TO_TYPE } from './memory/tags'
 import {
   evaluateBinaryExpression,
   evaluateLogicalExpression,
@@ -29,7 +32,7 @@ import {
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => IterableIterator<Value>
 
-const STACK_SIZE = 100
+const STACK_SIZE = 50
 const STACK_BEGIN = 0
 const HEAP_SIZE = 100
 const HEAP_BEGIN = STACK_BEGIN + STACK_SIZE + 1
@@ -74,9 +77,14 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'Literal') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    console.log('loaded literal ' + node.value)
-    const address = memory.mem_stack_push(TAG_TO_TYPE[node.valueType], node.value)
-    context.runtime.stash.push(address) //replace with address
+    if (node.value === undefined || node.valueType == undefined) {
+      context.runtime.stash.push(node)
+    }
+    else {
+      let address = memory.mem_stack_push(TYPE_TO_TAG[node.valueType], node.value)
+      console.log('storing literal ' + node.value + " with address " + address)
+      context.runtime.stash.push(address) //replace with address
+    }
   },
 
   SequenceExpression: function* (node: Node, context: Context) {
@@ -103,6 +111,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const identifier = node.identifier as Identifier
     declareIdentifier(context, identifier.name, node)
+
     context.runtime.stash.push(identifier)
   },
 
@@ -114,6 +123,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     checkIdentifier(node)
 
     const identifier = getVariable(context, node.name)
+    console.log("load identifier " + node.name + " at addr " + identifier)
+
     context.runtime.stash.push(identifier)
   },
 
@@ -130,7 +141,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
         callArguments.push(expression)
       }
     }
-
     agenda.push(
       { type: 'CallExpression_i', arity: callArguments.length },
       ...callArguments,
@@ -302,7 +312,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'ReturnStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-
     if (node.argument != undefined || node.argument != null) {
       context.runtime.agenda.push({ type: 'ReturnStatement_i' }, node.argument)
     } else {
@@ -396,6 +405,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const [type_left, left] = memory.mem_read(left_addr)
     const [type_right, right] = memory.mem_read(right_addr)
     const operator = command.operator
+    console.log(right, operator, left)
     if (operator === '/' && right === 0) {
       throw new DivisionByZeroError(command)
     }
@@ -421,7 +431,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
     checkUnaryExpression(command, operator, value, context)
     const result = evaluateUnaryExpression(operator, value)
-    const push_addr = memory.mem_stack_push(type, result)
+    const push_addr = memory.mem_stack_push(type, result as number | string)
     stash.push(push_addr)
   },
 
@@ -453,13 +463,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.type != 'WhileStatement_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
-
     const stash = context.runtime.stash
     const agenda = context.runtime.agenda
-
     checkLoop(command, command.test, context)
-
-    if (stash.pop()) {
+    const [type, value] = memory.mem_read(stash.pop())
+    if (value) {
       agenda.push(command, command.test, { type: 'Pop_i' }, command.body)
     }
   },
@@ -472,8 +480,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const stash = context.runtime.stash
     const agenda = context.runtime.agenda
     checkLoop(command, command.test, context)
-
-    if (stash.pop()) {
+    const address = stash.pop()
+    const [type, value] = memory.mem_read(address)
+    if (value) {
       agenda.push(command, command.test, { type: 'Pop_i' }, command.body)
     }
   },
@@ -490,9 +499,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.type != 'ReturnStatement_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
-    console.log(command)
     const agenda = context.runtime.agenda
-    agenda.pop().type === 'Mark_i' ? null : agenda.push(command)
+    agenda.pop().type === 'Mark_i' ? memory.exit_scope() : agenda.push(command)
+
   },
 
   AssignmentExpression_i: function* (command: Command, context: Context) {
@@ -508,19 +517,31 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     const addr = stash.peek()
-    setValueToIdentifier(command, context, identifier!.name, addr)
+    if (addr.type != "Closure_i") {
+      try {
+        const var_addr = getVariable(context, identifier!.name) //get addr
+        const [type, newVal] = memory.mem_read(addr)
+        memory.mem_write_to_address(var_addr, type, newVal)
+        console.log("setting " + newVal + " to identifier " + identifier!.name + " at addr " + var_addr)
+        setValueToIdentifier(command, context, identifier!.name, var_addr)
+      } catch (error) {
+        const [type, val] = memory.mem_read(addr)
+        console.log("setting " + val + " to address " + addr + " to identifier " + identifier!.name)
+        setValueToIdentifier(command, context, identifier!.name, addr)
+      }
+    }
+    else {
+      setValueToIdentifier(command, context, identifier!.name, addr)
+    }
   },
 
   EnvironmentRestoration_i: function* (command: Command, context: Context) {
     if (command.type != 'EnvironmentRestoration_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
-    console.log(context.runtime.environments)
-    console.log('restoring env')
     popEnvironment(context)
     popTypeEnvironment(context)
     context.numberOfOuterEnvironments -= 1
-    console.log(context.runtime.environments)
   },
 
   LogicalExpression_i: function* (command: Command, context: Context) {
@@ -593,10 +614,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const arity = command.arity
     const args = []
 
-    for (let i = arity - 1; i >= 0; i--) args[i] = stash.pop()
-
+    for (let i = arity - 1; i >= 0; i--) args[i] = memory.mem_read(stash.pop())
     const lambda = stash.pop() as ClosureInstruction
-    console.log(lambda.parameters)
 
     checkNumberOfArguments(context, command, lambda)
 
@@ -618,10 +637,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     agenda.push(...bodyStatements.body.slice().reverse())
 
     for (let i = 0; i < args.length; i++) {
+      const [type, val] = args[i]
       agenda.push({
         type: 'AssignmentExpression',
         left: { type: 'VariableDeclarationExpression', identifier: lambda.parameters[i] },
-        right: { type: 'Literal', value: args[i] }
+        right: { type: 'Literal', value: val, valueType: TAG_TO_TYPE[type.toString()] }
       })
     }
     const functionEnvironment = createBlockEnvironment(context, 'FunctionEnvironment')
@@ -646,10 +666,15 @@ export function* evaluate(node: Node, context: Context) {
   const stash = context.runtime.stash
   while (agenda.length()) {
     const command = agenda.pop() as Node
+
     yield* evaluators[command.type](command, context)
   }
 
   // By right C programs don't return anything, this should be undefined.
-  const [type, value] = memory.mem_read(stash.peek())
-  return value
+
+  if (isNumber(stash.peek())) {
+    const [type, value] = memory.mem_read(stash.peek())
+    return value
+  }
+  return undefined
 }

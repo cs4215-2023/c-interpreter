@@ -8,11 +8,13 @@ export default class Stack extends MemoryBuffer {
   public stack_pointer: number
   public base_pointer: number
   public stack_addr_begin: number
+  //check what is happening here
   constructor(stack_size: number, stack_addr_begin: number) {
     super(1, 1, 4, stack_size)
     this.stack_pointer = stack_addr_begin
     this.stack_addr_begin = stack_addr_begin
     this.base_pointer = stack_addr_begin
+    this.stack_size = stack_size
   }
 
   //BASIC FUNCTIONALITY
@@ -37,14 +39,17 @@ export default class Stack extends MemoryBuffer {
   }
 
   public push(tag: number, x: number) {
-    if (this.stack_pointer === this.stack_size) {
-      Error('stack overflow')
+    if ((this.stack_pointer - this.stack_addr_begin) / this.word_size >= this.stack_size) {
+      console.log("stack overflow,replacing top of stack")
+      this.stack_set_tag_and_value(this.stack_pointer - this.word_size, tag, x)
+      return this.stack_pointer - this.word_size
     }
     const address = this.stack_pointer
     //first is the type
     this.stack_set(address, tag)
     //second is the value
     this.stack_set(address + this.word_size / 2, x)
+
 
     this.stack_pointer += this.word_size
     return address
@@ -83,10 +88,10 @@ export default class Stack extends MemoryBuffer {
     tag === TAGS.int_tag || tag === TAGS.pointer_tag
       ? ~~x
       : tag === TAGS.char_tag
-      ? String.fromCharCode(x as number)
-      : tag === TAGS.float_tag
-      ? x
-      : Error('Tag is undefined')
+        ? String.fromCharCode(x as number)
+        : tag === TAGS.float_tag
+          ? x
+          : Error('Tag is undefined')
 
   //END DATA TYPES
 
@@ -116,7 +121,7 @@ export default class Stack extends MemoryBuffer {
 
   //PROPERTIES
   public size() {
-    return this.stack_pointer / this.word_size
+    return (this.stack_pointer - this.stack_addr_begin) / this.word_size
   }
   //ENDPROPERTIES
 }
