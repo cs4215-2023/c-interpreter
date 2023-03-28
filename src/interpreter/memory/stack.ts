@@ -30,12 +30,18 @@ export default class Stack extends MemoryBuffer {
   public stack_get_tag_and_value(address: number): [number, number] {
     const type = this.stack_get(address)
     const val = this.stack_get(address + this.word_size / 2)
-    return type !== TAGS.float_tag ? [~~type, ~~val] : [~~type, val]
+    return ~~type !== TAGS.float_tag ? [~~type, ~~val] : [~~type, val]
   }
 
   public stack_set_tag_and_value(address: number, tag: number, x: number) {
     this.stack_set(address, tag)
     this.stack_set(address + this.word_size / 2, x)
+  }
+
+  public allocate_one() { //allocate one slot of data
+    const address = this.stack_pointer
+    this.stack_pointer += this.word_size
+    return address
   }
 
   public push(tag: number, x: number) {
@@ -75,6 +81,7 @@ export default class Stack extends MemoryBuffer {
   }
 
   public push_float(x: number) {
+    console.log("pushing " + x + " as float")
     return this.push(TAGS.float_tag, x)
   }
 
@@ -87,10 +94,10 @@ export default class Stack extends MemoryBuffer {
     tag === TAGS.int_tag || tag === TAGS.pointer_tag
       ? ~~x
       : tag === TAGS.char_tag
-      ? String.fromCharCode(x as number)
-      : tag === TAGS.float_tag
-      ? x
-      : Error('Tag is undefined')
+        ? String.fromCharCode(x as number)
+        : tag === TAGS.float_tag
+          ? x
+          : Error('Tag is undefined')
 
   //END DATA TYPES
 

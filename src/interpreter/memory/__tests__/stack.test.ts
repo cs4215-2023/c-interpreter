@@ -23,6 +23,16 @@ describe('stack tests', () => {
     const stack_size = 20
     const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
 
+    const addr = stack.push_float(0.5)
+    const [type, val] = stack.stack_get_tag_and_value(addr)
+    expect(val).toBe(0.5)
+    expect(type).toBe(TAGS.float_tag)
+  })
+
+  it('push and pop float test', () => {
+    const stack_size = 20
+    const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
+
     stack.push_float(12.1)
     expect(stack.pop()[1]).toBeCloseTo(12.1)
   })

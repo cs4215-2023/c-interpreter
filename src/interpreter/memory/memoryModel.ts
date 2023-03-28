@@ -43,15 +43,21 @@ export default class MemoryModel {
   }
 
   public mem_stack_push(tag: number, x: number | string | null) {
-    return tag === TAGS.int_tag || tag === TAGS.float_tag
+    return tag === TAGS.int_tag
       ? this.stack.push_int(x as number)
-      : tag === TAGS.char_tag
-      ? this.stack.push_char(x as string)
-      : tag === TAGS.pointer_tag
-      ? this.stack.push_pointer(x as number)
-      : tag === TAGS.void_tag
-      ? this.stack.push(TAGS.void_tag, 0)
-      : null
+      : tag === TAGS.float_tag
+        ? this.stack.push_float(x as number)
+        : tag === TAGS.char_tag
+          ? this.stack.push_char(x as string)
+          : tag === TAGS.pointer_tag
+            ? this.stack.push_pointer(x as number)
+            : tag === TAGS.void_tag
+              ? this.stack.push(TAGS.void_tag, 0)
+              : null
+  }
+
+  public mem_stack_allocate_one() {
+    return this.stack.allocate_one()
   }
 
   public mem_read(address: number): [number, number] {
