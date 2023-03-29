@@ -34,7 +34,7 @@ export const printf = (stringInput: string, ...args: any[]) => {
       if (typeof currentArg == 'string' && Number.isInteger(currentArg)) {
         return new Error()
       }
-      return currentArg.toPrecision(FLOAT_PRECISION)
+      return currentArg.toFixed(FLOAT_PRECISION)
     }
   }
 

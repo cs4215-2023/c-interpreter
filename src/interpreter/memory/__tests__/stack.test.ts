@@ -80,7 +80,6 @@ describe('stack tests', () => {
     } catch (e) {
       expect(e).toStrictEqual(StackOverflowError)
     }
-
   })
 
   it('big stack overflow test', () => {
