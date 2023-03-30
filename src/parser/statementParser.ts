@@ -3,6 +3,7 @@ import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
 import { RuleNode } from 'antlr4ts/tree/RuleNode'
 
 import {
+  CondExpressionStatementContext,
   ConditionalStatementContext,
   ExpressionStatementContext,
   FunctionDeclarationContext,
@@ -12,11 +13,12 @@ import {
   StatementContext
 } from '../lang/ClangParser'
 import { ClangVisitor } from '../lang/ClangVisitor'
+import { ConditionalExpressionParser } from './conditionalExpressionStatementParser'
 import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
 import { FunctionParser } from './functionParser'
 import { IterationStatementParser } from './iterationStatementParser'
-import { Expression, Statement } from './types'
+import { ConditionalExpression, Expression, Statement } from './types'
 
 export class StatementParser
   extends AbstractParseTreeVisitor<Statement>
@@ -71,6 +73,7 @@ export class StatementParser
     const func = ctx.functionDeclaration()
     const returnStatement = ctx.returnStatement()
     const conditionalStatement = ctx.conditionalStatement()
+    const conditionalExpressionStatement = ctx.condExpressionStatement()
     if (exp != undefined) {
       return this.visitExpression(exp)
     } else if (iter != undefined) {
@@ -81,6 +84,8 @@ export class StatementParser
       return this.visitReturnStatement(returnStatement)
     } else if (conditionalStatement != undefined) {
       return this.visitConditionalStatement(conditionalStatement)
+    } else if (conditionalExpressionStatement != undefined) {
+      return this.visitCondExpressionStatement(conditionalExpressionStatement)
     }
     return this.defaultResult()
   }
@@ -129,6 +134,16 @@ export class StatementParser
     return {
       type: 'ReturnStatement',
       argument: argument
+    }
+  }
+
+  visitCondExpressionStatement(ctx: CondExpressionStatementContext): Statement {
+    console.log('visiting cond expression')
+    return {
+      type: 'ConditionalExpressionStatement',
+      conditionalExpression: new ConditionalExpressionParser().visit(
+        ctx._conditionalExpression
+      ) as ConditionalExpression
     }
   }
 }

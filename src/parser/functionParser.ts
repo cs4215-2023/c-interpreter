@@ -7,14 +7,7 @@ import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
 import { StatementParser } from './statementParser'
 import { TypeParser } from './typeParser'
-import {
-  ArrayDeclarationExpression,
-  Pattern,
-  PointerDeclarationExpression,
-  Statement,
-  TypedIdentifier,
-  VariableDeclarationExpression
-} from './types'
+import { Statement, TypedIdentifier } from './types'
 import { tokenToIdentifierWrapper } from './util'
 
 export class FunctionParser

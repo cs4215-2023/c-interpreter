@@ -41,6 +41,7 @@ export type Statement =
   | WhileStatement
   | ForStatement
   | Function
+  | ConditionalExpressionStatement
 
 export interface BlockStatement extends BaseStatement {
   type: 'BlockStatement'
@@ -87,6 +88,11 @@ export interface ForStatement extends BaseStatement {
   test: Expression
   update: Expression
   body: BlockStatement
+}
+
+export interface ConditionalExpressionStatement extends BaseStatement {
+  type: 'ConditionalExpressionStatement'
+  conditionalExpression: ConditionalExpression
 }
 
 export type Function = FunctionDeclaration
