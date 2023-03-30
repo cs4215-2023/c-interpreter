@@ -63,6 +63,20 @@ export class StackOverflowError extends RuntimeSourceError {
   }
 }
 
+export class InvalidTypeError extends RuntimeSourceError {
+  constructor(public name: string, node: Node) {
+    super(node)
+  }
+
+  public explain() {
+    return `Invalid type error!`
+  }
+
+  public elaborate() {
+    return `Invalid type error!.`
+  }
+}
+
 export class UnassignedVariable extends RuntimeSourceError {
   constructor(public name: string, node: Node) {
     super(node)

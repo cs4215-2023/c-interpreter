@@ -145,7 +145,7 @@ export interface VariableDeclarationExpression extends BaseExpression {
 
 export interface PointerDeclarationExpression extends BaseExpression {
   type: 'PointerDeclarationExpression'
-  pointer: PointerIdentifier
+  pointer: Identifier
   pointerType: Type
 }
 
@@ -203,11 +203,12 @@ export interface SequenceExpression extends BaseExpression {
   expressions: Array<Expression>
 }
 
-export type Pattern = Identifier | PointerIdentifier
+export type Pattern = Identifier
 
 export interface Identifier extends BaseExpression {
   type: 'Identifier'
   name: string
+  isPointer: boolean | undefined
 }
 
 export interface TypedIdentifier extends BaseExpression {
@@ -220,8 +221,8 @@ export interface TypedIdentifier extends BaseExpression {
 export interface PointerIdentifier extends BaseExpression {
   type: 'Identifier'
   name: string
-  pointingAddress: undefined
-  pointerAddress: undefined
+  pointingAddress: undefined | number
+  pointerAddress: undefined | number
   isReferenced: boolean
   isDereferenced: boolean
 }

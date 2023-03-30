@@ -7,36 +7,27 @@ import { Identifier, PointerIdentifier } from '../../types'
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)
 
-const typedPointer: PointerIdentifier = {
+const typedPointer: Identifier = {
   type: 'Identifier',
   name: 'a',
-  pointerAddress: undefined,
-  pointingAddress: undefined,
-  isReferenced: false,
-  isDereferenced: false
+  isPointer: true
 }
-
-const referencePointer: PointerIdentifier = {
+const referencePointer: Identifier = {
   type: 'Identifier',
   name: 'b',
-  pointerAddress: undefined,
-  pointingAddress: undefined,
-  isReferenced: true,
-  isDereferenced: false
+  isPointer: undefined //can be false or true
 }
 
-const dereferencePointer: PointerIdentifier = {
+const dereferencePointer: Identifier = {
   type: 'Identifier',
   name: 'b',
-  pointerAddress: undefined,
-  pointingAddress: undefined,
-  isReferenced: false,
-  isDereferenced: true
+  isPointer: true //must be true
 }
 
 const variableA: Identifier = {
   type: 'Identifier',
-  name: 'a'
+  name: 'a',
+  isPointer: false
 }
 
 describe('Pointer', () => {
@@ -74,7 +65,6 @@ describe('Pointer', () => {
     const prog = parse(code, context)
     const expectedProg: Program = {
       type: 'Program',
-
       body: [
         {
           expression: {
@@ -92,7 +82,7 @@ describe('Pointer', () => {
                   }
                 },
                 operator: '=',
-                right: referencePointer,
+                right: { argument: referencePointer, operator: "&", type: "UnaryExpression" },
                 type: 'AssignmentExpression'
               },
               {
@@ -132,7 +122,7 @@ describe('Pointer', () => {
                   }
                 },
                 operator: '=',
-                right: dereferencePointer,
+                right: { argument: dereferencePointer, operator: "*", type: "UnaryExpression" },
                 type: 'AssignmentExpression'
               },
               {

@@ -48,7 +48,8 @@ export const parserArrayExpression = <T extends Constructable>(
         console.log(token.text)
         identifier.push({
           type: 'Identifier',
-          name: token.text
+          name: token.text,
+          isPointer: true
         })
       })
       return identifier
@@ -79,6 +80,7 @@ export const parserArrayExpression = <T extends Constructable>(
     visitArrayIdentifierWithType(ctx: ArrayIdentifierWithTypeContext): Expression {
       console.log('visitarrayidentifierwithtypecontext')
       const identifier = tokenToIdentifierWrapper(ctx._id)
+      identifier.isPointer = true
       const type = new TypeParser().visit(ctx._idType)
       let size = undefined
       if (ctx._size != undefined) {

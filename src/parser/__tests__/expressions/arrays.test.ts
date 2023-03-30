@@ -23,7 +23,8 @@ describe('  declarations', () => {
                 size: 2,
                 identifier: {
                   name: 'a',
-                  type: 'Identifier'
+                  type: 'Identifier',
+                  isPointer: true
                 }
               },
               {
@@ -70,7 +71,8 @@ describe('  declarations', () => {
                 size: 2,
                 identifier: {
                   name: 'a',
-                  type: 'Identifier'
+                  type: 'Identifier',
+                  isPointer: true
                 }
               },
               {
@@ -99,7 +101,8 @@ describe('  declarations', () => {
               {
                 identifier: {
                   name: 'v',
-                  type: 'Identifier'
+                  type: 'Identifier',
+                  isPointer: true
                 },
                 size: undefined,
                 type: 'ArrayDeclarationExpression',

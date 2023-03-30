@@ -21,7 +21,8 @@ const parameterB: TypedIdentifier = {
 
 const id: Identifier = {
   name: 'foo',
-  type: 'Identifier'
+  type: 'Identifier',
+  isPointer: false
 }
 
 describe('Function related tests', () => {
@@ -55,12 +56,14 @@ describe('Function related tests', () => {
 
     const bodyB: Identifier = {
       name: 'b',
-      type: 'Identifier'
+      type: 'Identifier',
+      isPointer: false
     }
 
     const bodyC: Identifier = {
       name: 'c',
-      type: 'Identifier'
+      type: 'Identifier',
+      isPointer: false
     }
 
     const expectedProg: Program = {
@@ -136,7 +139,7 @@ describe('Function related tests', () => {
                       },
                       operator: '=',
                       right: {
-                        left: { type: 'Identifier', name: 'a' },
+                        left: { type: 'Identifier', name: 'a', isPointer: false },
                         loc: {
                           end: {
                             column: 40,
@@ -150,7 +153,8 @@ describe('Function related tests', () => {
                         operator: '+',
                         right: {
                           name: 'b',
-                          type: 'Identifier'
+                          type: 'Identifier',
+                          isPointer: false
                         },
                         type: 'BinaryExpression'
                       },
@@ -258,7 +262,8 @@ describe('Function related tests', () => {
                     ],
                     callee: {
                       name: 'foo',
-                      type: 'Identifier'
+                      type: 'Identifier',
+                      isPointer: false
                     },
                     type: 'CallExpression'
                   }

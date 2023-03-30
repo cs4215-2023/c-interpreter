@@ -139,6 +139,8 @@ export function declareIdentifier(context: Context, name: string, node: Node, ad
     typeEnvironment.head[name] = node.identifierType
   } else if (node.type == 'ArrayDeclarationExpression') {
     typeEnvironment.head[name] = node.arrayType
+  } else if (node.type == 'PointerDeclarationExpression') {
+    typeEnvironment.head[name] = node.pointerType
   }
   return environment
 }

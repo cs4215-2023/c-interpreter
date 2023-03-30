@@ -8,7 +8,8 @@ export const locationDummyNode = (line: number, column: number) =>
 export const identifier = (name: string, loc?: SourceLocation | null): Identifier => ({
   type: 'Identifier',
   name,
-  loc
+  loc,
+  isPointer: false
 })
 
 export const literal = (value: string | number | null, loc?: SourceLocation | null): Literal => {

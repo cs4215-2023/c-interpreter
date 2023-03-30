@@ -15,7 +15,7 @@ export const parserIdentifierExpression = <T extends Constructable>(
       console.log('visitTypedIdentifierExpression')
       const idWithType = this.visitIdentifierWithType(ctx.identifierWithType())
       return {
-        identifier: { type: 'Identifier', name: idWithType.name },
+        identifier: { type: 'Identifier', name: idWithType.name, isPointer: false },
         identifierType: idWithType.typeDeclaration,
         type: 'VariableDeclarationExpression'
       }
@@ -34,7 +34,8 @@ export const parserIdentifierExpression = <T extends Constructable>(
     visitIdentifierExpression(ctx: IdentifierExpressionContext): Identifier {
       return {
         type: 'Identifier',
-        name: ctx.IDENTIFIER().text
+        name: ctx.IDENTIFIER().text,
+        isPointer: false
       }
     }
   }
