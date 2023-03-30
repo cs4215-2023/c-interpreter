@@ -366,6 +366,21 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     )
   },
 
+  ConditionalExpressionStatement: function* (node: Node, context: Context) {
+    if (node.type != 'ConditionalExpressionStatement') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+    const conditionalExpression = node.conditionalExpression
+    context.runtime.agenda.push(
+      {
+        type: 'IfStatement_i',
+        consequent: conditionalExpression.consequent,
+        alternate: conditionalExpression.alternate
+      },
+      conditionalExpression.test
+    )
+  },
+
   BlockStatement: function* (node: Node, context: Context) {
     if (node.type != 'BlockStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
@@ -688,6 +703,7 @@ export function* evaluate(node: Node, context: Context) {
   const agenda = context.runtime.agenda
   const stash = context.runtime.stash
   while (agenda.length()) {
+    console.log(agenda.peek())
     const command = agenda.pop() as Node
     yield* evaluators[command.type](command, context)
   }
