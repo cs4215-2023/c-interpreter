@@ -74,8 +74,7 @@ statement:
 	| conditionalStatement
 	| iterationStatement
 	| returnStatement
-	| functionDeclaration
-	| condExpressionStatement;
+	| functionDeclaration;
 
 expression:
 	identifierWithType														# VariableDeclarationExpression
@@ -115,21 +114,16 @@ expression:
 	| left = expression operator = PLUSEQUAL right = expression				# AssignAndAddOne
 	| operators = SUB argument = expression									# Negative
 	| operators = ADD argument = expression									# Positive
-	| operators = NOT argument = parenthesesExpression						# Not;
+	| operators = NOT argument = parenthesesExpression						# Not
+	| test = expression (
+		'?' consequent = expression ':' alternate = expression
+	)+ # ConditionalExpression;
 
 statementBlock: (statement)*;
 
 parenthesesExpression: '(' inner = expression ')';
 
 postFix: argument = IDENTIFIER (PLUSPLUS | MINUSMINUS);
-
-condExpressionStatement:
-	conditionalExpression = condExpression ';';
-
-condExpression:
-	test = expression (
-		'?' consequent = expression ':' alternate = condExpression
-	)?;
 
 returnStatement: 'return' argument = expression? ';';
 
