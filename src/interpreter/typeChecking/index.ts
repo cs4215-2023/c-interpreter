@@ -4,7 +4,12 @@ import { checkIdentifier } from '../../utils/runtime/checkIdentifier'
 import { Stack } from '../../utils/stack'
 import { handleRuntimeError, InterpreterError } from '../errors'
 import { declareIdentifierType, getIdentifierType } from '../utils'
-import { createBlockTypeEnvironment, pushTypeEnvironment } from './typeEnvironment'
+import {
+  createBlockTypeEnvironment,
+  currentTypeEnvironment,
+  popTypeEnvironment,
+  pushTypeEnvironment
+} from './typeEnvironment'
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => any
 
@@ -74,6 +79,16 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'CallExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
+
+    const callee = typeCheck(node.callee, context)
+    const args = []
+    for (const expression of node.arguments) {
+      if (expression.type != 'EmptyExpression') {
+        args.push(typeCheck(expression, context))
+      }
+    }
+    // const result = apply(context, callee, args, node)
+    // return result
   },
 
   EmptyExpression: function* (node: Node, context: Context) {
@@ -205,14 +220,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'FunctionDeclaration') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-
-    context.runtime.agenda.push({
-      type: 'FunctionDeclaration_i',
-      id: node.id,
-      parameters: node.params,
-      body: node.body,
-      typeDeclaration: node.typeDeclaration
-    })
   },
 
   IfStatement: function* (node: Node, context: Context) {
@@ -279,18 +286,16 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    const A = context.runtime.agenda
-
     const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment')
-
-    if (!(A.length() === 0)) {
-      A.push({ type: 'EnvironmentRestoration_i' })
-    }
-
-    // make a copy of the body and then reverse it instead.
-    A.push(...node.body.slice().reverse())
-
     pushTypeEnvironment(context, typeEnv)
+
+    let result
+    for (const statement of node.body) {
+      result = typeCheck(statement, context)
+    }
+    popTypeEnvironment(context)
+
+    return result
   },
 
   EmptyStatement: function* (node: Node, context: Context) {
