@@ -63,12 +63,11 @@ describe('Type checking', () => {
 	void main() {
 		return f(1);
 	}`
-    const context = createContext(Variant.DEFAULT, undefined, undefined)
-    const result = await sourceRunner(code, context)
-    if (result.status == 'finished') {
-      expect(result.value).toBe(1)
-    } else {
-      expect(1).toBe(2)
+    try {
+      const context = createContext(Variant.DEFAULT, undefined, undefined)
+      await sourceRunner(code, context)
+    } catch (e) {
+      expect(e).toStrictEqual(new TypeMismatch(dummyNode, intType, floatType))
     }
   })
 })

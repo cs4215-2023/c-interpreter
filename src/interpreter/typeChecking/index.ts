@@ -2,6 +2,7 @@ import {
   ExpressionStatement,
   Identifier,
   Node,
+  PrimitiveType,
   TypedIdentifier,
   WhileStatement
 } from '../../parser/types'
@@ -16,11 +17,12 @@ import {
   popTypeEnvironment,
   pushTypeEnvironment
 } from './typeEnvironment'
-import { setFunctionParams } from './utils'
+import { ClosureType } from './types'
+import { assignFunctionType, setFunctionParams } from './utils'
 
-export type Evaluator<T extends Node> = (node: T, context: Context) => any
+export type TypeChecker<T extends Node> = (node: T, context: Context) => any
 
-export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
+export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
   Literal: function (node: Node, context: Context) {
     if (node.type != 'Literal') {
       throw handleRuntimeError(context, new InterpreterError(node))
@@ -41,7 +43,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     let result
 
     for (const expr of node.expressions) {
-      result = typeCheck(expr, context)
+      result = yield* typeCheck(expr, context)
     }
 
     return result
@@ -60,7 +62,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       node.identifierType = node.identifier.typeDeclaration
     }
     const identifier = node.identifier as Identifier
-    declareIdentifierType(context, identifier.name, identifier)
+    declareIdentifierType(context, identifier.name, node)
   },
 
   Identifier: function* (node: Node, context: Context) {
@@ -77,8 +79,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.type != 'TypedIdentifier') {
       throw handleRuntimeError(context, new InterpreterError(command))
     }
-    checkIdentifier(command)
-    return getIdentifierType(context, command.name)
+    return command.typeDeclaration
   },
 
   CallExpression: function* (node: Node, context: Context) {
@@ -97,7 +98,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     for (let i = 0; i < args.length; i++) {
-      typeCheck(
+      yield* typeCheck(
         {
           type: 'AssignmentExpression',
           operator: '=',
@@ -127,7 +128,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw new Error('Pointer not implemented yet')
     }
 
-    const argumentType = typeCheck(node.argument, context)
+    const argumentType = yield* typeCheck(node.argument, context)
     if (argumentType == 'void') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -139,8 +140,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    const left = typeCheck(node.left, context)
-    const right = typeCheck(node.right, context)
+    const left = yield* typeCheck(node.left, context)
+    const right = yield* typeCheck(node.right, context)
 
     if (left == 'void' || right == 'void') {
       throw handleRuntimeError(context, new InterpreterError(node))
@@ -154,13 +155,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    const test = typeCheck(node.test, context)
+    const test = yield* typeCheck(node.test, context)
     if (test == 'void') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    typeCheck(node.consequent, context)
-    typeCheck(node.alternate, context)
+    yield* typeCheck(node.consequent, context)
+    yield* typeCheck(node.alternate, context)
   },
 
   LogicalExpression: function* (node: Node, context: Context) {
@@ -168,8 +169,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    const left = typeCheck(node.left, context)
-    const right = typeCheck(node.right, context)
+    const left = yield* typeCheck(node.left, context)
+    const right = yield* typeCheck(node.right, context)
 
     if (left == 'void' || right == 'void') {
       throw handleRuntimeError(context, new InterpreterError(node))
@@ -199,8 +200,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       body: forLoopContent
     }
 
-    typeCheck(node.init, context)
-    return typeCheck(whileStatement, context)
+    yield* typeCheck(node.init, context)
+    return yield* typeCheck(whileStatement, context)
   },
 
   AssignmentExpression: function* (node: Node, context: Context) {
@@ -230,7 +231,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    const argumentType = typeCheck(node.argument, context)
+    const argumentType = yield* typeCheck(node.argument, context)
     if (argumentType == 'void') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -243,14 +244,33 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    const funcType = node.typeDeclaration.valueType
-    // declare the function
-    declareIdentifierType(context, node.id.name, node)
-    setFunctionParams(node, context, node.id.name, node.params)
+    const functionClosureEnv = createBlockTypeEnvironment(context, 'FunctionClosure')
+    pushTypeEnvironment(context, functionClosureEnv)
 
-    const returnType = typeCheck(node.body, context)
+    const functionClosure: ClosureType = {
+      type: 'Closure',
+      parameterTypes: node.params,
+      returnType: node.typeDeclaration
+    }
+
+    for (const param of node.params) {
+      yield* typeCheck(
+        {
+          type: 'VariableDeclarationExpression',
+          identifier: param,
+          identifierType: param.typeDeclaration
+        },
+        context
+      )
+    }
+
+    assignFunctionType(node, context, node.id.name, functionClosure)
+
+    const returnType = yield* typeCheck(node.body, context)
+
+    // loop through since there may be multiple return values.
     for (const type of returnType) {
-      if (type != funcType) {
+      if (type != functionClosure.returnType) {
         throw handleRuntimeError(context, new InterpreterError(node))
       }
     }
@@ -261,16 +281,16 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    typeCheck(node.test, context)
-    typeCheck(node.consequent, context)
-    typeCheck(node.alternate, context)
+    yield* typeCheck(node.test, context)
+    yield* typeCheck(node.consequent, context)
+    yield* typeCheck(node.alternate, context)
   },
 
   ExpressionStatement: function* (node: Node, context: Context) {
     if (node.type != 'ExpressionStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    return typeCheck(node.expression, context)
+    return yield* typeCheck(node.expression, context)
   },
 
   ReturnStatement: function* (node: Node, context: Context) {
@@ -278,10 +298,10 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
     if (node.argument == undefined || node.argument == null) {
-      return 'void'
+      return { type: 'PrimitiveType', valueType: 'void', signed: undefined } as PrimitiveType
     }
 
-    return typeCheck(node.argument, context)
+    return yield* typeCheck(node.argument, context)
   },
 
   WhileStatement: function* (node: Node, context: Context) {
@@ -289,13 +309,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    const test = typeCheck(node.test, context)
+    const test = yield* typeCheck(node.test, context)
 
     if (test == 'void') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    return typeCheck(node.body, context)
+    return yield* typeCheck(node.body, context)
   },
 
   DoWhileStatement: function* (node: Node, context: Context) {
@@ -304,8 +324,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     // type check body first
-    typeCheck(node.body, context)
-    const test = typeCheck(node.test, context)
+    yield* typeCheck(node.body, context)
+    const test = yield* typeCheck(node.test, context)
 
     if (test == 'void') {
       throw handleRuntimeError(context, new InterpreterError(node))
@@ -322,7 +342,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const result = []
     for (const statement of node.body) {
-      const typeCheckResult = typeCheck(statement, context)
+      const typeCheckResult = yield* typeCheck(statement, context)
       if (statement.type == 'ReturnStatement') {
         result.push(typeCheckResult)
       }
@@ -348,25 +368,15 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const type_env = createBlockTypeEnvironment(context, 'globalTypeEnvironment')
     pushTypeEnvironment(context, type_env)
 
-    // calls main at the end
-    node.body.push({
-      type: 'ExpressionStatement',
-      expression: {
-        type: 'CallExpression',
-        callee: { type: 'Identifier', name: 'main' },
-        arguments: []
-      }
-    })
-
     let result
 
     for (const statement of node.body) {
-      result = typeCheck(statement, context)
+      result = yield* typeCheck(statement, context)
     }
     return result
   }
 }
 
-export function typeCheck(node: Node, context: Context) {
-  return evaluators[node.type](node, context)
+export function* typeCheck(node: Node, context: Context) {
+  return yield* typeCheckers[node.type](node, context)
 }
