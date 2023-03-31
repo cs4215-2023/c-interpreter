@@ -1,15 +1,22 @@
-import { ExpressionStatement, Identifier, Node, WhileStatement } from '../../parser/types'
+import {
+  ExpressionStatement,
+  Identifier,
+  Node,
+  TypedIdentifier,
+  WhileStatement
+} from '../../parser/types'
 import { Command, Context, WhileStatementInstruction } from '../../types'
 import { checkIdentifier } from '../../utils/runtime/checkIdentifier'
 import { Stack } from '../../utils/stack'
 import { handleRuntimeError, InterpreterError } from '../errors'
-import { declareIdentifierType, getIdentifierType } from '../utils'
+import { declareIdentifierType, getIdentifierType, setValueToIdentifier } from '../utils'
 import {
   createBlockTypeEnvironment,
   currentTypeEnvironment,
   popTypeEnvironment,
   pushTypeEnvironment
 } from './typeEnvironment'
+import { setFunctionParams } from './utils'
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => any
 
@@ -40,7 +47,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     return result
   },
 
-  // TODO
   ArrayExpression: function* (node: Node, context: Context) {
     throw new Error(`not supported yet: ${node.type}`)
   },
@@ -80,15 +86,31 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    const callee = typeCheck(node.callee, context)
-    const args = []
-    for (const expression of node.arguments) {
-      if (expression.type != 'EmptyExpression') {
-        args.push(typeCheck(expression, context))
-      }
+    const paramTypes = getIdentifierType(
+      context,
+      (node.callee as Identifier).name
+    ) as TypedIdentifier[]
+    const args = node.arguments
+
+    if (args.length != paramTypes.length) {
+      throw handleRuntimeError(context, new InterpreterError(node))
     }
-    // const result = apply(context, callee, args, node)
-    // return result
+
+    for (let i = 0; i < args.length; i++) {
+      typeCheck(
+        {
+          type: 'AssignmentExpression',
+          operator: '=',
+          left: {
+            type: 'VariableDeclarationExpression',
+            identifier: paramTypes[i],
+            identifierType: paramTypes[i].typeDeclaration
+          },
+          right: args[i]
+        },
+        context
+      )
+    }
   },
 
   EmptyExpression: function* (node: Node, context: Context) {
@@ -220,6 +242,18 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'FunctionDeclaration') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
+
+    const funcType = node.typeDeclaration.valueType
+    // declare the function
+    declareIdentifierType(context, node.id.name, node)
+    setFunctionParams(node, context, node.id.name, node.params)
+
+    const returnType = typeCheck(node.body, context)
+    for (const type of returnType) {
+      if (type != funcType) {
+        throw handleRuntimeError(context, new InterpreterError(node))
+      }
+    }
   },
 
   IfStatement: function* (node: Node, context: Context) {
@@ -243,14 +277,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'ReturnStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    if (node.argument != undefined || node.argument != null) {
-      context.runtime.agenda.push({ type: 'ReturnStatement_i' }, node.argument)
-    } else {
-      context.runtime.agenda.push(
-        { type: 'ReturnStatement_i' },
-        { type: 'Literal', value: node.argument }
-      )
+    if (node.argument == undefined || node.argument == null) {
+      return 'void'
     }
+
+    return typeCheck(node.argument, context)
   },
 
   WhileStatement: function* (node: Node, context: Context) {
@@ -289,9 +320,12 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment')
     pushTypeEnvironment(context, typeEnv)
 
-    let result
+    const result = []
     for (const statement of node.body) {
-      result = typeCheck(statement, context)
+      const typeCheckResult = typeCheck(statement, context)
+      if (statement.type == 'ReturnStatement') {
+        result.push(typeCheckResult)
+      }
     }
     popTypeEnvironment(context)
 
@@ -302,15 +336,37 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'EmptyStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
+  },
+
+  Program: function* (node: Node, context: Context) {
+    if (node.type !== 'Program') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+
+    // Create global environment
+    context.numberOfOuterEnvironments += 1
+    const type_env = createBlockTypeEnvironment(context, 'globalTypeEnvironment')
+    pushTypeEnvironment(context, type_env)
+
+    // calls main at the end
+    node.body.push({
+      type: 'ExpressionStatement',
+      expression: {
+        type: 'CallExpression',
+        callee: { type: 'Identifier', name: 'main' },
+        arguments: []
+      }
+    })
+
+    let result
+
+    for (const statement of node.body) {
+      result = typeCheck(statement, context)
+    }
+    return result
   }
 }
 
 export function typeCheck(node: Node, context: Context) {
-  const evaluator = evaluators[node.type]
-  if (!evaluator) {
-    return handleRuntimeError(context, new InterpreterError(node))
-  }
-  const result = evaluator(node, context)
-
-  return result
+  return evaluators[node.type](node, context)
 }

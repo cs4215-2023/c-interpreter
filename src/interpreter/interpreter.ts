@@ -688,8 +688,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
 export function* evaluate(node: Node, context: Context) {
   // compile the program to instructions
-  typeCheck(node, context)
+
   yield* evaluators[node.type](node, context)
+  typeCheck(node, context)
   const agenda = context.runtime.agenda
   const stash = context.runtime.stash
   while (agenda.length()) {

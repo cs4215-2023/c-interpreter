@@ -178,7 +178,7 @@ export function getVariable(context: Context, name: string) {
   return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
 }
 
-export function getIdentifierType(context: Context, name: string): Type {
+export function getIdentifierType(context: Context, name: string) {
   let environment: TypeEnvironment | null = currentTypeEnvironment(context)
   while (environment) {
     if (environment.head.hasOwnProperty(name)) {
