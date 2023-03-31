@@ -1,5 +1,5 @@
 import * as errors from '../../errors/errors'
-import { PrimitiveValueType, TypedIdentifier } from '../../parser/types'
+import { TypedIdentifier } from '../../parser/types'
 import { Node } from '../../parser/types'
 import { Context, TypeEnvironment } from '../../types'
 import { handleRuntimeError } from '../errors'
