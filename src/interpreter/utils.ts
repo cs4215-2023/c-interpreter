@@ -12,7 +12,7 @@ import {
 import { checkType } from '../utils/runtime/checkType'
 import { currentEnvironment } from './environment'
 import { handleRuntimeError } from './errors'
-import { currentTypeEnvironment } from './typeEnvironment'
+import { currentTypeEnvironment } from './typeChecking/typeEnvironment'
 
 export function checkNumberOfArguments(
   context: Context,
@@ -112,7 +112,7 @@ export const setValueToIdentifier = (
   let environment: Environment | null = currentEnvironment(context)
   while (environment) {
     if (environment.head.hasOwnProperty(name)) {
-      const typeExpected = getType(context, name) as Type
+      const typeExpected = getIdentifierType(context, name) as Type
       checkType(context, typeExpected, type, command)
       environment.head[name] = value
       return value
@@ -143,6 +143,22 @@ export function declareIdentifier(context: Context, name: string, node: Node, ad
   return environment
 }
 
+export function declareIdentifierType(context: Context, name: string, node: Node) {
+  const typeEnvironment = currentTypeEnvironment(context)
+  if (typeEnvironment.head.hasOwnProperty(name)) {
+    return handleRuntimeError(
+      context,
+      new errors.ExceptionError(new Error('Redeclared'), node.loc!)
+    )
+  }
+  if (node.type == 'VariableDeclarationExpression') {
+    typeEnvironment.head[name] = node.identifierType
+  } else if (node.type == 'ArrayDeclarationExpression') {
+    typeEnvironment.head[name] = node.arrayType
+  }
+  return typeEnvironment
+}
+
 export function getVariable(context: Context, name: string) {
   let environment: Environment | null = currentEnvironment(context)
   while (environment) {
@@ -162,7 +178,7 @@ export function getVariable(context: Context, name: string) {
   return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
 }
 
-export function getType(context: Context, name: string): Type {
+export function getIdentifierType(context: Context, name: string): Type {
   let environment: TypeEnvironment | null = currentTypeEnvironment(context)
   while (environment) {
     if (environment.head.hasOwnProperty(name)) {

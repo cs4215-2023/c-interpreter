@@ -18,12 +18,13 @@ import {
   evaluateLogicalExpression,
   evaluateUnaryExpression
 } from './operators'
+import { typeCheck } from './typeChecking'
 import {
   createBlockTypeEnvironment,
   currentTypeEnvironment,
   popTypeEnvironment,
   pushTypeEnvironment
-} from './typeEnvironment'
+} from './typeChecking/typeEnvironment'
 import {
   checkNumberOfArguments,
   declareIdentifier,
@@ -420,6 +421,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     // reverse the order
     node.body.reverse()
     context.runtime.agenda.push(...node.body)
+    context.typeCheckAgenda.push(...node.body)
   },
 
   // INSTRUCTIONS
@@ -686,6 +688,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
 export function* evaluate(node: Node, context: Context) {
   // compile the program to instructions
+  typeCheck(node, context)
   yield* evaluators[node.type](node, context)
   const agenda = context.runtime.agenda
   const stash = context.runtime.stash

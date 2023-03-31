@@ -1,10 +1,10 @@
 import { uniqueId } from 'lodash'
 
-import { Context, Frame, TypeEnvironment } from '../types'
+import { Context, Frame, TypeEnvironment } from '../../types'
 
 export function createBlockTypeEnvironment(
   context: Context,
-  name = 'blockEnvironment',
+  name = 'blocktypeEnvironment',
   head: Frame = {}
 ): TypeEnvironment {
   return {

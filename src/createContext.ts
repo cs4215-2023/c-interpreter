@@ -148,7 +148,8 @@ export const createEmptyContext = <T>(
     executionMethod: 'auto',
     variant,
     unTypecheckedCode: [],
-    previousCode: []
+    previousCode: [],
+    typeCheckAgenda: new Stack()
   }
 }
 

@@ -114,6 +114,7 @@ export interface Context<T = any> {
    * Code previously executed in this context
    */
   previousCode: string[]
+  typeCheckAgenda: Stack<T>
 }
 
 // tslint:disable:no-any
