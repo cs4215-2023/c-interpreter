@@ -82,7 +82,7 @@ describe('Pointer', () => {
                   }
                 },
                 operator: '=',
-                right: { argument: referencePointer, operator: "&", type: "UnaryExpression" },
+                right: { argument: referencePointer, operator: '&', type: 'UnaryExpression' },
                 type: 'AssignmentExpression'
               },
               {
@@ -122,7 +122,7 @@ describe('Pointer', () => {
                   }
                 },
                 operator: '=',
-                right: { argument: dereferencePointer, operator: "*", type: "UnaryExpression" },
+                right: { argument: dereferencePointer, operator: '*', type: 'UnaryExpression' },
                 type: 'AssignmentExpression'
               },
               {

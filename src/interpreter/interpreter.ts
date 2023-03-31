@@ -13,7 +13,7 @@ import { isNumber } from '../utils/runtime/utils'
 import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
 import { handleRuntimeError, InterpreterError } from './errors'
 import MemoryModel from './memory/memoryModel'
-import { TAGS, TAG_TO_TYPE, TYPE_TO_TAG } from './memory/tags'
+import { TAG_TO_TYPE, TAGS, TYPE_TO_TAG } from './memory/tags'
 import {
   evaluateBinaryExpression,
   evaluateLogicalExpression,
@@ -136,11 +136,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     // }
     const identifier = node.pointer as Identifier
 
-    if (identifier.isPointer !== true) { throw InvalidTypeError } //pointer assertion
+    if (identifier.isPointer !== true) {
+      throw InvalidTypeError
+    } //pointer assertion
 
     const address = memory.mem_stack_allocate_one()
     declareIdentifier(context, identifier.name, node, address)
-    console.log("allocated address " + address + " to pointer " + identifier.name)
+    console.log('allocated address ' + address + ' to pointer ' + identifier.name)
     context.runtime.stash.push(identifier)
   },
 
@@ -473,13 +475,20 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     //get address here
     const [type, value] = memory.mem_read(address)
     if (operator == '&') {
-      console.log("since pointer referencing, pushing address " + address)
-      stash.push(address)
+      console.log('since pointer referencing, pushing address ' + address)
+      //maybe write the address to stack, then push that address instead and read the addr from the address
+      const push_addr = memory.mem_stack_push(type + 3, address as number)//pointer type is offset by 3
+      stash.push(push_addr)
     } else if (operator == '*') {
-      console.log("pointer deref?")
-      if (type === TAGS.char_pointer_tag || type === TAGS.int_pointer_tag || type === TAGS.float_pointer_tag) {
+      if (
+        type === TAGS.char_pointer_tag ||
+        type === TAGS.int_pointer_tag ||
+        type === TAGS.float_pointer_tag
+      ) {
         stash.push(value)
-      } else { throw InvalidTypeError }
+      } else {
+        throw InvalidTypeError
+      }
     } else {
       checkUnaryExpression(command, type, context)
       const result = evaluateUnaryExpression(operator, value)
@@ -574,8 +583,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       const [valueType, newVal] = memory.mem_read(addr)
       const var_addr = getVariable(context, identifier!.name) //get addr
       if (identifier?.isPointer) {
-        //NOTE: POINTER TAG IS OFFSET TYPE TAG BY 3, YES IT SUCKS
-        memory.mem_write_to_address(var_addr, valueType + 3, addr) //don't write new val here, but write addr
+        const actualAddr = newVal //just to make it clear this is an address
+        memory.mem_write_to_address(var_addr, valueType, actualAddr) //don't write new val here, but write addr
         console.log(
           'setting address' + addr + ' to pointer ' + identifier!.name + ' at addr ' + var_addr
         )

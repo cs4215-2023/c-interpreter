@@ -26,5 +26,5 @@ export function tokenToIdentifierWrapper(token: Token): Identifier {
 
 // Interface that helps with class composition
 export interface Constructable {
-  new(...args: any[]): any
+  new (...args: any[]): any
 }

@@ -16,7 +16,7 @@ describe('stack tests', () => {
     const stack_size = 20
     const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
 
-    stack.push_pointer(18)
+    stack.push_pointer(TAGS.int_pointer_tag, 18)
     expect(stack.pop()).toEqual([TAGS.pointer_tag, 18])
   })
 
@@ -45,7 +45,7 @@ describe('stack tests', () => {
     stack.push_char('c')
     stack.push_int(3)
     stack.push_float(12.1)
-    stack.push_pointer(18) //technically pointing to 18 on the stack
+    stack.push_pointer(TAGS.int_pointer_tag, 18) //technically pointing to 18 on the stack
     expect(stack.size()).toBe(4)
     expect(stack.pop()).toEqual([TAGS.pointer_tag, 18])
   })
@@ -57,7 +57,7 @@ describe('stack tests', () => {
     stack.push_char('c')
     stack.push_int(3)
     stack.push_float(12.1)
-    stack.push_pointer(18) //technically pointing to 18 on the stack
+    stack.push_pointer(TAGS.int_pointer_tag, 18) //technically pointing to 18 on the stack
 
     for (let i = 0; i < 4; i++) {
       stack.pop()
@@ -72,15 +72,14 @@ describe('stack tests', () => {
     stack.push_char('c')
     stack.push_int(3)
     stack.push_float(12.1)
-    stack.push_pointer(18) //technically pointing to 18 on the stack
+    stack.push_pointer(TAGS.int_pointer_tag, 18) //technically pointing to 18 on the stack
     stack.push_float(12.1)
 
     try {
-      stack.push_pointer(18)
+      stack.push_pointer(TAGS.int_pointer_tag, 18)
     } catch (e) {
       expect(e).toStrictEqual(StackOverflowError)
     }
-
   })
 
   it('big stack overflow test', () => {
@@ -128,7 +127,7 @@ describe('stack tests', () => {
     stack.push_char('c')
     stack.push_int(3)
     stack.push_float(12.1)
-    stack.push_pointer(18) //technically pointing to 18 on the stack
+    stack.push_pointer(TAGS.int_pointer_tag, 18) //technically pointing to 18 on the stack
     stack.enter_scope() //a base pointer will be added here
     stack.push_int(3)
 
@@ -154,7 +153,7 @@ describe('stack tests', () => {
     stack.push_char('c')
     stack.push_int(3)
     stack.push_float(12.1)
-    stack.push_pointer(18) //technically pointing to 18 on the stack
+    stack.push_pointer(TAGS.int_pointer_tag, 18) //technically pointing to 18 on the stack
     stack.enter_scope() //a base pointer will be added here
     stack.push_int(3)
     stack.push_float(1.3)

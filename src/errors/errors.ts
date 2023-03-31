@@ -10,7 +10,7 @@ export class ExceptionError implements SourceError {
   public type = ErrorType.RUNTIME
   public severity = ErrorSeverity.ERROR
 
-  constructor(public error: Error, public location: SourceLocation) { }
+  constructor(public error: Error, public location: SourceLocation) {}
 
   public explain() {
     return this.error.toString()
@@ -105,8 +105,9 @@ export class InvalidNumberOfArguments extends RuntimeSourceError {
   }
 
   public explain() {
-    return `Expected ${this.expected} ${this.hasVarArgs ? 'or more ' : ''}arguments, but got ${this.got
-      }.`
+    return `Expected ${this.expected} ${this.hasVarArgs ? 'or more ' : ''}arguments, but got ${
+      this.got
+    }.`
   }
 
   public elaborate() {

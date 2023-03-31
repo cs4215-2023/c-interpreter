@@ -1,6 +1,6 @@
 import { assert } from 'console'
-import { StackOverflowError } from '../../errors/errors'
 
+import { StackOverflowError } from '../../errors/errors'
 import MemoryBuffer from './memoryBuffer'
 import { TAGS } from './tags'
 
@@ -87,8 +87,8 @@ export default class Stack extends MemoryBuffer {
   }
 
   //for arrays, i think the question now is where in the memory do we store the values?
-  public push_pointer(address: number) {
-    return this.push(TAGS.pointer_tag, address)
+  public push_pointer(tag: number, address: number) {
+    return this.push(tag, address)
   }
 
   public type_to_data = (tag: number, x: number | string) =>
