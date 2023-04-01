@@ -7,7 +7,7 @@ import {
   TypedIdentifier,
   WhileStatement
 } from '../../parser/types'
-import { Command, Context, WhileStatementInstruction } from '../../types'
+import { Command, Context, Value, WhileStatementInstruction } from '../../types'
 import { checkIdentifier } from '../../utils/runtime/checkIdentifier'
 import { Stack } from '../../utils/stack'
 import { handleRuntimeError, InterpreterError } from '../errors'
@@ -25,16 +25,16 @@ import { assignFunctionType, setFunctionParams } from './utils'
 export type TypeChecker<T extends Node> = (node: T, context: Context) => any
 
 export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
-  Literal: function (node: Node, context: Context): PrimitiveValueType {
+  Literal: function* (node: Node, context: Context) {
     if (node.type != 'Literal') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
     if (node.value === undefined || node.valueType == undefined) {
       throw handleRuntimeError(context, new InterpreterError(node))
-    } else {
-      return node.valueType
     }
+    console.log(node.valueType)
+    return node.valueType
   },
 
   SequenceExpression: function* (node: Node, context: Context) {
@@ -42,13 +42,9 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    let result
-
     for (const expr of node.expressions) {
-      result = yield* typeCheck(expr, context)
+      yield* typeCheck(expr, context)
     }
-
-    return result
   },
 
   ArrayExpression: function* (node: Node, context: Context) {
@@ -214,7 +210,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     const left = yield* typeCheck(node.left, context)
     const right = yield* typeCheck(node.right, context)
-
+    console.log(left, right)
     if (left != right) {
       throw handleRuntimeError(context, new TypeError(node, left, right))
     }
@@ -260,9 +256,13 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     assignFunctionType(node, context, node.id.name, functionClosure)
 
-    const returnType = yield* typeCheck(node.body, context)
+    const returnType: [] = yield* typeCheck(node.body, context)
 
     // loop through since there may be multiple return values.
+
+    if (returnType.length == 0 && functionClosure.returnType.valueType != 'void') {
+      throw handleRuntimeError(context, new TypeError(node, functionClosure.type, 'void'))
+    }
     for (const type of returnType) {
       if (type != functionClosure.returnType) {
         throw handleRuntimeError(context, new TypeError(node, functionClosure.type, type))
@@ -309,7 +309,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
       throw handleRuntimeError(context, new TypeError(node, 'int, float or char', 'void'))
     }
 
-    return yield* typeCheck(node.body, context)
+    yield* typeCheck(node.body, context)
   },
 
   DoWhileStatement: function* (node: Node, context: Context) {
@@ -362,12 +362,9 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     const type_env = createBlockTypeEnvironment(context, 'globalTypeEnvironment')
     pushTypeEnvironment(context, type_env)
 
-    let result
-
     for (const statement of node.body) {
-      result = yield* typeCheck(statement, context)
+      yield* typeCheck(statement, context)
     }
-    return result
   }
 }
 
@@ -375,5 +372,6 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 // 1) testing
 // 2) return type
 export function* typeCheck(node: Node, context: Context) {
-  return yield* typeCheckers[node.type](node, context)
+  const result = yield* typeCheckers[node.type](node, context)
+  return result
 }
