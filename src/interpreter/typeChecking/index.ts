@@ -42,9 +42,13 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
+    let result
+
     for (const expr of node.expressions) {
-      yield* typeCheck(expr, context)
+      result = yield* typeCheck(expr, context)
     }
+
+    return result
   },
 
   ArrayExpression: function* (node: Node, context: Context) {
@@ -86,13 +90,10 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    const paramTypes = getIdentifierType(
-      context,
-      (node.callee as Identifier).name
-    ) as TypedIdentifier[]
+    const closure = getIdentifierType(context, (node.callee as Identifier).name) as ClosureType
     const args = node.arguments
 
-    if (args.length != paramTypes.length) {
+    if (args.length != closure.parameterTypes.length) {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
@@ -103,14 +104,16 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
           operator: '=',
           left: {
             type: 'VariableDeclarationExpression',
-            identifier: paramTypes[i],
-            identifierType: paramTypes[i].typeDeclaration
+            identifier: closure.parameterTypes[i],
+            identifierType: closure.parameterTypes[i].typeDeclaration
           },
           right: args[i]
         },
         context
       )
     }
+
+    return closure.returnType.valueType
   },
 
   EmptyExpression: function* (node: Node, context: Context) {
@@ -264,7 +267,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
       throw handleRuntimeError(context, new TypeError(node, functionClosure.type, 'void'))
     }
     for (const type of returnType) {
-      if (type != functionClosure.returnType) {
+      if (type != functionClosure.returnType.valueType) {
         throw handleRuntimeError(context, new TypeError(node, functionClosure.type, type))
       }
     }
@@ -276,8 +279,10 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
 
     yield* typeCheck(node.test, context)
-    yield* typeCheck(node.consequent, context)
-    yield* typeCheck(node.alternate, context)
+    const returnTypes = []
+    returnTypes.push(...(yield* typeCheck(node.consequent, context)))
+    returnTypes.push(...(yield* typeCheck(node.alternate, context)))
+    return returnTypes
   },
 
   ExpressionStatement: function* (node: Node, context: Context) {
@@ -337,6 +342,9 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     const result = []
     for (const statement of node.body) {
       const typeCheckResult = yield* typeCheck(statement, context)
+      if (typeCheckResult instanceof Array) {
+        result.push(...typeCheckResult)
+      }
       if (statement.type == 'ReturnStatement') {
         result.push(typeCheckResult)
       }
