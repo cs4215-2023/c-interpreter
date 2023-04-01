@@ -91,7 +91,12 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
 
     const closure = getIdentifierType(context, (node.callee as Identifier).name) as ClosureType
-    const args = node.arguments
+    const args = []
+    for (const expression of node.arguments) {
+      if (expression.type != 'EmptyExpression') {
+        args.push(expression)
+      }
+    }
 
     if (args.length != closure.parameterTypes.length) {
       throw handleRuntimeError(context, new InterpreterError(node))
@@ -162,8 +167,23 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    yield* typeCheck(node.consequent, context)
-    yield* typeCheck(node.alternate, context)
+    const returnTypes = []
+
+    const consequent = yield* typeCheck(node.consequent, context)
+    const alternate = yield* typeCheck(node.alternate, context)
+
+    if (consequent instanceof Array) {
+      returnTypes.push(...consequent)
+    } else {
+      returnTypes.push(consequent)
+    }
+
+    if (alternate instanceof Array) {
+      returnTypes.push(...consequent)
+    } else {
+      returnTypes.push(consequent)
+    }
+    return returnTypes
   },
 
   LogicalExpression: function* (node: Node, context: Context) {
@@ -342,11 +362,12 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     const result = []
     for (const statement of node.body) {
       const typeCheckResult = yield* typeCheck(statement, context)
-      if (typeCheckResult instanceof Array) {
-        result.push(...typeCheckResult)
-      }
-      if (statement.type == 'ReturnStatement') {
-        result.push(typeCheckResult)
+      if (typeCheckResult != undefined) {
+        if (typeCheckResult instanceof Array) {
+          result.push(...typeCheckResult)
+        } else {
+          result.push(typeCheckResult)
+        }
       }
     }
     popTypeEnvironment(context)
