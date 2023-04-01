@@ -1,37 +1,7 @@
-import { UNKNOWN_LOCATION } from '../../../constants'
 import createContext from '../../../createContext'
-import { TypeMismatch } from '../../../errors/errors'
-import { PrimitiveType } from '../../../parser/types'
 import { sourceRunner } from '../../../runner'
 import { Variant } from '../../../types'
-import { locationDummyNode } from '../../../utils/astCreator'
-
-const location = UNKNOWN_LOCATION
-const dummyNode = locationDummyNode(location.start.line, location.start.column)
-
-const intType: PrimitiveType = {
-  type: 'PrimitiveType',
-  signed: undefined,
-  valueType: 'int'
-}
-
-const floatType: PrimitiveType = {
-  type: 'PrimitiveType',
-  signed: undefined,
-  valueType: 'float'
-}
-
-const voidType: PrimitiveType = {
-  type: 'PrimitiveType',
-  signed: undefined,
-  valueType: 'void'
-}
-
-const charType: PrimitiveType = {
-  type: 'PrimitiveType',
-  signed: undefined,
-  valueType: 'char'
-}
+import { TypeError } from '../../typeChecking/errors'
 
 describe('Type checking', () => {
   it('Int to float assignment throws error ', async () => {
@@ -40,7 +10,10 @@ describe('Type checking', () => {
       const context = createContext(Variant.DEFAULT, undefined, undefined)
       await sourceRunner(code, context)
     } catch (e) {
-      expect(e).toStrictEqual(new TypeMismatch(dummyNode, intType, floatType))
+      expect(e).toBeInstanceOf(TypeError)
+      const castError = e as TypeError
+      expect(castError.expected).toBe('int')
+      expect(castError.received).toBe('float')
     }
   })
 
@@ -67,7 +40,10 @@ describe('Type checking', () => {
       const context = createContext(Variant.DEFAULT, undefined, undefined)
       await sourceRunner(code, context)
     } catch (e) {
-      expect(e).toStrictEqual(new TypeMismatch(dummyNode, intType, floatType))
+      expect(e).toBeInstanceOf(TypeError)
+      const castError = e as TypeError
+      expect(castError.expected).toBe('void')
+      expect(castError.received).toBe('int')
     }
   })
 })

@@ -179,9 +179,9 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
 
     if (alternate instanceof Array) {
-      returnTypes.push(...consequent)
+      returnTypes.push(...alternate)
     } else {
-      returnTypes.push(consequent)
+      returnTypes.push(alternate)
     }
     return returnTypes
   },
@@ -284,11 +284,17 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     // loop through since there may be multiple return values.
 
     if (returnType.length == 0 && functionClosure.returnType.valueType != 'void') {
-      throw handleRuntimeError(context, new TypeError(node, functionClosure.type, 'void'))
+      throw handleRuntimeError(
+        context,
+        new TypeError(node, functionClosure.returnType.valueType, 'void')
+      )
     }
     for (const type of returnType) {
-      if (type != functionClosure.returnType.valueType) {
-        throw handleRuntimeError(context, new TypeError(node, functionClosure.type, type))
+      if (type != undefined && type != functionClosure.returnType.valueType) {
+        throw handleRuntimeError(
+          context,
+          new TypeError(node, functionClosure.returnType.valueType, type)
+        )
       }
     }
   },
@@ -379,6 +385,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     if (node.type != 'EmptyStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
+    return [undefined]
   },
 
   Program: function* (node: Node, context: Context) {
