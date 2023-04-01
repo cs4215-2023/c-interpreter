@@ -71,7 +71,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     checkIdentifier(node)
 
-    return getIdentifierType(context, node.name)
+    return getIdentifierType(context, node.name).valueType
   },
 
   TypedIdentifier: function* (command: Command, context: Context) {
@@ -292,7 +292,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
     if (node.argument == undefined || node.argument == null) {
-      return { type: 'PrimitiveType', valueType: 'void', signed: undefined } as PrimitiveType
+      return 'void'
     }
 
     return yield* typeCheck(node.argument, context)
