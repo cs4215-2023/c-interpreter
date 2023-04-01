@@ -20,12 +20,6 @@ import {
 } from './operators'
 import { typeCheck } from './typeChecking'
 import {
-  createBlockTypeEnvironment,
-  currentTypeEnvironment,
-  popTypeEnvironment,
-  pushTypeEnvironment
-} from './typeChecking/typeEnvironment'
-import {
   checkNumberOfArguments,
   declareIdentifier,
   getVariable,
@@ -39,27 +33,6 @@ const STACK_BEGIN = 0
 const HEAP_SIZE = 100
 const HEAP_BEGIN = STACK_BEGIN + STACK_SIZE + 1
 const memory = new MemoryModel(STACK_SIZE, STACK_BEGIN, HEAP_SIZE, HEAP_BEGIN)
-
-function* evaluateBlockStatement(context: Context, node: Node) {
-  if (node.type != 'BlockStatement') {
-    throw new Error('Not evaluating block statement')
-  }
-  //scan block statement here
-  //   const [varFrame, typeFrame] = scanFrameVariables(node.body)
-  const env = createBlockEnvironment(context, 'blockEnvironment')
-  const typeEnv = createBlockTypeEnvironment(context, 'blockEnvironment')
-
-  pushEnvironment(context, env)
-  pushTypeEnvironment(context, typeEnv)
-  let result
-  for (const statement of node.body) {
-    result = yield* evaluate(statement, context)
-  }
-
-  popEnvironment(context)
-  popTypeEnvironment(context)
-  return result
-}
 
 /**
  * WARNING: Do not use object literal shorthands, e.g.
@@ -375,7 +348,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const A = context.runtime.agenda
 
     const env = createBlockEnvironment(context, 'localEnvironment')
-    const typeEnv = createBlockTypeEnvironment(context, 'localTypeEnvironment')
 
     if (!(A.length() === 0)) {
       A.push({ type: 'EnvironmentRestoration_i' })
@@ -386,7 +358,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     context.numberOfOuterEnvironments += 1
     pushEnvironment(context, env)
-    pushTypeEnvironment(context, typeEnv)
     memory.enter_scope()
   },
 
@@ -404,9 +375,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     // Create global environment
     context.numberOfOuterEnvironments += 1
     const environment = createBlockEnvironment(context, 'globalEnvironment')
-    const type_env = createBlockTypeEnvironment(context, 'globalTypeEnvironment')
     pushEnvironment(context, environment)
-    pushTypeEnvironment(context, type_env)
 
     // calls main at the end
     node.body.push({
@@ -421,7 +390,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     // reverse the order
     node.body.reverse()
     context.runtime.agenda.push(...node.body)
-    context.typeCheckAgenda.push(...node.body)
   },
 
   // INSTRUCTIONS
@@ -436,11 +404,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const [type_left, left] = memory.mem_read(left_addr)
     const [type_right, right] = memory.mem_read(right_addr)
     const operator = command.operator
-    console.log(right, operator, left)
-    console.log(command)
     checkBinaryExpression(command, type_left, type_right)
     const result = evaluateBinaryExpression(command, operator, right, left)
-    console.log(result)
     const push_addr = memory.mem_stack_push(type_left, result)
     stash.push(push_addr)
   },
@@ -570,7 +535,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     popEnvironment(context)
-    popTypeEnvironment(context)
     context.numberOfOuterEnvironments -= 1
   },
 
@@ -668,11 +632,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       })
     }
     const functionEnvironment = createBlockEnvironment(context, 'FunctionEnvironment')
-    const functionTypeEnvironment = createBlockTypeEnvironment(context, 'FunctionTypeEnvironment', {
-      ...currentTypeEnvironment(context).head
-    })
     pushEnvironment(context, functionEnvironment)
-    pushTypeEnvironment(context, functionTypeEnvironment)
     memory.enter_scope()
   },
 
@@ -690,16 +650,12 @@ export function* evaluate(node: Node, context: Context) {
   // compile the program to instructions
   yield* typeCheck(node, context)
   yield* evaluators[node.type](node, context)
-
   const agenda = context.runtime.agenda
   const stash = context.runtime.stash
   while (agenda.length()) {
-    console.log(agenda.peek())
     const command = agenda.pop() as Node
     yield* evaluators[command.type](command, context)
   }
-
-  console.log('type env at the end: ', currentTypeEnvironment(context))
 
   // By right C programs don't return anything, this should be undefined.
 

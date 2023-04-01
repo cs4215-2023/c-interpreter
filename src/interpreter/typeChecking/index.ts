@@ -1,26 +1,16 @@
-import {
-  ExpressionStatement,
-  Identifier,
-  Node,
-  PrimitiveType,
-  PrimitiveValueType,
-  TypedIdentifier,
-  WhileStatement
-} from '../../parser/types'
-import { Command, Context, Value, WhileStatementInstruction } from '../../types'
+import { Identifier, Node } from '../../parser/types'
+import { Command, Context } from '../../types'
 import { checkIdentifier } from '../../utils/runtime/checkIdentifier'
-import { Stack } from '../../utils/stack'
 import { handleRuntimeError, InterpreterError } from '../errors'
-import { declareIdentifierType, getIdentifierType, setValueToIdentifier } from '../utils'
+import { declareIdentifierType, getIdentifierType } from '../utils'
 import { TypeError } from './errors'
 import {
   createBlockTypeEnvironment,
-  currentTypeEnvironment,
   popTypeEnvironment,
   pushTypeEnvironment
 } from './typeEnvironment'
 import { ClosureType } from './types'
-import { assignFunctionType, setFunctionParams } from './utils'
+import { assignFunctionType } from './utils'
 
 export type TypeChecker<T extends Node> = (node: T, context: Context) => any
 
@@ -33,7 +23,6 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     if (node.value === undefined || node.valueType == undefined) {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    console.log(node.valueType)
     return node.valueType
   },
 
@@ -205,25 +194,15 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     if (node.type != 'ForStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    // Idea: Convert to while loop
-    const forLoopContent = node.body
-
-    // convert expression to statement using expressionStatement
-    const updateStatement: ExpressionStatement = {
-      type: 'ExpressionStatement',
-      expression: node.update
-    }
-    forLoopContent.body.push(updateStatement)
-
-    // wrap body in while loop instruction
-    const whileStatement: WhileStatement = {
-      type: 'WhileStatement',
-      test: node.test,
-      body: forLoopContent
-    }
 
     yield* typeCheck(node.init, context)
-    yield* typeCheck(whileStatement, context)
+    const testType = yield* typeCheck(node.test, context)
+    if (testType == 'void') {
+      throw handleRuntimeError(context, new TypeError(node, 'int, float or char', 'void'))
+    }
+
+    yield* typeCheck(node.update, context)
+    yield* typeCheck(node.body, context)
   },
 
   AssignmentExpression: function* (node: Node, context: Context) {
@@ -233,7 +212,6 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     const left = yield* typeCheck(node.left, context)
     const right = yield* typeCheck(node.right, context)
-    console.log(left, right)
     if (left != right) {
       throw handleRuntimeError(context, new TypeError(node, left, right))
     }
