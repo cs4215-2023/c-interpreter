@@ -12,3 +12,4 @@ export const UNKNOWN_LOCATION: SourceLocation = {
 }
 
 export const FLOAT_PRECISION: number = 6
+export const DECLARED_BUT_NOT_YET_ASSIGNED = Symbol('Used to implement hoisting')

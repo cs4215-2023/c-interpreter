@@ -33,3 +33,31 @@ export function assignFunctionType(
   const environment: TypeEnvironment | null = currentTypeEnvironment(context)
   environment.head[name] = functionClosure
 }
+
+export function getVariableType(context: Context, name: string) {
+  let environment: TypeEnvironment | null = currentTypeEnvironment(context)
+  while (environment) {
+    if (environment.head.hasOwnProperty(name)) {
+      return environment.head[name]
+    } else {
+      environment = environment.tail
+    }
+  }
+  return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
+}
+
+export function declareIdentifierType(context: Context, name: string, node: Node) {
+  const typeEnvironment = currentTypeEnvironment(context)
+  if (typeEnvironment.head.hasOwnProperty(name)) {
+    return handleRuntimeError(
+      context,
+      new errors.ExceptionError(new Error('Redeclared'), node.loc!)
+    )
+  }
+  if (node.type == 'VariableDeclarationExpression') {
+    typeEnvironment.head[name] = node.identifierType
+  } else if (node.type == 'ArrayDeclarationExpression') {
+    typeEnvironment.head[name] = node.arrayType
+  }
+  return typeEnvironment
+}

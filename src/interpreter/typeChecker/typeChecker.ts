@@ -2,7 +2,7 @@ import { Identifier, Node } from '../../parser/types'
 import { Command, Context } from '../../types'
 import { checkIdentifier } from '../../utils/runtime/checkIdentifier'
 import { handleRuntimeError, InterpreterError } from '../errors'
-import { declareIdentifierType, getIdentifierType } from '../utils'
+import {} from '../utils'
 import { TypeError } from './errors'
 import {
   createBlockTypeEnvironment,
@@ -10,7 +10,7 @@ import {
   pushTypeEnvironment
 } from './typeEnvironment'
 import { ClosureType } from './types'
-import { assignFunctionType } from './utils'
+import { assignFunctionType, declareIdentifierType, getVariableType } from './utils'
 
 export type TypeChecker<T extends Node> = (node: T, context: Context) => any
 
@@ -64,7 +64,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     checkIdentifier(node)
 
-    return getIdentifierType(context, node.name).valueType
+    return getVariableType(context, node.name).valueType
   },
 
   TypedIdentifier: function* (command: Command, context: Context) {
@@ -79,7 +79,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    const closure = getIdentifierType(context, (node.callee as Identifier).name) as ClosureType
+    const closure = getVariableType(context, (node.callee as Identifier).name) as ClosureType
     const args = []
     for (const expression of node.arguments) {
       if (expression.type != 'EmptyExpression') {
@@ -140,7 +140,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     const right = yield* typeCheck(node.right, context)
 
     if (left == 'void' || right == 'void') {
-      throw handleRuntimeError(context, new InterpreterError(node))
+      throw handleRuntimeError(context, new TypeError(node, 'char, int or float', 'void'))
     }
 
     return left == 'float' || right == 'float' ? 'float' : 'int'
@@ -153,7 +153,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     const test = yield* typeCheck(node.test, context)
     if (test == 'void') {
-      throw handleRuntimeError(context, new InterpreterError(node))
+      throw handleRuntimeError(context, new TypeError(node, 'char, int or float', 'void'))
     }
 
     const returnTypes = []
@@ -184,7 +184,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     const right = yield* typeCheck(node.right, context)
 
     if (left == 'void' || right == 'void') {
-      throw handleRuntimeError(context, new InterpreterError(node))
+      throw handleRuntimeError(context, new TypeError(node, 'char, int or float', 'void'))
     }
 
     return left == 'float' || right == 'float' ? 'float' : 'int'
@@ -224,7 +224,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     const argumentType = yield* typeCheck(node.argument, context)
     if (argumentType == 'void') {
-      throw handleRuntimeError(context, new InterpreterError(node))
+      throw handleRuntimeError(context, new TypeError(node, 'char, int or float', 'void'))
     }
 
     return argumentType == 'float' ? 'float' : 'int'
@@ -372,7 +372,6 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
 
     // Create global environment
-    context.numberOfOuterEnvironments += 1
     const type_env = createBlockTypeEnvironment(context, 'globalTypeEnvironment')
     pushTypeEnvironment(context, type_env)
 
@@ -382,9 +381,6 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
   }
 }
 
-// TODO:
-// 1) testing
-// 2) return type
 export function* typeCheck(node: Node, context: Context) {
   const result = yield* typeCheckers[node.type](node, context)
   return result

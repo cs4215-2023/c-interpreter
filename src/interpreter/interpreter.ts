@@ -18,7 +18,7 @@ import {
   evaluateLogicalExpression,
   evaluateUnaryExpression
 } from './operators'
-import { typeCheck } from './typeChecking'
+import { typeCheck } from './typeChecker/typeChecker'
 import {
   checkNumberOfArguments,
   declareIdentifier,
@@ -519,13 +519,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       console.log(
         'setting ' + newVal + ' to identifier ' + identifier!.name + ' at addr ' + var_addr
       )
-      setValueToIdentifier(command, context, identifier!.name, var_addr, {
-        type: 'PrimitiveType',
-        valueType: TAG_TO_TYPE[valueType],
-        signed: undefined
-      } as Type)
+      setValueToIdentifier(command, context, identifier!.name, var_addr)
     } else {
-      setValueToIdentifier(command, context, identifier!.name, addr, addr.typeDeclaration)
+      setValueToIdentifier(command, context, identifier!.name, addr)
     }
   },
 
