@@ -46,6 +46,11 @@ export default class Stack extends MemoryBuffer {
     return address
   }
 
+  public allocate_n(n: number) {
+    const address = this.stack_pointer
+    this.stack_pointer += n * this.word_size
+    return address
+  }
   public push(tag: number, x: number) {
     if ((this.stack_pointer - this.stack_addr_begin) / this.word_size >= this.stack_size) {
       console.log('stack overflow,replacing top of stack')
@@ -92,7 +97,7 @@ export default class Stack extends MemoryBuffer {
   }
 
   public type_to_data = (tag: number, x: number | string) =>
-    tag === TAGS.int_tag || tag === TAGS.pointer_tag
+    tag === TAGS.int_tag || tag === TAGS.int_pointer_tag || TAGS.char_pointer_tag || TAGS.float_pointer_tag
       ? ~~x
       : tag === TAGS.char_tag
         ? String.fromCharCode(x as number)

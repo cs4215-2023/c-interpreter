@@ -1,5 +1,6 @@
 import {
   ArrayContentContext,
+  ArrayIdentifierContext,
   ArrayIdentifierWithTypeContext,
   ArrayInitialisationContext,
   ArrayInitialisationExpressionContext,
@@ -29,6 +30,7 @@ export const parserArrayExpression = <T extends Constructable>(
       return arrayInitialisor
     }
     visitArrayContent(ctx: ArrayContentContext): Expression[] {
+      console.log("visit array content")
       if (ctx === undefined) {
         return []
       } else {
@@ -53,6 +55,10 @@ export const parserArrayExpression = <T extends Constructable>(
         })
       })
       return identifier
+    }
+    visitArrayIdentifier(ctx: ArrayIdentifierContext) {
+      console.log("visit array identifier")
+
     }
     visitNumberList(ctx: NumberListContext): Expression[] {
       if (ctx === undefined) {

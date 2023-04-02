@@ -17,7 +17,7 @@ describe('stack tests', () => {
     const stack = new Stack(stack_size, STACK_ADDR_BEGIN)
 
     stack.push_pointer(TAGS.int_pointer_tag, 18)
-    expect(stack.pop()).toEqual([TAGS.pointer_tag, 18])
+    expect(stack.pop()).toEqual([TAGS.int_pointer_tag, 18])
   })
 
   it('push and pop float test', () => {
@@ -47,7 +47,7 @@ describe('stack tests', () => {
     stack.push_float(12.1)
     stack.push_pointer(TAGS.int_pointer_tag, 18) //technically pointing to 18 on the stack
     expect(stack.size()).toBe(4)
-    expect(stack.pop()).toEqual([TAGS.pointer_tag, 18])
+    expect(stack.pop()).toEqual([TAGS.int_pointer_tag, 18])
   })
 
   it('pop test', () => {
@@ -164,7 +164,7 @@ describe('stack tests', () => {
 
     expect(stack.size()).toBe(4)
     const [type, val] = stack.pop()
-    expect([type, stack.type_to_data(type, val)]).toEqual([TAGS.pointer_tag, 18])
+    expect([type, stack.type_to_data(type, val)]).toEqual([TAGS.int_pointer_tag, 18])
   })
 
   it('return and exit scope test', () => {

@@ -3,6 +3,7 @@
 import { InvalidTypeError } from '../errors/errors'
 import { ExpressionStatement, Identifier, Node, PointerIdentifier, Type } from '../parser/types'
 import { ClosureInstruction, Command, Context, Value, WhileStatementInstruction } from '../types'
+import { identifier } from '../utils/astCreator'
 import { checkBinaryExpression } from '../utils/runtime/checkBinaryExp'
 import { checkIdentifier } from '../utils/runtime/checkIdentifier'
 import { checkLogicalExpression } from '../utils/runtime/checkLogicalExp'
@@ -144,6 +145,22 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     declareIdentifier(context, identifier.name, node, address)
     console.log('allocated address ' + address + ' to pointer ' + identifier.name)
     context.runtime.stash.push(identifier)
+  },
+
+  ArrayDeclarationExpression: function* (node: Node, context: Context) {
+    if (node.type != 'ArrayDeclarationExpression') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+    //if elements are already declared
+    let size: number
+    if (node.size === undefined) {
+      size = node.array!.elements.length
+    } else {
+      size = node.size
+    }
+    const address = memory.mem_stack_allocate_n(2 * size) //allocate memory for both address and content
+    declareIdentifier(context, node.identifier.name, node, address)
+    context.runtime.stash.push(node.identifier)
   },
 
   Identifier: function* (node: Node, context: Context) {
@@ -477,7 +494,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (operator == '&') {
       console.log('since pointer referencing, pushing address ' + address)
       //maybe write the address to stack, then push that address instead and read the addr from the address
-      const push_addr = memory.mem_stack_push(type + 3, address as number)//pointer type is offset by 3
+      const push_addr = memory.mem_stack_push(type + 3, address as number) //pointer type is offset by 3
       stash.push(push_addr)
     } else if (operator == '*') {
       if (
