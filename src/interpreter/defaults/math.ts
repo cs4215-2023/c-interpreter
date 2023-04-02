@@ -1,4 +1,4 @@
-// everything here returns an integer, regardless of input
+// Everything here returns an integer, regardless of input.
 export const math_functions = {
   abs: Math.abs,
   acos: Math.acos,

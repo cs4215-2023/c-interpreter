@@ -19,7 +19,6 @@ import {
   Type,
   UnaryOperator
 } from '../src/parser/types'
-import { EnvTree, TypeEnvTree } from './createContext'
 import { Stack } from './utils/stack'
 
 /**
@@ -74,10 +73,8 @@ export interface Context<T = any> {
     break: boolean
     debuggerOn: boolean
     isRunning: boolean
-    environmentTree: EnvTree
     environments: Environment[]
     typeEnv: TypeEnvironment[]
-    typeEnvTree: TypeEnvTree
     nodes: Node[]
     agenda: Stack<T>
     stash: Stack<T>
@@ -114,7 +111,6 @@ export interface Context<T = any> {
    * Code previously executed in this context
    */
   previousCode: string[]
-  typeCheckAgenda: Stack<T>
 }
 
 // tslint:disable:no-any

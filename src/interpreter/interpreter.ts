@@ -41,7 +41,6 @@ const memory = new MemoryModel(STACK_SIZE, STACK_BEGIN, HEAP_SIZE, HEAP_BEGIN)
 // tslint:disable:object-literal-shorthand
 
 export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
-  // expressions and statements
   Literal: function* (node: Node, context: Context) {
     if (node.type != 'Literal') {
       throw handleRuntimeError(context, new InterpreterError(node))
@@ -61,7 +60,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
           TYPE_TO_TAG[node.valueType] +
           ')'
       )
-      context.runtime.stash.push(address) //replace with address
+      context.runtime.stash.push(address)
     }
   },
 
@@ -191,17 +190,17 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'ForStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    // Idea: Convert to while loop
+    // Idea: Convert to while loop.
     const forLoopContent = node.body
 
-    // convert expression to statement using expressionStatement
+    // Convert expression to statement using expressionStatement.
     const updateStatement: ExpressionStatement = {
       type: 'ExpressionStatement',
       expression: node.update
     }
     forLoopContent.body.push(updateStatement)
 
-    // wrap body in while loop instruction
+    // Wrap body in while loop instruction.
     const whileStatementInstruction: WhileStatementInstruction = {
       type: 'WhileStatement_i',
       test: node.test,
@@ -221,7 +220,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    //Assignment here refers to =
+    //Assignment here refers to =.
     if (node.left.type == 'Identifier') {
       context.runtime.agenda.push(
         { type: 'Pop_i' },
@@ -257,7 +256,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       right: binaryExpression
     }
 
-    // call the argument
+    // Call the argument.
     agenda.push(node.argument, assignmentExpression)
   },
 
@@ -345,7 +344,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       A.push({ type: 'EnvironmentRestoration_i' })
     }
 
-    // make a copy of the body and then reverse it instead.
+    // Make a copy of the body and then reverse it instead.
     A.push(...node.body.slice().reverse())
 
     context.numberOfOuterEnvironments += 1
@@ -364,12 +363,12 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    // Create global environment
+    // Create global environment.
     context.numberOfOuterEnvironments += 1
     const environment = createBlockEnvironment(context, 'globalEnvironment')
     pushEnvironment(context, environment)
 
-    // calls main at the end
+    // Call main at the end.
     node.body.push({
       type: 'ExpressionStatement',
       expression: {
@@ -379,7 +378,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       }
     })
 
-    // reverse the order
+    // Reverse the order
     node.body.reverse()
     context.runtime.agenda.push(...node.body)
   },
@@ -409,7 +408,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const stash = context.runtime.stash
     const operator = command.operator
     const address = stash.pop()
-    //get address here
+    // Get address here.
     const [type, value] = memory.mem_read(address)
     if (operator == '&' || operator == '*') {
       throw new Error('Pointer not implemented yet')
@@ -495,14 +494,15 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const stash = context.runtime.stash
     let identifier = command.symbol
 
-    // we are assigning to variable
+    // We are assigning to a variable.
     if (command.symbol == undefined) {
       identifier = stash.pop()
     }
 
     const addr = stash.peek()
     if (addr.type != 'Closure_i') {
-      const var_addr = getVariable(context, identifier!.name) //get addr
+      // Get address here.
+      const var_addr = getVariable(context, identifier!.name)
       const [valueType, newVal] = memory.mem_read(addr)
       memory.mem_write_to_address(var_addr, valueType, newVal)
       console.log(
@@ -536,7 +536,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const operator = command.operator
 
     const result = evaluateLogicalExpression(operator, left, right)
-    const push_addr = memory.mem_stack_push(type_left, result) //type checking kinda?
+    const push_addr = memory.mem_stack_push(type_left, result)
     stash.push(push_addr)
   },
 
@@ -624,14 +624,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.type != 'Mark_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
-    // do nothing, since mark_i is already popped from agenda, its similar to return statement.
+    // Do nothing, since mark_i is already popped from agenda, its similar to return statement.
   }
 }
 
 // tslint:enable:object-literal-shorthand
 
 export function* evaluate(node: Node, context: Context) {
-  // compile the program to instructions
   yield* typeCheck(node, context)
   yield* evaluators[node.type](node, context)
   const agenda = context.runtime.agenda

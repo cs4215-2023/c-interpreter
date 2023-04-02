@@ -2,7 +2,7 @@ import { assert } from 'console'
 
 import Heap from './heap'
 import Stack from './stack'
-import { MEM_TYPE, TAGS } from './tags'
+import { TAGS } from './tags'
 
 //main class to utilize for interpreter
 export default class MemoryModel {

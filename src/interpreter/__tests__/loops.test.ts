@@ -1,12 +1,7 @@
-import { UNKNOWN_LOCATION } from '../../constants'
 import createContext from '../../createContext'
 import { UndefinedVariable } from '../../errors/errors'
 import { sourceRunner } from '../../runner'
 import { Variant } from '../../types'
-import { locationDummyNode } from '../../utils/astCreator'
-
-const location = UNKNOWN_LOCATION
-const dummyNode = locationDummyNode(location.start.line, location.start.column)
 
 describe('Loops', () => {
   it('While loop -- as condition', async () => {

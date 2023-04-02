@@ -1,3 +1,4 @@
+import { FLOAT_TYPE, INT_TYPE, VOID_TYPE } from '../constants'
 import { handleRuntimeError, InterpreterError } from '../interpreter/errors'
 import { Identifier, Node } from '../parser/types'
 import { Command, Context } from '../types'
@@ -129,7 +130,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     const argumentType = yield* typeCheck(node.argument, context)
     checkVoid(node, argumentType, context)
-    return argumentType == 'float' ? 'float' : 'int'
+    return argumentType == FLOAT_TYPE ? FLOAT_TYPE : INT_TYPE
   },
 
   BinaryExpression: function* (node: Node, context: Context) {
@@ -142,7 +143,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     checkLeftRightNotVoid(node, left, right, context)
 
-    return left == 'float' || right == 'float' ? 'float' : 'int'
+    return left == FLOAT_TYPE || right == FLOAT_TYPE ? FLOAT_TYPE : INT_TYPE
   },
 
   ConditionalExpression: function* (node: Node, context: Context) {
@@ -182,7 +183,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     checkLeftRightNotVoid(node, left, right, context)
 
-    return left == 'float' || right == 'float' ? 'float' : 'int'
+    return left == FLOAT_TYPE || right == FLOAT_TYPE ? FLOAT_TYPE : INT_TYPE
   },
 
   ForStatement: function* (node: Node, context: Context) {
@@ -218,7 +219,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     const argumentType = yield* typeCheck(node.argument, context)
     checkVoid(node, argumentType, context)
 
-    return argumentType == 'float' ? 'float' : 'int'
+    return argumentType == FLOAT_TYPE ? FLOAT_TYPE : INT_TYPE
   },
 
   FunctionDeclaration: function* (node: Node, context: Context) {
@@ -252,10 +253,10 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     // loop through since there may be multiple return values.
 
-    if (returnType.length == 0 && functionClosure.returnType.valueType != 'void') {
+    if (returnType.length == 0 && functionClosure.returnType.valueType != VOID_TYPE) {
       throw handleRuntimeError(
         context,
-        new TypeError(node, functionClosure.returnType.valueType, 'void')
+        new TypeError(node, functionClosure.returnType.valueType, VOID_TYPE)
       )
     }
     for (const type of returnType) {
@@ -292,7 +293,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
     if (node.argument == undefined || node.argument == null) {
-      return 'void'
+      return VOID_TYPE
     }
 
     return yield* typeCheck(node.argument, context)
