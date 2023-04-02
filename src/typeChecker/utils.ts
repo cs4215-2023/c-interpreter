@@ -1,8 +1,8 @@
-import * as errors from '../../errors/errors'
-import { TypedIdentifier } from '../../parser/types'
-import { Node } from '../../parser/types'
-import { Context, TypeEnvironment } from '../../types'
-import { handleRuntimeError } from '../errors'
+import * as errors from '../errors/errors'
+import { handleRuntimeError } from '../interpreter/errors'
+import { TypedIdentifier } from '../parser/types'
+import { Node } from '../parser/types'
+import { Context, TypeEnvironment } from '../types'
 import { currentTypeEnvironment } from './typeEnvironment'
 import { ClosureType } from './types'
 

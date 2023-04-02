@@ -1,7 +1,7 @@
-import createContext from '../../../createContext'
-import { sourceRunner } from '../../../runner'
-import { Variant } from '../../../types'
+import createContext from '../../createContext'
+import { sourceRunner } from '../../runner'
 import { TypeError } from '../../typeChecker/errors'
+import { Variant } from '../../types'
 
 describe('Type checking', () => {
   it('Int to float assignment throws error ', async () => {

@@ -1,6 +1,6 @@
-import { RuntimeSourceError } from '../../errors/runtimeSourceError'
-import { PrimitiveValueType } from '../../parser/types'
-import { Command, ErrorSeverity, ErrorType } from '../../types'
+import { RuntimeSourceError } from '../errors/runtimeSourceError'
+import { PrimitiveValueType } from '../parser/types'
+import { Command, ErrorSeverity, ErrorType } from '../types'
 
 export class TypeError extends RuntimeSourceError {
   public type = ErrorType.SYNTAX

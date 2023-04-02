@@ -70,7 +70,9 @@ describe('Loops', () => {
     try {
       await sourceRunner(code, context)
     } catch (e) {
-      expect(e).toStrictEqual(new UndefinedVariable('a', dummyNode))
+      expect(e).toBeInstanceOf(UndefinedVariable)
+      const castError = e as UndefinedVariable
+      expect(castError.name).toBe('a')
     }
   })
 

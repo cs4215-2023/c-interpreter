@@ -1,18 +1,12 @@
 import { DECLARED_BUT_NOT_YET_ASSIGNED } from '../constants'
 import * as errors from '../errors/errors'
-import { Node, Type } from '../parser/types'
-import {
-  CallInstruction,
-  ClosureInstruction,
-  Command,
-  Context,
-  Environment,
-  TypeEnvironment
-} from '../types'
-import { checkType } from '../utils/runtime/checkType'
+import { Node } from '../parser/types'
+import { Value } from '../types'
+import { CallInstruction, ClosureInstruction, Command, Context, Environment } from '../types'
 import { currentEnvironment } from './environment'
 import { handleRuntimeError } from './errors'
-import { currentTypeEnvironment } from './typeChecker/typeEnvironment'
+
+export const isNumber = (v: Value) => typeof v === 'number'
 
 export function checkNumberOfArguments(
   context: Context,

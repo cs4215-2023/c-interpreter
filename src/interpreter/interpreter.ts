@@ -1,24 +1,18 @@
 /* tslint:disable:max-classes-per-file */
 
-import { ExpressionStatement, Identifier, Node, Type } from '../parser/types'
+import MemoryModel from '../memory/memoryModel'
+import { TAG_TO_TYPE, TYPE_TO_TAG } from '../memory/tags'
+import { ExpressionStatement, Identifier, Node } from '../parser/types'
+import { typeCheck } from '../typeChecker/typeChecker'
 import { ClosureInstruction, Command, Context, Value, WhileStatementInstruction } from '../types'
-import { checkBinaryExpression } from '../utils/runtime/checkBinaryExp'
-import { checkIdentifier } from '../utils/runtime/checkIdentifier'
-import { checkLogicalExpression } from '../utils/runtime/checkLogicalExp'
-import { checkUnaryExpression } from '../utils/runtime/checkUnaryExp'
-import { checkIfStatement } from '../utils/runtime/statements/checkIf'
-import { checkLoop } from '../utils/runtime/statements/checkLoop'
-import { isNumber } from '../utils/runtime/utils'
 import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
 import { handleRuntimeError, InterpreterError } from './errors'
-import MemoryModel from './memory/memoryModel'
-import { TAG_TO_TYPE, TYPE_TO_TAG } from './memory/tags'
 import {
   evaluateBinaryExpression,
   evaluateLogicalExpression,
   evaluateUnaryExpression
 } from './operators'
-import { typeCheck } from './typeChecker/typeChecker'
+import { isNumber } from './utils'
 import {
   checkNumberOfArguments,
   declareIdentifier,
@@ -104,8 +98,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    checkIdentifier(node)
-
     const identifier = getVariable(context, node.name)
     console.log('load identifier ' + node.name + ' at addr ' + identifier)
 
@@ -116,7 +108,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.type != 'TypedIdentifier') {
       throw handleRuntimeError(context, new InterpreterError(command))
     }
-    checkIdentifier(command)
+
     const identifier = getVariable(context, command.name)
     context.runtime.stash.push(identifier)
   },
@@ -404,7 +396,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const [type_left, left] = memory.mem_read(left_addr)
     const [type_right, right] = memory.mem_read(right_addr)
     const operator = command.operator
-    checkBinaryExpression(command, type_left, type_right)
     const result = evaluateBinaryExpression(command, operator, right, left)
     const push_addr = memory.mem_stack_push(type_left, result)
     stash.push(push_addr)
@@ -423,7 +414,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (operator == '&' || operator == '*') {
       throw new Error('Pointer not implemented yet')
     }
-    checkUnaryExpression(command, type, context)
+
     const result = evaluateUnaryExpression(operator, value)
     const push_addr = memory.mem_stack_push(type, result as number)
     stash.push(push_addr)
@@ -438,7 +429,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const agenda = context.runtime.agenda
     const bool_addr = stash.pop()
     const [type, bool] = memory.mem_read(bool_addr)
-    checkIfStatement(command, bool, context)
     agenda.push(bool ? command.consequent : command.alternate)
   },
 
@@ -451,7 +441,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const agenda = context.runtime.agenda
     const bool_addr = stash.pop()
     const [type, bool] = memory.mem_read(bool_addr)
-    checkIfStatement(command, bool, context)
     agenda.push(bool ? command.consequent : command.alternate)
   },
 
@@ -461,7 +450,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
     const stash = context.runtime.stash
     const agenda = context.runtime.agenda
-    checkLoop(command, command.test, context)
+
     const [type, value] = memory.mem_read(stash.pop())
     if (value) {
       agenda.push(command, command.test, { type: 'Pop_i' }, command.body)
@@ -475,7 +464,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const stash = context.runtime.stash
     const agenda = context.runtime.agenda
-    checkLoop(command, command.test, context)
+
     const address = stash.pop()
     const [type, value] = memory.mem_read(address)
     if (value) {
@@ -546,7 +535,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const [type_right, right] = memory.mem_read(right_addr)
     const operator = command.operator
 
-    checkLogicalExpression(command, operator, left, right, context)
     const result = evaluateLogicalExpression(operator, left, right)
     const push_addr = memory.mem_stack_push(type_left, result) //type checking kinda?
     stash.push(push_addr)

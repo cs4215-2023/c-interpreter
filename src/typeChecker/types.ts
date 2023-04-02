@@ -1,4 +1,4 @@
-import { PrimitiveType, TypedIdentifier } from '../../parser/types'
+import { PrimitiveType, TypedIdentifier } from '../parser/types'
 
 export type ClosureType = {
   type: 'Closure'

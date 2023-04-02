@@ -1,6 +1,6 @@
 import { assert } from 'console'
 
-import { StackOverflowError } from '../../errors/errors'
+import { StackOverflowError } from '../errors/errors'
 import MemoryBuffer from './memoryBuffer'
 import { TAGS } from './tags'
 
