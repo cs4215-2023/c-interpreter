@@ -1,4 +1,5 @@
 import { FLOAT_TYPE, INT_TYPE, VOID_TYPE } from '../constants'
+import { builtin_functions } from '../interpreter/defaults/functions'
 import { handleRuntimeError, InterpreterError } from '../interpreter/errors'
 import { Identifier, Node } from '../parser/types'
 import { Command, Context } from '../types'
@@ -361,6 +362,9 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     // Create global environment
     const type_env = createBlockTypeEnvironment(context, 'globalTypeEnvironment')
+    const global_frame = {}
+
+    for (const key in builtin_functions) global_frame[key] = { type: 'Builtin', name: key }
     pushTypeEnvironment(context, type_env)
 
     for (const statement of node.body) {

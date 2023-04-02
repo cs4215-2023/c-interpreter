@@ -1,13 +1,13 @@
 import { FLOAT_PRECISION } from '../../constants'
 
+const REGEX = /%[c,f,d]+/g
+
 export const builtin_functions = {
   printf: (x: string, ...args: any[]) => console.log(printf(x, args))
 }
 
-const regex = /%[c,f,d]+/g
-
 export const printf = (stringInput: string, ...args: any[]) => {
-  const found = stringInput.match(regex)
+  const found = stringInput.match(REGEX)
   if (found == null) {
     return stringInput
   }
@@ -42,6 +42,6 @@ export const printf = (stringInput: string, ...args: any[]) => {
     }
   }
 
-  const replacedString = stringInput.replace(regex, replaceTokens)
+  const replacedString = stringInput.replace(REGEX, replaceTokens)
   return replacedString
 }

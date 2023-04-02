@@ -33,13 +33,7 @@ SIGNEDTYPE: 'signed' | 'unsigned';
 
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
-FORMATSPECIFIERS:
-	'"' '%d' '"'
-	| '"' '%i' '"'
-	| '"' '%c' '"'
-	| '"' '%f' '"'
-	| '"' '%s' '"'
-	| '"' '%p' '"';
+FORMATSPECIFIERS: '%d' | '%i' | '%c' | '%f' | '%s' | '%p';
 
 NUMBER: [0-9_]+;
 CHAR: '\'' ~[\])] '\'';
@@ -50,7 +44,7 @@ MINUSMINUS: '--';
 
 start: (statement)*;
 
-stringLiteral: '"' IDENTIFIER? '"';
+stringLiteral: '"' (IDENTIFIER | FORMATSPECIFIERS)* '"';
 
 stringLiteralList: stringLiteral (',' stringLiteral)*;
 
@@ -90,7 +84,6 @@ expression:
 	| pointerDerefernce														# PointerDereferenceExpression
 	| pointerReference														# PointerReferenceExpression
 	| functionCall															# FunctionCallExpression
-	| printf																# PrintfExpression
 	| left = expression operator = MUL right = expression					# Multiplication
 	| left = expression operator = DIV right = expression					# Division
 	| left = expression operator = MOD right = expression					# ModulusDivision
@@ -180,9 +173,6 @@ functionCall:
 	func = IDENTIFIER '(' args = functionCallParameters ')';
 
 functionCallParameters: expressionList;
-
-printf:
-	'printf(' (stringLiteral | FORMATSPECIFIERS)* ',' identifierList ')';
 
 // primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 

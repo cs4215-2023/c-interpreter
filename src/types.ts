@@ -271,3 +271,7 @@ export interface ClosureInstruction {
   loc?: SourceLocation
   typeDeclaration: Type
 }
+
+export interface Builtin {
+  type: 'Builtin'
+}
