@@ -11,6 +11,7 @@ import { StringLiteralExpressionContext } from "./ClangParser";
 import { IdentifierExpressionContext } from "./ClangParser";
 import { PostFixNotationExpressionContext } from "./ClangParser";
 import { ArrayInitialisationExpressionContext } from "./ClangParser";
+import { ArrayIdentifierExpressionContext } from "./ClangParser";
 import { ParenthesisExpressionContext } from "./ClangParser";
 import { PointerDeclarationExpressionContext } from "./ClangParser";
 import { PointerDereferenceExpressionContext } from "./ClangParser";
@@ -187,6 +188,19 @@ export interface ClangListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitArrayInitialisationExpression?: (ctx: ArrayInitialisationExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `ArrayIdentifierExpression`
+	 * labeled alternative in `ClangParser.expression`.
+	 * @param ctx the parse tree
+	 */
+	enterArrayIdentifierExpression?: (ctx: ArrayIdentifierExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `ArrayIdentifierExpression`
+	 * labeled alternative in `ClangParser.expression`.
+	 * @param ctx the parse tree
+	 */
+	exitArrayIdentifierExpression?: (ctx: ArrayIdentifierExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `ParenthesisExpression`

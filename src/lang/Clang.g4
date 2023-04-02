@@ -85,6 +85,7 @@ expression:
 	| IDENTIFIER															# IdentifierExpression
 	| postFix																# PostFixNotationExpression
 	| arrayInitialisation													# ArrayInitialisationExpression
+	| arrayIdentifier														# ArrayIdentifierExpression
 	| '(' inner = expression ')'											# ParenthesisExpression
 	| pointer																# PointerDeclarationExpression
 	| pointerDerefernce														# PointerDereferenceExpression

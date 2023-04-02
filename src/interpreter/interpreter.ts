@@ -86,14 +86,14 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       const address = memory.mem_stack_push(TYPE_TO_TAG[node.valueType], node.value)
       console.log(
         'storing literal ' +
-        node.value +
-        ' with address ' +
-        address +
-        ' as ' +
-        node.valueType +
-        '(' +
-        TYPE_TO_TAG[node.valueType] +
-        ')'
+          node.value +
+          ' with address ' +
+          address +
+          ' as ' +
+          node.valueType +
+          '(' +
+          TYPE_TO_TAG[node.valueType] +
+          ')'
       )
       context.runtime.stash.push(address) //replace with address
     }

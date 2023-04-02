@@ -645,7 +645,7 @@ export class ClangParser extends Parser {
 			let _alt: number;
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 171;
+			this.state = 172;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 10, this._ctx) ) {
 			case 1:
@@ -731,106 +731,116 @@ export class ClangParser extends Parser {
 
 			case 9:
 				{
-				_localctx = new ParenthesisExpressionContext(_localctx);
+				_localctx = new ArrayIdentifierExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
 				this.state = 156;
-				this.match(ClangParser.T__2);
-				this.state = 157;
-				(_localctx as ParenthesisExpressionContext)._inner = this.expression(0);
-				this.state = 158;
-				this.match(ClangParser.T__3);
+				this.arrayIdentifier();
 				}
 				break;
 
 			case 10:
 				{
-				_localctx = new PointerDeclarationExpressionContext(_localctx);
+				_localctx = new ParenthesisExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 160;
-				this.pointer();
+				this.state = 157;
+				this.match(ClangParser.T__2);
+				this.state = 158;
+				(_localctx as ParenthesisExpressionContext)._inner = this.expression(0);
+				this.state = 159;
+				this.match(ClangParser.T__3);
 				}
 				break;
 
 			case 11:
 				{
-				_localctx = new PointerDereferenceExpressionContext(_localctx);
+				_localctx = new PointerDeclarationExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
 				this.state = 161;
-				this.pointerDerefernce();
+				this.pointer();
 				}
 				break;
 
 			case 12:
 				{
-				_localctx = new PointerReferenceExpressionContext(_localctx);
+				_localctx = new PointerDereferenceExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
 				this.state = 162;
-				this.pointerReference();
+				this.pointerDerefernce();
 				}
 				break;
 
 			case 13:
 				{
-				_localctx = new FunctionCallExpressionContext(_localctx);
+				_localctx = new PointerReferenceExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
 				this.state = 163;
-				this.functionCall();
+				this.pointerReference();
 				}
 				break;
 
 			case 14:
 				{
-				_localctx = new PrintfExpressionContext(_localctx);
+				_localctx = new FunctionCallExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
 				this.state = 164;
-				this.printf();
+				this.functionCall();
 				}
 				break;
 
 			case 15:
 				{
-				_localctx = new NegativeContext(_localctx);
+				_localctx = new PrintfExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
 				this.state = 165;
-				(_localctx as NegativeContext)._operators = this.match(ClangParser.SUB);
-				this.state = 166;
-				(_localctx as NegativeContext)._argument = this.expression(3);
+				this.printf();
 				}
 				break;
 
 			case 16:
 				{
-				_localctx = new PositiveContext(_localctx);
+				_localctx = new NegativeContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 166;
+				(_localctx as NegativeContext)._operators = this.match(ClangParser.SUB);
 				this.state = 167;
-				(_localctx as PositiveContext)._operators = this.match(ClangParser.ADD);
-				this.state = 168;
-				(_localctx as PositiveContext)._argument = this.expression(2);
+				(_localctx as NegativeContext)._argument = this.expression(3);
 				}
 				break;
 
 			case 17:
 				{
+				_localctx = new PositiveContext(_localctx);
+				this._ctx = _localctx;
+				_prevctx = _localctx;
+				this.state = 168;
+				(_localctx as PositiveContext)._operators = this.match(ClangParser.ADD);
+				this.state = 169;
+				(_localctx as PositiveContext)._argument = this.expression(2);
+				}
+				break;
+
+			case 18:
+				{
 				_localctx = new NotContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 169;
-				(_localctx as NotContext)._operators = this.match(ClangParser.NOT);
 				this.state = 170;
+				(_localctx as NotContext)._operators = this.match(ClangParser.NOT);
+				this.state = 171;
 				(_localctx as NotContext)._argument = this.parenthesesExpression();
 				}
 				break;
 			}
 			this._ctx._stop = this._input.tryLT(-1);
-			this.state = 238;
+			this.state = 239;
 			this._errHandler.sync(this);
 			_alt = this.interpreter.adaptivePredict(this._input, 12, this._ctx);
 			while (_alt !== 2 && _alt !== ATN.INVALID_ALT_NUMBER) {
@@ -840,7 +850,7 @@ export class ClangParser extends Parser {
 					}
 					_prevctx = _localctx;
 					{
-					this.state = 236;
+					this.state = 237;
 					this._errHandler.sync(this);
 					switch ( this.interpreter.adaptivePredict(this._input, 11, this._ctx) ) {
 					case 1:
@@ -848,13 +858,13 @@ export class ClangParser extends Parser {
 						_localctx = new MultiplicationContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as MultiplicationContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 173;
+						this.state = 174;
 						if (!(this.precpred(this._ctx, 24))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 24)");
 						}
-						this.state = 174;
-						(_localctx as MultiplicationContext)._operator = this.match(ClangParser.MUL);
 						this.state = 175;
+						(_localctx as MultiplicationContext)._operator = this.match(ClangParser.MUL);
+						this.state = 176;
 						(_localctx as MultiplicationContext)._right = this.expression(25);
 						}
 						break;
@@ -864,13 +874,13 @@ export class ClangParser extends Parser {
 						_localctx = new DivisionContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as DivisionContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 176;
+						this.state = 177;
 						if (!(this.precpred(this._ctx, 23))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 23)");
 						}
-						this.state = 177;
-						(_localctx as DivisionContext)._operator = this.match(ClangParser.DIV);
 						this.state = 178;
+						(_localctx as DivisionContext)._operator = this.match(ClangParser.DIV);
+						this.state = 179;
 						(_localctx as DivisionContext)._right = this.expression(24);
 						}
 						break;
@@ -880,13 +890,13 @@ export class ClangParser extends Parser {
 						_localctx = new ModulusDivisionContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as ModulusDivisionContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 179;
+						this.state = 180;
 						if (!(this.precpred(this._ctx, 22))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 22)");
 						}
-						this.state = 180;
-						(_localctx as ModulusDivisionContext)._operator = this.match(ClangParser.MOD);
 						this.state = 181;
+						(_localctx as ModulusDivisionContext)._operator = this.match(ClangParser.MOD);
+						this.state = 182;
 						(_localctx as ModulusDivisionContext)._right = this.expression(23);
 						}
 						break;
@@ -896,13 +906,13 @@ export class ClangParser extends Parser {
 						_localctx = new AdditionContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as AdditionContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 182;
+						this.state = 183;
 						if (!(this.precpred(this._ctx, 21))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 21)");
 						}
-						this.state = 183;
-						(_localctx as AdditionContext)._operator = this.match(ClangParser.ADD);
 						this.state = 184;
+						(_localctx as AdditionContext)._operator = this.match(ClangParser.ADD);
+						this.state = 185;
 						(_localctx as AdditionContext)._right = this.expression(22);
 						}
 						break;
@@ -912,13 +922,13 @@ export class ClangParser extends Parser {
 						_localctx = new SubtractionContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as SubtractionContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 185;
+						this.state = 186;
 						if (!(this.precpred(this._ctx, 20))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 20)");
 						}
-						this.state = 186;
-						(_localctx as SubtractionContext)._operator = this.match(ClangParser.SUB);
 						this.state = 187;
+						(_localctx as SubtractionContext)._operator = this.match(ClangParser.SUB);
+						this.state = 188;
 						(_localctx as SubtractionContext)._right = this.expression(21);
 						}
 						break;
@@ -928,13 +938,13 @@ export class ClangParser extends Parser {
 						_localctx = new BitShiftLeftContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as BitShiftLeftContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 188;
+						this.state = 189;
 						if (!(this.precpred(this._ctx, 19))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 19)");
 						}
-						this.state = 189;
-						(_localctx as BitShiftLeftContext)._operator = this.match(ClangParser.BITSHIFTLEFT);
 						this.state = 190;
+						(_localctx as BitShiftLeftContext)._operator = this.match(ClangParser.BITSHIFTLEFT);
+						this.state = 191;
 						(_localctx as BitShiftLeftContext)._right = this.expression(20);
 						}
 						break;
@@ -944,13 +954,13 @@ export class ClangParser extends Parser {
 						_localctx = new BitShiftRightContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as BitShiftRightContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 191;
+						this.state = 192;
 						if (!(this.precpred(this._ctx, 18))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 18)");
 						}
-						this.state = 192;
-						(_localctx as BitShiftRightContext)._operator = this.match(ClangParser.BITSHIFTRIGHT);
 						this.state = 193;
+						(_localctx as BitShiftRightContext)._operator = this.match(ClangParser.BITSHIFTRIGHT);
+						this.state = 194;
 						(_localctx as BitShiftRightContext)._right = this.expression(19);
 						}
 						break;
@@ -960,13 +970,13 @@ export class ClangParser extends Parser {
 						_localctx = new GreaterThanContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as GreaterThanContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 194;
+						this.state = 195;
 						if (!(this.precpred(this._ctx, 17))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 17)");
 						}
-						this.state = 195;
-						(_localctx as GreaterThanContext)._operator = this.match(ClangParser.GREATERTHAN);
 						this.state = 196;
+						(_localctx as GreaterThanContext)._operator = this.match(ClangParser.GREATERTHAN);
+						this.state = 197;
 						(_localctx as GreaterThanContext)._right = this.expression(18);
 						}
 						break;
@@ -976,13 +986,13 @@ export class ClangParser extends Parser {
 						_localctx = new LesserThanContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as LesserThanContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 197;
+						this.state = 198;
 						if (!(this.precpred(this._ctx, 16))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 16)");
 						}
-						this.state = 198;
-						(_localctx as LesserThanContext)._operator = this.match(ClangParser.LESSTHAN);
 						this.state = 199;
+						(_localctx as LesserThanContext)._operator = this.match(ClangParser.LESSTHAN);
+						this.state = 200;
 						(_localctx as LesserThanContext)._right = this.expression(17);
 						}
 						break;
@@ -992,13 +1002,13 @@ export class ClangParser extends Parser {
 						_localctx = new GreaterThanOrEqualContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as GreaterThanOrEqualContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 200;
+						this.state = 201;
 						if (!(this.precpred(this._ctx, 15))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 15)");
 						}
-						this.state = 201;
-						(_localctx as GreaterThanOrEqualContext)._operator = this.match(ClangParser.GREATERTHANOREQUAL);
 						this.state = 202;
+						(_localctx as GreaterThanOrEqualContext)._operator = this.match(ClangParser.GREATERTHANOREQUAL);
+						this.state = 203;
 						(_localctx as GreaterThanOrEqualContext)._right = this.expression(16);
 						}
 						break;
@@ -1008,13 +1018,13 @@ export class ClangParser extends Parser {
 						_localctx = new LesserThanOrEqualContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as LesserThanOrEqualContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 203;
+						this.state = 204;
 						if (!(this.precpred(this._ctx, 14))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 14)");
 						}
-						this.state = 204;
-						(_localctx as LesserThanOrEqualContext)._operator = this.match(ClangParser.LESSTHANOREQUAL);
 						this.state = 205;
+						(_localctx as LesserThanOrEqualContext)._operator = this.match(ClangParser.LESSTHANOREQUAL);
+						this.state = 206;
 						(_localctx as LesserThanOrEqualContext)._right = this.expression(15);
 						}
 						break;
@@ -1024,13 +1034,13 @@ export class ClangParser extends Parser {
 						_localctx = new EqualityCheckingContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as EqualityCheckingContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 206;
+						this.state = 207;
 						if (!(this.precpred(this._ctx, 13))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 13)");
 						}
-						this.state = 207;
-						(_localctx as EqualityCheckingContext)._operator = this.match(ClangParser.EQUALCHECK);
 						this.state = 208;
+						(_localctx as EqualityCheckingContext)._operator = this.match(ClangParser.EQUALCHECK);
+						this.state = 209;
 						(_localctx as EqualityCheckingContext)._right = this.expression(14);
 						}
 						break;
@@ -1040,13 +1050,13 @@ export class ClangParser extends Parser {
 						_localctx = new NotEqualContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as NotEqualContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 209;
+						this.state = 210;
 						if (!(this.precpred(this._ctx, 12))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 12)");
 						}
-						this.state = 210;
-						(_localctx as NotEqualContext)._operator = this.match(ClangParser.NOTEQUALCHECK);
 						this.state = 211;
+						(_localctx as NotEqualContext)._operator = this.match(ClangParser.NOTEQUALCHECK);
+						this.state = 212;
 						(_localctx as NotEqualContext)._right = this.expression(13);
 						}
 						break;
@@ -1056,13 +1066,13 @@ export class ClangParser extends Parser {
 						_localctx = new OrContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as OrContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 212;
+						this.state = 213;
 						if (!(this.precpred(this._ctx, 11))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 11)");
 						}
-						this.state = 213;
-						(_localctx as OrContext)._operator = this.match(ClangParser.OR);
 						this.state = 214;
+						(_localctx as OrContext)._operator = this.match(ClangParser.OR);
+						this.state = 215;
 						(_localctx as OrContext)._right = this.expression(12);
 						}
 						break;
@@ -1072,13 +1082,13 @@ export class ClangParser extends Parser {
 						_localctx = new AndContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as AndContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 215;
+						this.state = 216;
 						if (!(this.precpred(this._ctx, 10))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 10)");
 						}
-						this.state = 216;
-						(_localctx as AndContext)._operator = this.match(ClangParser.AND);
 						this.state = 217;
+						(_localctx as AndContext)._operator = this.match(ClangParser.AND);
+						this.state = 218;
 						(_localctx as AndContext)._right = this.expression(11);
 						}
 						break;
@@ -1088,13 +1098,13 @@ export class ClangParser extends Parser {
 						_localctx = new BitwiseAndContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as BitwiseAndContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 218;
+						this.state = 219;
 						if (!(this.precpred(this._ctx, 9))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 9)");
 						}
-						this.state = 219;
-						(_localctx as BitwiseAndContext)._operator = this.match(ClangParser.BITWISEAND);
 						this.state = 220;
+						(_localctx as BitwiseAndContext)._operator = this.match(ClangParser.BITWISEAND);
+						this.state = 221;
 						(_localctx as BitwiseAndContext)._right = this.expression(10);
 						}
 						break;
@@ -1104,13 +1114,13 @@ export class ClangParser extends Parser {
 						_localctx = new BitwiseOrContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as BitwiseOrContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 221;
+						this.state = 222;
 						if (!(this.precpred(this._ctx, 8))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 8)");
 						}
-						this.state = 222;
-						(_localctx as BitwiseOrContext)._operator = this.match(ClangParser.BITWISEOR);
 						this.state = 223;
+						(_localctx as BitwiseOrContext)._operator = this.match(ClangParser.BITWISEOR);
+						this.state = 224;
 						(_localctx as BitwiseOrContext)._right = this.expression(9);
 						}
 						break;
@@ -1120,13 +1130,13 @@ export class ClangParser extends Parser {
 						_localctx = new XorContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as XorContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 224;
+						this.state = 225;
 						if (!(this.precpred(this._ctx, 7))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 7)");
 						}
-						this.state = 225;
-						(_localctx as XorContext)._operator = this.match(ClangParser.XOR);
 						this.state = 226;
+						(_localctx as XorContext)._operator = this.match(ClangParser.XOR);
+						this.state = 227;
 						(_localctx as XorContext)._right = this.expression(8);
 						}
 						break;
@@ -1136,13 +1146,13 @@ export class ClangParser extends Parser {
 						_localctx = new AssignmentContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as AssignmentContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 227;
+						this.state = 228;
 						if (!(this.precpred(this._ctx, 6))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 6)");
 						}
-						this.state = 228;
-						(_localctx as AssignmentContext)._operator = this.match(ClangParser.EQUAL);
 						this.state = 229;
+						(_localctx as AssignmentContext)._operator = this.match(ClangParser.EQUAL);
+						this.state = 230;
 						(_localctx as AssignmentContext)._right = this.expression(7);
 						}
 						break;
@@ -1152,13 +1162,13 @@ export class ClangParser extends Parser {
 						_localctx = new AssignAndMinusOneContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as AssignAndMinusOneContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 230;
+						this.state = 231;
 						if (!(this.precpred(this._ctx, 5))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 5)");
 						}
-						this.state = 231;
-						(_localctx as AssignAndMinusOneContext)._operator = this.match(ClangParser.MINUSEQUAL);
 						this.state = 232;
+						(_localctx as AssignAndMinusOneContext)._operator = this.match(ClangParser.MINUSEQUAL);
+						this.state = 233;
 						(_localctx as AssignAndMinusOneContext)._right = this.expression(6);
 						}
 						break;
@@ -1168,20 +1178,20 @@ export class ClangParser extends Parser {
 						_localctx = new AssignAndAddOneContext(new ExpressionContext(_parentctx, _parentState));
 						(_localctx as AssignAndAddOneContext)._left = _prevctx;
 						this.pushNewRecursionContext(_localctx, _startState, ClangParser.RULE_expression);
-						this.state = 233;
+						this.state = 234;
 						if (!(this.precpred(this._ctx, 4))) {
 							throw this.createFailedPredicateException("this.precpred(this._ctx, 4)");
 						}
-						this.state = 234;
-						(_localctx as AssignAndAddOneContext)._operator = this.match(ClangParser.PLUSEQUAL);
 						this.state = 235;
+						(_localctx as AssignAndAddOneContext)._operator = this.match(ClangParser.PLUSEQUAL);
+						this.state = 236;
 						(_localctx as AssignAndAddOneContext)._right = this.expression(5);
 						}
 						break;
 					}
 					}
 				}
-				this.state = 240;
+				this.state = 241;
 				this._errHandler.sync(this);
 				_alt = this.interpreter.adaptivePredict(this._input, 12, this._ctx);
 			}
@@ -1209,17 +1219,17 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 244;
+			this.state = 245;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << ClangParser.T__0) | (1 << ClangParser.T__2) | (1 << ClangParser.T__6) | (1 << ClangParser.T__8) | (1 << ClangParser.T__12) | (1 << ClangParser.T__13) | (1 << ClangParser.T__14) | (1 << ClangParser.T__17) | (1 << ClangParser.MUL) | (1 << ClangParser.ADD) | (1 << ClangParser.SUB))) !== 0) || ((((_la - 34)) & ~0x1F) === 0 && ((1 << (_la - 34)) & ((1 << (ClangParser.NOT - 34)) | (1 << (ClangParser.BITWISEAND - 34)) | (1 << (ClangParser.PRIMITIVETYPE - 34)) | (1 << (ClangParser.SIGNEDTYPE - 34)) | (1 << (ClangParser.IDENTIFIER - 34)) | (1 << (ClangParser.NUMBER - 34)) | (1 << (ClangParser.CHAR - 34)) | (1 << (ClangParser.FLOAT - 34)))) !== 0)) {
 				{
 				{
-				this.state = 241;
+				this.state = 242;
 				this.statement();
 				}
 				}
-				this.state = 246;
+				this.state = 247;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1246,11 +1256,11 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 247;
-			this.match(ClangParser.T__2);
 			this.state = 248;
-			_localctx._inner = this.expression(0);
+			this.match(ClangParser.T__2);
 			this.state = 249;
+			_localctx._inner = this.expression(0);
+			this.state = 250;
 			this.match(ClangParser.T__3);
 			}
 		}
@@ -1276,9 +1286,9 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 251;
-			_localctx._argument = this.match(ClangParser.IDENTIFIER);
 			this.state = 252;
+			_localctx._argument = this.match(ClangParser.IDENTIFIER);
+			this.state = 253;
 			_la = this._input.LA(1);
 			if (!(_la === ClangParser.PLUSPLUS || _la === ClangParser.MINUSMINUS)) {
 			this._errHandler.recoverInline(this);
@@ -1313,15 +1323,15 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 254;
-			_localctx._test = this.expression(0);
 			this.state = 255;
-			this.match(ClangParser.T__4);
+			_localctx._test = this.expression(0);
 			this.state = 256;
-			_localctx._consequent = this.expression(0);
+			this.match(ClangParser.T__4);
 			this.state = 257;
-			this.match(ClangParser.T__5);
+			_localctx._consequent = this.expression(0);
 			this.state = 258;
+			this.match(ClangParser.T__5);
+			this.state = 259;
 			_localctx._alternate = this.expression(0);
 			}
 		}
@@ -1347,19 +1357,19 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 260;
+			this.state = 261;
 			this.match(ClangParser.T__6);
-			this.state = 262;
+			this.state = 263;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << ClangParser.T__0) | (1 << ClangParser.T__2) | (1 << ClangParser.T__17) | (1 << ClangParser.MUL) | (1 << ClangParser.ADD) | (1 << ClangParser.SUB))) !== 0) || ((((_la - 34)) & ~0x1F) === 0 && ((1 << (_la - 34)) & ((1 << (ClangParser.NOT - 34)) | (1 << (ClangParser.BITWISEAND - 34)) | (1 << (ClangParser.PRIMITIVETYPE - 34)) | (1 << (ClangParser.SIGNEDTYPE - 34)) | (1 << (ClangParser.IDENTIFIER - 34)) | (1 << (ClangParser.NUMBER - 34)) | (1 << (ClangParser.CHAR - 34)) | (1 << (ClangParser.FLOAT - 34)))) !== 0)) {
 				{
-				this.state = 261;
+				this.state = 262;
 				_localctx._argument = this.expression(0);
 				}
 			}
 
-			this.state = 264;
+			this.state = 265;
 			this.match(ClangParser.T__7);
 			}
 		}
@@ -1384,9 +1394,9 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 266;
-			this.expression(0);
 			this.state = 267;
+			this.expression(0);
+			this.state = 268;
 			this.match(ClangParser.T__7);
 			}
 		}
@@ -1412,43 +1422,43 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 269;
-			this.match(ClangParser.T__8);
 			this.state = 270;
-			this.match(ClangParser.T__2);
+			this.match(ClangParser.T__8);
 			this.state = 271;
-			_localctx._test = this.expression(0);
+			this.match(ClangParser.T__2);
 			this.state = 272;
-			this.match(ClangParser.T__3);
+			_localctx._test = this.expression(0);
 			this.state = 273;
-			this.match(ClangParser.T__9);
+			this.match(ClangParser.T__3);
 			this.state = 274;
-			_localctx._consequentStatement = this.statementBlock();
+			this.match(ClangParser.T__9);
 			this.state = 275;
+			_localctx._consequentStatement = this.statementBlock();
+			this.state = 276;
 			this.match(ClangParser.T__10);
-			this.state = 284;
+			this.state = 285;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la === ClangParser.T__11) {
 				{
-				this.state = 276;
+				this.state = 277;
 				this.match(ClangParser.T__11);
-				this.state = 282;
+				this.state = 283;
 				this._errHandler.sync(this);
 				switch (this._input.LA(1)) {
 				case ClangParser.T__9:
 					{
-					this.state = 277;
-					this.match(ClangParser.T__9);
 					this.state = 278;
-					_localctx._alternateStatementBlock = this.statementBlock();
+					this.match(ClangParser.T__9);
 					this.state = 279;
+					_localctx._alternateStatementBlock = this.statementBlock();
+					this.state = 280;
 					this.match(ClangParser.T__10);
 					}
 					break;
 				case ClangParser.T__8:
 					{
-					this.state = 281;
+					this.state = 282;
 					_localctx._elseIfStatement = this.conditionalStatement();
 					}
 					break;
@@ -1479,27 +1489,27 @@ export class ClangParser extends Parser {
 		let _localctx: IterationStatementContext = new IterationStatementContext(this._ctx, this.state);
 		this.enterRule(_localctx, 38, ClangParser.RULE_iterationStatement);
 		try {
-			this.state = 289;
+			this.state = 290;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case ClangParser.T__12:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 286;
+				this.state = 287;
 				this.whileLoop();
 				}
 				break;
 			case ClangParser.T__13:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 287;
+				this.state = 288;
 				this.doWhileLoop();
 				}
 				break;
 			case ClangParser.T__14:
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 288;
+				this.state = 289;
 				this.forLoop();
 				}
 				break;
@@ -1528,19 +1538,19 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 291;
-			this.match(ClangParser.T__12);
 			this.state = 292;
-			this.match(ClangParser.T__2);
+			this.match(ClangParser.T__12);
 			this.state = 293;
-			_localctx._condition = this.expression(0);
+			this.match(ClangParser.T__2);
 			this.state = 294;
-			this.match(ClangParser.T__3);
+			_localctx._condition = this.expression(0);
 			this.state = 295;
-			this.match(ClangParser.T__9);
+			this.match(ClangParser.T__3);
 			this.state = 296;
-			_localctx._body = this.statementBlock();
+			this.match(ClangParser.T__9);
 			this.state = 297;
+			_localctx._body = this.statementBlock();
+			this.state = 298;
 			this.match(ClangParser.T__10);
 			}
 		}
@@ -1565,23 +1575,23 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 299;
-			this.match(ClangParser.T__13);
 			this.state = 300;
-			this.match(ClangParser.T__9);
+			this.match(ClangParser.T__13);
 			this.state = 301;
-			_localctx._body = this.statementBlock();
+			this.match(ClangParser.T__9);
 			this.state = 302;
-			this.match(ClangParser.T__10);
+			_localctx._body = this.statementBlock();
 			this.state = 303;
-			this.match(ClangParser.T__12);
+			this.match(ClangParser.T__10);
 			this.state = 304;
-			this.match(ClangParser.T__2);
+			this.match(ClangParser.T__12);
 			this.state = 305;
-			_localctx._condition = this.expression(0);
+			this.match(ClangParser.T__2);
 			this.state = 306;
-			this.match(ClangParser.T__3);
+			_localctx._condition = this.expression(0);
 			this.state = 307;
+			this.match(ClangParser.T__3);
+			this.state = 308;
 			this.match(ClangParser.T__7);
 			}
 		}
@@ -1606,19 +1616,19 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 309;
-			this.match(ClangParser.T__14);
 			this.state = 310;
-			this.match(ClangParser.T__2);
+			this.match(ClangParser.T__14);
 			this.state = 311;
-			_localctx._innerForCondition = this.forCondition();
+			this.match(ClangParser.T__2);
 			this.state = 312;
-			this.match(ClangParser.T__3);
+			_localctx._innerForCondition = this.forCondition();
 			this.state = 313;
-			this.match(ClangParser.T__9);
+			this.match(ClangParser.T__3);
 			this.state = 314;
-			_localctx._body = this.statementBlock();
+			this.match(ClangParser.T__9);
 			this.state = 315;
+			_localctx._body = this.statementBlock();
+			this.state = 316;
 			this.match(ClangParser.T__10);
 			}
 		}
@@ -1644,23 +1654,23 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 317;
-			_localctx._initialise = this.expression(0);
 			this.state = 318;
+			_localctx._initialise = this.expression(0);
+			this.state = 319;
 			this.match(ClangParser.T__7);
-			this.state = 320;
+			this.state = 321;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << ClangParser.T__0) | (1 << ClangParser.T__2) | (1 << ClangParser.T__17) | (1 << ClangParser.MUL) | (1 << ClangParser.ADD) | (1 << ClangParser.SUB))) !== 0) || ((((_la - 34)) & ~0x1F) === 0 && ((1 << (_la - 34)) & ((1 << (ClangParser.NOT - 34)) | (1 << (ClangParser.BITWISEAND - 34)) | (1 << (ClangParser.PRIMITIVETYPE - 34)) | (1 << (ClangParser.SIGNEDTYPE - 34)) | (1 << (ClangParser.IDENTIFIER - 34)) | (1 << (ClangParser.NUMBER - 34)) | (1 << (ClangParser.CHAR - 34)) | (1 << (ClangParser.FLOAT - 34)))) !== 0)) {
 				{
-				this.state = 319;
+				this.state = 320;
 				_localctx._test = this.expression(0);
 				}
 			}
 
-			this.state = 322;
-			this.match(ClangParser.T__7);
 			this.state = 323;
+			this.match(ClangParser.T__7);
+			this.state = 324;
 			_localctx._update = this.expression(0);
 			}
 		}
@@ -1686,23 +1696,23 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 325;
-			_localctx._idType = this.type();
 			this.state = 326;
-			_localctx._id = this.match(ClangParser.IDENTIFIER);
+			_localctx._idType = this.type();
 			this.state = 327;
+			_localctx._id = this.match(ClangParser.IDENTIFIER);
+			this.state = 328;
 			this.match(ClangParser.T__15);
-			this.state = 329;
+			this.state = 330;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la === ClangParser.NUMBER) {
 				{
-				this.state = 328;
+				this.state = 329;
 				_localctx._size = this.match(ClangParser.NUMBER);
 				}
 			}
 
-			this.state = 331;
+			this.state = 332;
 			this.match(ClangParser.T__16);
 			}
 		}
@@ -1728,21 +1738,21 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 333;
-			_localctx._id = this.match(ClangParser.IDENTIFIER);
 			this.state = 334;
+			_localctx._id = this.match(ClangParser.IDENTIFIER);
+			this.state = 335;
 			this.match(ClangParser.T__15);
-			this.state = 336;
+			this.state = 337;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la === ClangParser.NUMBER) {
 				{
-				this.state = 335;
+				this.state = 336;
 				_localctx._size = this.match(ClangParser.NUMBER);
 				}
 			}
 
-			this.state = 338;
+			this.state = 339;
 			this.match(ClangParser.T__16);
 			}
 		}
@@ -1767,34 +1777,34 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 340;
+			this.state = 341;
 			this.match(ClangParser.T__9);
-			this.state = 344;
+			this.state = 345;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case ClangParser.PRIMITIVETYPE:
 			case ClangParser.SIGNEDTYPE:
 				{
-				this.state = 341;
+				this.state = 342;
 				this.pointerList();
 				}
 				break;
 			case ClangParser.NUMBER:
 				{
-				this.state = 342;
+				this.state = 343;
 				this.numberList();
 				}
 				break;
 			case ClangParser.IDENTIFIER:
 				{
-				this.state = 343;
+				this.state = 344;
 				this.identifierList();
 				}
 				break;
 			default:
 				throw new NoViableAltException(this);
 			}
-			this.state = 346;
+			this.state = 347;
 			this.match(ClangParser.T__10);
 			}
 		}
@@ -1819,23 +1829,23 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 348;
+			this.state = 349;
 			this.arrayIdentifierWithType();
-			this.state = 352;
+			this.state = 353;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 22, this._ctx) ) {
 			case 1:
 				{
-				this.state = 349;
-				_localctx._operator = this.match(ClangParser.EQUAL);
 				this.state = 350;
+				_localctx._operator = this.match(ClangParser.EQUAL);
+				this.state = 351;
 				_localctx._array = this.arrayContent();
 				}
 				break;
 
 			case 2:
 				{
-				this.state = 351;
+				this.state = 352;
 				this.stringLiteral();
 				}
 				break;
@@ -1863,11 +1873,11 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 354;
-			_localctx._idType = this.type();
 			this.state = 355;
-			this.match(ClangParser.MUL);
+			_localctx._idType = this.type();
 			this.state = 356;
+			this.match(ClangParser.MUL);
+			this.state = 357;
 			_localctx._id = this.match(ClangParser.IDENTIFIER);
 			}
 		}
@@ -1892,9 +1902,9 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 358;
-			_localctx._operator = this.match(ClangParser.MUL);
 			this.state = 359;
+			_localctx._operator = this.match(ClangParser.MUL);
+			this.state = 360;
 			_localctx._argument = this.match(ClangParser.IDENTIFIER);
 			}
 		}
@@ -1919,9 +1929,9 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 361;
-			_localctx._operator = this.match(ClangParser.BITWISEAND);
 			this.state = 362;
+			_localctx._operator = this.match(ClangParser.BITWISEAND);
+			this.state = 363;
 			_localctx._argument = this.match(ClangParser.IDENTIFIER);
 			}
 		}
@@ -1946,7 +1956,7 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 364;
+			this.state = 365;
 			this.function();
 			}
 		}
@@ -1972,31 +1982,31 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 366;
-			_localctx._idType = this.type();
 			this.state = 367;
+			_localctx._idType = this.type();
+			this.state = 368;
 			_localctx._id = this.match(ClangParser.IDENTIFIER);
 			{
-			this.state = 368;
+			this.state = 369;
 			this.match(ClangParser.T__2);
-			this.state = 370;
+			this.state = 371;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la === ClangParser.PRIMITIVETYPE || _la === ClangParser.SIGNEDTYPE) {
 				{
-				this.state = 369;
+				this.state = 370;
 				_localctx._params = this.identifierWithTypeList();
 				}
 			}
 
-			this.state = 372;
+			this.state = 373;
 			this.match(ClangParser.T__3);
 			}
-			this.state = 374;
-			this.match(ClangParser.T__9);
 			this.state = 375;
-			_localctx._body = this.statementBlock();
+			this.match(ClangParser.T__9);
 			this.state = 376;
+			_localctx._body = this.statementBlock();
+			this.state = 377;
 			this.match(ClangParser.T__10);
 			}
 		}
@@ -2021,13 +2031,13 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 378;
-			_localctx._func = this.match(ClangParser.IDENTIFIER);
 			this.state = 379;
-			this.match(ClangParser.T__2);
+			_localctx._func = this.match(ClangParser.IDENTIFIER);
 			this.state = 380;
-			_localctx._args = this.functionCallParameters();
+			this.match(ClangParser.T__2);
 			this.state = 381;
+			_localctx._args = this.functionCallParameters();
+			this.state = 382;
 			this.match(ClangParser.T__3);
 			}
 		}
@@ -2052,7 +2062,7 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 383;
+			this.state = 384;
 			this.expressionList();
 			}
 		}
@@ -2078,25 +2088,25 @@ export class ClangParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 385;
+			this.state = 386;
 			this.match(ClangParser.T__17);
-			this.state = 390;
+			this.state = 391;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la === ClangParser.T__0 || _la === ClangParser.FORMATSPECIFIERS) {
 				{
-				this.state = 388;
+				this.state = 389;
 				this._errHandler.sync(this);
 				switch (this._input.LA(1)) {
 				case ClangParser.T__0:
 					{
-					this.state = 386;
+					this.state = 387;
 					this.stringLiteral();
 					}
 					break;
 				case ClangParser.FORMATSPECIFIERS:
 					{
-					this.state = 387;
+					this.state = 388;
 					this.match(ClangParser.FORMATSPECIFIERS);
 					}
 					break;
@@ -2104,15 +2114,15 @@ export class ClangParser extends Parser {
 					throw new NoViableAltException(this);
 				}
 				}
-				this.state = 392;
+				this.state = 393;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
-			this.state = 393;
-			this.match(ClangParser.T__1);
 			this.state = 394;
-			this.identifierList();
+			this.match(ClangParser.T__1);
 			this.state = 395;
+			this.identifierList();
+			this.state = 396;
 			this.match(ClangParser.T__3);
 			}
 		}
@@ -2207,7 +2217,7 @@ export class ClangParser extends Parser {
 	}
 
 	public static readonly _serializedATN: string =
-		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x035\u0190\x04\x02" +
+		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x035\u0191\x04\x02" +
 		"\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07" +
 		"\t\x07\x04\b\t\b\x04\t\t\t\x04\n\t\n\x04\v\t\v\x04\f\t\f\x04\r\t\r\x04" +
 		"\x0E\t\x0E\x04\x0F\t\x0F\x04\x10\t\x10\x04\x11\t\x11\x04\x12\t\x12\x04" +
@@ -2223,48 +2233,48 @@ export class ClangParser extends Parser {
 		"\x85\v\n\x03\v\x03\v\x03\v\x07\v\x8A\n\v\f\v\x0E\v\x8D\v\v\x03\f\x03\f" +
 		"\x03\f\x03\f\x03\f\x05\f\x94\n\f\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03" +
 		"\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03" +
-		"\r\x03\r\x03\r\x03\r\x03\r\x03\r\x05\r\xAE\n\r\x03\r\x03\r\x03\r\x03\r" +
+		"\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x05\r\xAF\n\r\x03\r\x03\r\x03\r" +
 		"\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03" +
 		"\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03" +
 		"\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03" +
 		"\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03" +
-		"\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x07" +
-		"\r\xEF\n\r\f\r\x0E\r\xF2\v\r\x03\x0E\x07\x0E\xF5\n\x0E\f\x0E\x0E\x0E\xF8" +
-		"\v\x0E\x03\x0F\x03\x0F\x03\x0F\x03\x0F\x03\x10\x03\x10\x03\x10\x03\x11" +
-		"\x03\x11\x03\x11\x03\x11\x03\x11\x03\x11\x03\x12\x03\x12\x05\x12\u0109" +
-		"\n\x12\x03\x12\x03\x12\x03\x13\x03\x13\x03\x13\x03\x14\x03\x14\x03\x14" +
-		"\x03\x14\x03\x14\x03\x14\x03\x14\x03\x14\x03\x14\x03\x14\x03\x14\x03\x14" +
-		"\x03\x14\x05\x14\u011D\n\x14\x05\x14\u011F\n\x14\x03\x15\x03\x15\x03\x15" +
-		"\x05\x15\u0124\n\x15\x03\x16\x03\x16\x03\x16\x03\x16\x03\x16\x03\x16\x03" +
-		"\x16\x03\x16\x03\x17\x03\x17\x03\x17\x03\x17\x03\x17\x03\x17\x03\x17\x03" +
-		"\x17\x03\x17\x03\x17\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03" +
-		"\x18\x03\x18\x03\x19\x03\x19\x03\x19\x05\x19\u0143\n\x19\x03\x19\x03\x19" +
-		"\x03\x19\x03\x1A\x03\x1A\x03\x1A\x03\x1A\x05\x1A\u014C\n\x1A\x03\x1A\x03" +
-		"\x1A\x03\x1B\x03\x1B\x03\x1B\x05\x1B\u0153\n\x1B\x03\x1B\x03\x1B\x03\x1C" +
-		"\x03\x1C\x03\x1C\x03\x1C\x05\x1C\u015B\n\x1C\x03\x1C\x03\x1C\x03\x1D\x03" +
-		"\x1D\x03\x1D\x03\x1D\x05\x1D\u0163\n\x1D\x03\x1E\x03\x1E\x03\x1E\x03\x1E" +
-		"\x03\x1F\x03\x1F\x03\x1F\x03 \x03 \x03 \x03!\x03!\x03\"\x03\"\x03\"\x03" +
-		"\"\x05\"\u0175\n\"\x03\"\x03\"\x03\"\x03\"\x03\"\x03\"\x03#\x03#\x03#" +
-		"\x03#\x03#\x03$\x03$\x03%\x03%\x03%\x07%\u0187\n%\f%\x0E%\u018A\v%\x03" +
-		"%\x03%\x03%\x03%\x03%\x02\x02\x03\x18&\x02\x02\x04\x02\x06\x02\b\x02\n" +
-		"\x02\f\x02\x0E\x02\x10\x02\x12\x02\x14\x02\x16\x02\x18\x02\x1A\x02\x1C" +
-		"\x02\x1E\x02 \x02\"\x02$\x02&\x02(\x02*\x02,\x02.\x020\x022\x024\x026" +
-		"\x028\x02:\x02<\x02>\x02@\x02B\x02D\x02F\x02H\x02\x02\x03\x03\x0245\x02" +
-		"\u01AD\x02M\x03\x02\x02\x02\x04P\x03\x02\x02\x02\x06V\x03\x02\x02\x02" +
-		"\b^\x03\x02\x02\x02\nb\x03\x02\x02\x02\ff\x03\x02\x02\x02\x0En\x03\x02" +
-		"\x02\x02\x10v\x03\x02\x02\x02\x12~\x03\x02\x02\x02\x14\x86\x03\x02\x02" +
-		"\x02\x16\x93\x03\x02\x02\x02\x18\xAD\x03\x02\x02\x02\x1A\xF6\x03\x02\x02" +
-		"\x02\x1C\xF9\x03\x02\x02\x02\x1E\xFD\x03\x02\x02\x02 \u0100\x03\x02\x02" +
-		"\x02\"\u0106\x03\x02\x02\x02$\u010C\x03\x02\x02\x02&\u010F\x03\x02\x02" +
-		"\x02(\u0123\x03\x02\x02\x02*\u0125\x03\x02\x02\x02,\u012D\x03\x02\x02" +
-		"\x02.\u0137\x03\x02\x02\x020\u013F\x03\x02\x02\x022\u0147\x03\x02\x02" +
-		"\x024\u014F\x03\x02\x02\x026\u0156\x03\x02\x02\x028\u015E\x03\x02\x02" +
-		"\x02:\u0164\x03\x02\x02\x02<\u0168\x03\x02\x02\x02>\u016B\x03\x02\x02" +
-		"\x02@\u016E\x03\x02\x02\x02B\u0170\x03\x02\x02\x02D\u017C\x03\x02\x02" +
-		"\x02F\u0181\x03\x02\x02\x02H\u0183\x03\x02\x02\x02JL\x05\x16\f\x02KJ\x03" +
-		"\x02\x02\x02LO\x03\x02\x02\x02MK\x03\x02\x02\x02MN\x03\x02\x02\x02N\x03" +
-		"\x03\x02\x02\x02OM\x03\x02\x02\x02PR\x07\x03\x02\x02QS\x07/\x02\x02RQ" +
-		"\x03\x02\x02\x02RS\x03\x02\x02\x02ST\x03\x02\x02\x02TU\x07\x03\x02\x02" +
+		"\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03" +
+		"\r\x07\r\xF0\n\r\f\r\x0E\r\xF3\v\r\x03\x0E\x07\x0E\xF6\n\x0E\f\x0E\x0E" +
+		"\x0E\xF9\v\x0E\x03\x0F\x03\x0F\x03\x0F\x03\x0F\x03\x10\x03\x10\x03\x10" +
+		"\x03\x11\x03\x11\x03\x11\x03\x11\x03\x11\x03\x11\x03\x12\x03\x12\x05\x12" +
+		"\u010A\n\x12\x03\x12\x03\x12\x03\x13\x03\x13\x03\x13\x03\x14\x03\x14\x03" +
+		"\x14\x03\x14\x03\x14\x03\x14\x03\x14\x03\x14\x03\x14\x03\x14\x03\x14\x03" +
+		"\x14\x03\x14\x05\x14\u011E\n\x14\x05\x14\u0120\n\x14\x03\x15\x03\x15\x03" +
+		"\x15\x05\x15\u0125\n\x15\x03\x16\x03\x16\x03\x16\x03\x16\x03\x16\x03\x16" +
+		"\x03\x16\x03\x16\x03\x17\x03\x17\x03\x17\x03\x17\x03\x17\x03\x17\x03\x17" +
+		"\x03\x17\x03\x17\x03\x17\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18" +
+		"\x03\x18\x03\x18\x03\x19\x03\x19\x03\x19\x05\x19\u0144\n\x19\x03\x19\x03" +
+		"\x19\x03\x19\x03\x1A\x03\x1A\x03\x1A\x03\x1A\x05\x1A\u014D\n\x1A\x03\x1A" +
+		"\x03\x1A\x03\x1B\x03\x1B\x03\x1B\x05\x1B\u0154\n\x1B\x03\x1B\x03\x1B\x03" +
+		"\x1C\x03\x1C\x03\x1C\x03\x1C\x05\x1C\u015C\n\x1C\x03\x1C\x03\x1C\x03\x1D" +
+		"\x03\x1D\x03\x1D\x03\x1D\x05\x1D\u0164\n\x1D\x03\x1E\x03\x1E\x03\x1E\x03" +
+		"\x1E\x03\x1F\x03\x1F\x03\x1F\x03 \x03 \x03 \x03!\x03!\x03\"\x03\"\x03" +
+		"\"\x03\"\x05\"\u0176\n\"\x03\"\x03\"\x03\"\x03\"\x03\"\x03\"\x03#\x03" +
+		"#\x03#\x03#\x03#\x03$\x03$\x03%\x03%\x03%\x07%\u0188\n%\f%\x0E%\u018B" +
+		"\v%\x03%\x03%\x03%\x03%\x03%\x02\x02\x03\x18&\x02\x02\x04\x02\x06\x02" +
+		"\b\x02\n\x02\f\x02\x0E\x02\x10\x02\x12\x02\x14\x02\x16\x02\x18\x02\x1A" +
+		"\x02\x1C\x02\x1E\x02 \x02\"\x02$\x02&\x02(\x02*\x02,\x02.\x020\x022\x02" +
+		"4\x026\x028\x02:\x02<\x02>\x02@\x02B\x02D\x02F\x02H\x02\x02\x03\x03\x02" +
+		"45\x02\u01AF\x02M\x03\x02\x02\x02\x04P\x03\x02\x02\x02\x06V\x03\x02\x02" +
+		"\x02\b^\x03\x02\x02\x02\nb\x03\x02\x02\x02\ff\x03\x02\x02\x02\x0En\x03" +
+		"\x02\x02\x02\x10v\x03\x02\x02\x02\x12~\x03\x02\x02\x02\x14\x86\x03\x02" +
+		"\x02\x02\x16\x93\x03\x02\x02\x02\x18\xAE\x03\x02\x02\x02\x1A\xF7\x03\x02" +
+		"\x02\x02\x1C\xFA\x03\x02\x02\x02\x1E\xFE\x03\x02\x02\x02 \u0101\x03\x02" +
+		"\x02\x02\"\u0107\x03\x02\x02\x02$\u010D\x03\x02\x02\x02&\u0110\x03\x02" +
+		"\x02\x02(\u0124\x03\x02\x02\x02*\u0126\x03\x02\x02\x02,\u012E\x03\x02" +
+		"\x02\x02.\u0138\x03\x02\x02\x020\u0140\x03\x02\x02\x022\u0148\x03\x02" +
+		"\x02\x024\u0150\x03\x02\x02\x026\u0157\x03\x02\x02\x028\u015F\x03\x02" +
+		"\x02\x02:\u0165\x03\x02\x02\x02<\u0169\x03\x02\x02\x02>\u016C\x03\x02" +
+		"\x02\x02@\u016F\x03\x02\x02\x02B\u0171\x03\x02\x02\x02D\u017D\x03\x02" +
+		"\x02\x02F\u0182\x03\x02\x02\x02H\u0184\x03\x02\x02\x02JL\x05\x16\f\x02" +
+		"KJ\x03\x02\x02\x02LO\x03\x02\x02\x02MK\x03\x02\x02\x02MN\x03\x02\x02\x02" +
+		"N\x03\x03\x02\x02\x02OM\x03\x02\x02\x02PR\x07\x03\x02\x02QS\x07/\x02\x02" +
+		"RQ\x03\x02\x02\x02RS\x03\x02\x02\x02ST\x03\x02\x02\x02TU\x07\x03\x02\x02" +
 		"U\x05\x03\x02\x02\x02V[\x05\x04\x03\x02WX\x07\x04\x02\x02XZ\x05\x04\x03" +
 		"\x02YW\x03\x02\x02\x02Z]\x03\x02\x02\x02[Y\x03\x02\x02\x02[\\\x03\x02" +
 		"\x02\x02\\\x07\x03\x02\x02\x02][\x03\x02\x02\x02^_\x05\n\x06\x02_`\x07" +
@@ -2286,113 +2296,114 @@ export class ClangParser extends Parser {
 		"\x94\x05&\x14\x02\x90\x94\x05(\x15\x02\x91\x94\x05\"\x12\x02\x92\x94\x05" +
 		"@!\x02\x93\x8E\x03\x02\x02\x02\x93\x8F\x03\x02\x02\x02\x93\x90\x03\x02" +
 		"\x02\x02\x93\x91\x03\x02\x02\x02\x93\x92\x03\x02\x02\x02\x94\x17\x03\x02" +
-		"\x02\x02\x95\x96\b\r\x01\x02\x96\xAE\x05\b\x05\x02\x97\xAE\x071\x02\x02" +
-		"\x98\xAE\x072\x02\x02\x99\xAE\x073\x02\x02\x9A\xAE\x05\x04\x03\x02\x9B" +
-		"\xAE\x07/\x02\x02\x9C\xAE\x05\x1E\x10\x02\x9D\xAE\x058\x1D\x02\x9E\x9F" +
-		"\x07\x05\x02\x02\x9F\xA0\x05\x18\r\x02\xA0\xA1\x07\x06\x02\x02\xA1\xAE" +
-		"\x03\x02\x02\x02\xA2\xAE\x05:\x1E\x02\xA3\xAE\x05<\x1F\x02\xA4\xAE\x05" +
-		"> \x02\xA5\xAE\x05D#\x02\xA6\xAE\x05H%\x02\xA7\xA8\x07\x18\x02\x02\xA8" +
-		"\xAE\x05\x18\r\x05\xA9\xAA\x07\x17\x02\x02\xAA\xAE\x05\x18\r\x04\xAB\xAC" +
-		"\x07$\x02\x02\xAC\xAE\x05\x1C\x0F\x02\xAD\x95\x03\x02\x02\x02\xAD\x97" +
-		"\x03\x02\x02\x02\xAD\x98\x03\x02\x02\x02\xAD\x99\x03\x02\x02\x02\xAD\x9A" +
-		"\x03\x02\x02\x02\xAD\x9B\x03\x02\x02\x02\xAD\x9C\x03\x02\x02\x02\xAD\x9D" +
-		"\x03\x02\x02\x02\xAD\x9E\x03\x02\x02\x02\xAD\xA2\x03\x02\x02\x02\xAD\xA3" +
-		"\x03\x02\x02\x02\xAD\xA4\x03\x02\x02\x02\xAD\xA5\x03\x02\x02\x02\xAD\xA6" +
-		"\x03\x02\x02\x02\xAD\xA7\x03\x02\x02\x02\xAD\xA9\x03\x02\x02\x02\xAD\xAB" +
-		"\x03\x02\x02\x02\xAE\xF0\x03\x02\x02\x02\xAF\xB0\f\x1A\x02\x02\xB0\xB1" +
-		"\x07\x15\x02\x02\xB1\xEF\x05\x18\r\x1B\xB2\xB3\f\x19\x02\x02\xB3\xB4\x07" +
-		"\x16\x02\x02\xB4\xEF\x05\x18\r\x1A\xB5\xB6\f\x18\x02\x02\xB6\xB7\x07\x19" +
-		"\x02\x02\xB7\xEF\x05\x18\r\x19\xB8\xB9\f\x17\x02\x02\xB9\xBA\x07\x17\x02" +
-		"\x02\xBA\xEF\x05\x18\r\x18\xBB\xBC\f\x16\x02\x02\xBC\xBD\x07\x18\x02\x02" +
-		"\xBD\xEF\x05\x18\r\x17\xBE\xBF\f\x15\x02\x02\xBF\xC0\x07*\x02\x02\xC0" +
-		"\xEF\x05\x18\r\x16\xC1\xC2\f\x14\x02\x02\xC2\xC3\x07)\x02\x02\xC3\xEF" +
-		"\x05\x18\r\x15\xC4\xC5\f\x13\x02\x02\xC5\xC6\x07\x1C\x02\x02\xC6\xEF\x05" +
-		"\x18\r\x14\xC7\xC8\f\x12\x02\x02\xC8\xC9\x07\x1A\x02\x02\xC9\xEF\x05\x18" +
-		"\r\x13\xCA\xCB\f\x11\x02\x02\xCB\xCC\x07\x1D\x02\x02\xCC\xEF\x05\x18\r" +
-		"\x12\xCD\xCE\f\x10\x02\x02\xCE\xCF\x07\x1B\x02\x02\xCF\xEF\x05\x18\r\x11" +
-		"\xD0\xD1\f\x0F\x02\x02\xD1\xD2\x07\x1F\x02\x02\xD2\xEF\x05\x18\r\x10\xD3" +
-		"\xD4\f\x0E\x02\x02\xD4\xD5\x07 \x02\x02\xD5\xEF\x05\x18\r\x0F\xD6\xD7" +
-		"\f\r\x02\x02\xD7\xD8\x07#\x02\x02\xD8\xEF\x05\x18\r\x0E\xD9\xDA\f\f\x02" +
-		"\x02\xDA\xDB\x07\"\x02\x02\xDB\xEF\x05\x18\r\r\xDC\xDD\f\v\x02\x02\xDD" +
-		"\xDE\x07%\x02\x02\xDE\xEF\x05\x18\r\f\xDF\xE0\f\n\x02\x02\xE0\xE1\x07" +
-		"&\x02\x02\xE1\xEF\x05\x18\r\v\xE2\xE3\f\t\x02\x02\xE3\xE4\x07!\x02\x02" +
-		"\xE4\xEF\x05\x18\r\n\xE5\xE6\f\b\x02\x02\xE6\xE7\x07\x1E\x02\x02\xE7\xEF" +
-		"\x05\x18\r\t\xE8\xE9\f\x07\x02\x02\xE9\xEA\x07\'\x02\x02\xEA\xEF\x05\x18" +
-		"\r\b\xEB\xEC\f\x06\x02\x02\xEC\xED\x07(\x02\x02\xED\xEF\x05\x18\r\x07" +
-		"\xEE\xAF\x03\x02\x02\x02\xEE\xB2\x03\x02\x02\x02\xEE\xB5\x03\x02\x02\x02" +
-		"\xEE\xB8\x03\x02\x02\x02\xEE\xBB\x03\x02\x02\x02\xEE\xBE\x03\x02\x02\x02" +
-		"\xEE\xC1\x03\x02\x02\x02\xEE\xC4\x03\x02\x02\x02\xEE\xC7\x03\x02\x02\x02" +
-		"\xEE\xCA\x03\x02\x02\x02\xEE\xCD\x03\x02\x02\x02\xEE\xD0\x03\x02\x02\x02" +
-		"\xEE\xD3\x03\x02\x02\x02\xEE\xD6\x03\x02\x02\x02\xEE\xD9\x03\x02\x02\x02" +
-		"\xEE\xDC\x03\x02\x02\x02\xEE\xDF\x03\x02\x02\x02\xEE\xE2\x03\x02\x02\x02" +
-		"\xEE\xE5\x03\x02\x02\x02\xEE\xE8\x03\x02\x02\x02\xEE\xEB\x03\x02\x02\x02" +
-		"\xEF\xF2\x03\x02\x02\x02\xF0\xEE\x03\x02\x02\x02\xF0\xF1\x03\x02\x02\x02" +
-		"\xF1\x19\x03\x02\x02\x02\xF2\xF0\x03\x02\x02\x02\xF3\xF5\x05\x16\f\x02" +
-		"\xF4\xF3\x03\x02\x02\x02\xF5\xF8\x03\x02\x02\x02\xF6\xF4\x03\x02\x02\x02" +
-		"\xF6\xF7\x03\x02\x02\x02\xF7\x1B\x03\x02\x02\x02\xF8\xF6\x03\x02\x02\x02" +
-		"\xF9\xFA\x07\x05\x02\x02\xFA\xFB\x05\x18\r\x02\xFB\xFC\x07\x06\x02\x02" +
-		"\xFC\x1D\x03\x02\x02\x02\xFD\xFE\x07/\x02\x02\xFE\xFF\t\x02\x02\x02\xFF" +
-		"\x1F\x03\x02\x02\x02\u0100\u0101\x05\x18\r\x02\u0101\u0102\x07\x07\x02" +
-		"\x02\u0102\u0103\x05\x18\r\x02\u0103\u0104\x07\b\x02\x02\u0104\u0105\x05" +
-		"\x18\r\x02\u0105!\x03\x02\x02\x02\u0106\u0108\x07\t\x02\x02\u0107\u0109" +
-		"\x05\x18\r\x02\u0108\u0107\x03\x02\x02\x02\u0108\u0109\x03\x02\x02\x02" +
-		"\u0109\u010A\x03\x02\x02\x02\u010A\u010B\x07\n\x02\x02\u010B#\x03\x02" +
-		"\x02\x02\u010C\u010D\x05\x18\r\x02\u010D\u010E\x07\n\x02\x02\u010E%\x03" +
-		"\x02\x02\x02\u010F\u0110\x07\v\x02\x02\u0110\u0111\x07\x05\x02\x02\u0111" +
-		"\u0112\x05\x18\r\x02\u0112\u0113\x07\x06\x02\x02\u0113\u0114\x07\f\x02" +
-		"\x02\u0114\u0115\x05\x1A\x0E\x02\u0115\u011E\x07\r\x02\x02\u0116\u011C" +
-		"\x07\x0E\x02\x02\u0117\u0118\x07\f\x02\x02\u0118\u0119\x05\x1A\x0E\x02" +
-		"\u0119\u011A\x07\r\x02\x02\u011A\u011D\x03\x02\x02\x02\u011B\u011D\x05" +
-		"&\x14\x02\u011C\u0117\x03\x02\x02\x02\u011C\u011B\x03\x02\x02\x02\u011D" +
-		"\u011F\x03\x02\x02\x02\u011E\u0116\x03\x02\x02\x02\u011E\u011F\x03\x02" +
-		"\x02\x02\u011F\'\x03\x02\x02\x02\u0120\u0124\x05*\x16\x02\u0121\u0124" +
-		"\x05,\x17\x02\u0122\u0124\x05.\x18\x02\u0123\u0120\x03\x02\x02\x02\u0123" +
-		"\u0121\x03\x02\x02\x02\u0123\u0122\x03\x02\x02\x02\u0124)\x03\x02\x02" +
-		"\x02\u0125\u0126\x07\x0F\x02\x02\u0126\u0127\x07\x05\x02\x02\u0127\u0128" +
-		"\x05\x18\r\x02\u0128\u0129\x07\x06\x02\x02\u0129\u012A\x07\f\x02\x02\u012A" +
-		"\u012B\x05\x1A\x0E\x02\u012B\u012C\x07\r\x02\x02\u012C+\x03\x02\x02\x02" +
-		"\u012D\u012E\x07\x10\x02\x02\u012E\u012F\x07\f\x02\x02\u012F\u0130\x05" +
-		"\x1A\x0E\x02\u0130\u0131\x07\r\x02\x02\u0131\u0132\x07\x0F\x02\x02\u0132" +
-		"\u0133\x07\x05\x02\x02\u0133\u0134\x05\x18\r\x02\u0134\u0135\x07\x06\x02" +
-		"\x02\u0135\u0136\x07\n\x02\x02\u0136-\x03\x02\x02\x02\u0137\u0138\x07" +
-		"\x11\x02\x02\u0138\u0139\x07\x05\x02\x02\u0139\u013A\x050\x19\x02\u013A" +
-		"\u013B\x07\x06\x02\x02\u013B\u013C\x07\f\x02\x02\u013C\u013D\x05\x1A\x0E" +
-		"\x02\u013D\u013E\x07\r\x02\x02\u013E/\x03\x02\x02\x02\u013F\u0140\x05" +
-		"\x18\r\x02\u0140\u0142\x07\n\x02\x02\u0141\u0143\x05\x18\r\x02\u0142\u0141" +
-		"\x03\x02\x02\x02\u0142\u0143\x03\x02\x02\x02\u0143\u0144\x03\x02\x02\x02" +
-		"\u0144\u0145\x07\n\x02\x02\u0145\u0146\x05\x18\r\x02\u01461\x03\x02\x02" +
-		"\x02\u0147\u0148\x05\n\x06\x02\u0148\u0149\x07/\x02\x02\u0149\u014B\x07" +
-		"\x12\x02\x02\u014A\u014C\x071\x02\x02\u014B\u014A\x03\x02\x02\x02\u014B" +
-		"\u014C\x03\x02\x02\x02\u014C\u014D\x03\x02\x02\x02\u014D\u014E\x07\x13" +
-		"\x02\x02\u014E3\x03\x02\x02\x02\u014F\u0150\x07/\x02\x02\u0150\u0152\x07" +
-		"\x12\x02\x02\u0151\u0153\x071\x02\x02\u0152\u0151\x03\x02\x02\x02\u0152" +
-		"\u0153\x03\x02\x02\x02\u0153\u0154\x03\x02\x02\x02\u0154\u0155\x07\x13" +
-		"\x02\x02\u01555\x03\x02\x02\x02\u0156\u015A\x07\f\x02\x02\u0157\u015B" +
-		"\x05\x14\v\x02\u0158\u015B\x05\x12\n\x02\u0159\u015B\x05\x0E\b\x02\u015A" +
-		"\u0157\x03\x02\x02\x02\u015A\u0158\x03\x02\x02\x02\u015A\u0159\x03\x02" +
-		"\x02\x02\u015B\u015C\x03\x02\x02\x02\u015C\u015D\x07\r\x02\x02\u015D7" +
-		"\x03\x02\x02\x02\u015E\u0162\x052\x1A\x02\u015F\u0160\x07\x1E\x02\x02" +
-		"\u0160\u0163\x056\x1C\x02\u0161\u0163\x05\x04\x03\x02\u0162\u015F\x03" +
-		"\x02\x02\x02\u0162\u0161\x03\x02\x02\x02\u0162\u0163\x03\x02\x02\x02\u0163" +
-		"9\x03\x02\x02\x02\u0164\u0165\x05\n\x06\x02\u0165\u0166\x07\x15\x02\x02" +
-		"\u0166\u0167\x07/\x02\x02\u0167;\x03\x02\x02\x02\u0168\u0169\x07\x15\x02" +
-		"\x02\u0169\u016A\x07/\x02\x02\u016A=\x03\x02\x02\x02\u016B\u016C\x07%" +
-		"\x02\x02\u016C\u016D\x07/\x02\x02\u016D?\x03\x02\x02\x02\u016E\u016F\x05" +
-		"B\"\x02\u016FA\x03\x02\x02\x02\u0170\u0171\x05\n\x06\x02\u0171\u0172\x07" +
-		"/\x02\x02\u0172\u0174\x07\x05\x02\x02\u0173\u0175\x05\f\x07\x02\u0174" +
-		"\u0173\x03\x02\x02\x02\u0174\u0175\x03\x02\x02\x02\u0175\u0176\x03\x02" +
-		"\x02\x02\u0176\u0177\x07\x06\x02\x02\u0177\u0178\x03\x02\x02\x02\u0178" +
-		"\u0179\x07\f\x02\x02\u0179\u017A\x05\x1A\x0E\x02\u017A\u017B\x07\r\x02" +
-		"\x02\u017BC\x03\x02\x02\x02\u017C\u017D\x07/\x02\x02\u017D\u017E\x07\x05" +
-		"\x02\x02\u017E\u017F\x05F$\x02\u017F\u0180\x07\x06\x02\x02\u0180E\x03" +
-		"\x02\x02\x02\u0181\u0182\x05\x10\t\x02\u0182G\x03\x02\x02\x02\u0183\u0188" +
-		"\x07\x14\x02\x02\u0184\u0187\x05\x04\x03\x02\u0185\u0187\x070\x02\x02" +
-		"\u0186\u0184\x03\x02\x02\x02\u0186\u0185\x03\x02\x02\x02\u0187\u018A\x03" +
-		"\x02\x02\x02\u0188\u0186\x03\x02\x02\x02\u0188\u0189\x03\x02\x02\x02\u0189" +
-		"\u018B\x03\x02\x02\x02\u018A\u0188\x03\x02\x02\x02\u018B\u018C\x07\x04" +
-		"\x02\x02\u018C\u018D\x05\x0E\b\x02\u018D\u018E\x07\x06\x02\x02\u018EI" +
-		"\x03\x02\x02\x02\x1CMR[bks{\x83\x8B\x93\xAD\xEE\xF0\xF6\u0108\u011C\u011E" +
-		"\u0123\u0142\u014B\u0152\u015A\u0162\u0174\u0186\u0188";
+		"\x02\x02\x95\x96\b\r\x01\x02\x96\xAF\x05\b\x05\x02\x97\xAF\x071\x02\x02" +
+		"\x98\xAF\x072\x02\x02\x99\xAF\x073\x02\x02\x9A\xAF\x05\x04\x03\x02\x9B" +
+		"\xAF\x07/\x02\x02\x9C\xAF\x05\x1E\x10\x02\x9D\xAF\x058\x1D\x02\x9E\xAF" +
+		"\x054\x1B\x02\x9F\xA0\x07\x05\x02\x02\xA0\xA1\x05\x18\r\x02\xA1\xA2\x07" +
+		"\x06\x02\x02\xA2\xAF\x03\x02\x02\x02\xA3\xAF\x05:\x1E\x02\xA4\xAF\x05" +
+		"<\x1F\x02\xA5\xAF\x05> \x02\xA6\xAF\x05D#\x02\xA7\xAF\x05H%\x02\xA8\xA9" +
+		"\x07\x18\x02\x02\xA9\xAF\x05\x18\r\x05\xAA\xAB\x07\x17\x02\x02\xAB\xAF" +
+		"\x05\x18\r\x04\xAC\xAD\x07$\x02\x02\xAD\xAF\x05\x1C\x0F\x02\xAE\x95\x03" +
+		"\x02\x02\x02\xAE\x97\x03\x02\x02\x02\xAE\x98\x03\x02\x02\x02\xAE\x99\x03" +
+		"\x02\x02\x02\xAE\x9A\x03\x02\x02\x02\xAE\x9B\x03\x02\x02\x02\xAE\x9C\x03" +
+		"\x02\x02\x02\xAE\x9D\x03\x02\x02\x02\xAE\x9E\x03\x02\x02\x02\xAE\x9F\x03" +
+		"\x02\x02\x02\xAE\xA3\x03\x02\x02\x02\xAE\xA4\x03\x02\x02\x02\xAE\xA5\x03" +
+		"\x02\x02\x02\xAE\xA6\x03\x02\x02\x02\xAE\xA7\x03\x02\x02\x02\xAE\xA8\x03" +
+		"\x02\x02\x02\xAE\xAA\x03\x02\x02\x02\xAE\xAC\x03\x02\x02\x02\xAF\xF1\x03" +
+		"\x02\x02\x02\xB0\xB1\f\x1A\x02\x02\xB1\xB2\x07\x15\x02\x02\xB2\xF0\x05" +
+		"\x18\r\x1B\xB3\xB4\f\x19\x02\x02\xB4\xB5\x07\x16\x02\x02\xB5\xF0\x05\x18" +
+		"\r\x1A\xB6\xB7\f\x18\x02\x02\xB7\xB8\x07\x19\x02\x02\xB8\xF0\x05\x18\r" +
+		"\x19\xB9\xBA\f\x17\x02\x02\xBA\xBB\x07\x17\x02\x02\xBB\xF0\x05\x18\r\x18" +
+		"\xBC\xBD\f\x16\x02\x02\xBD\xBE\x07\x18\x02\x02\xBE\xF0\x05\x18\r\x17\xBF" +
+		"\xC0\f\x15\x02\x02\xC0\xC1\x07*\x02\x02\xC1\xF0\x05\x18\r\x16\xC2\xC3" +
+		"\f\x14\x02\x02\xC3\xC4\x07)\x02\x02\xC4\xF0\x05\x18\r\x15\xC5\xC6\f\x13" +
+		"\x02\x02\xC6\xC7\x07\x1C\x02\x02\xC7\xF0\x05\x18\r\x14\xC8\xC9\f\x12\x02" +
+		"\x02\xC9\xCA\x07\x1A\x02\x02\xCA\xF0\x05\x18\r\x13\xCB\xCC\f\x11\x02\x02" +
+		"\xCC\xCD\x07\x1D\x02\x02\xCD\xF0\x05\x18\r\x12\xCE\xCF\f\x10\x02\x02\xCF" +
+		"\xD0\x07\x1B\x02\x02\xD0\xF0\x05\x18\r\x11\xD1\xD2\f\x0F\x02\x02\xD2\xD3" +
+		"\x07\x1F\x02\x02\xD3\xF0\x05\x18\r\x10\xD4\xD5\f\x0E\x02\x02\xD5\xD6\x07" +
+		" \x02\x02\xD6\xF0\x05\x18\r\x0F\xD7\xD8\f\r\x02\x02\xD8\xD9\x07#\x02\x02" +
+		"\xD9\xF0\x05\x18\r\x0E\xDA\xDB\f\f\x02\x02\xDB\xDC\x07\"\x02\x02\xDC\xF0" +
+		"\x05\x18\r\r\xDD\xDE\f\v\x02\x02\xDE\xDF\x07%\x02\x02\xDF\xF0\x05\x18" +
+		"\r\f\xE0\xE1\f\n\x02\x02\xE1\xE2\x07&\x02\x02\xE2\xF0\x05\x18\r\v\xE3" +
+		"\xE4\f\t\x02\x02\xE4\xE5\x07!\x02\x02\xE5\xF0\x05\x18\r\n\xE6\xE7\f\b" +
+		"\x02\x02\xE7\xE8\x07\x1E\x02\x02\xE8\xF0\x05\x18\r\t\xE9\xEA\f\x07\x02" +
+		"\x02\xEA\xEB\x07\'\x02\x02\xEB\xF0\x05\x18\r\b\xEC\xED\f\x06\x02\x02\xED" +
+		"\xEE\x07(\x02\x02\xEE\xF0\x05\x18\r\x07\xEF\xB0\x03\x02\x02\x02\xEF\xB3" +
+		"\x03\x02\x02\x02\xEF\xB6\x03\x02\x02\x02\xEF\xB9\x03\x02\x02\x02\xEF\xBC" +
+		"\x03\x02\x02\x02\xEF\xBF\x03\x02\x02\x02\xEF\xC2\x03\x02\x02\x02\xEF\xC5" +
+		"\x03\x02\x02\x02\xEF\xC8\x03\x02\x02\x02\xEF\xCB\x03\x02\x02\x02\xEF\xCE" +
+		"\x03\x02\x02\x02\xEF\xD1\x03\x02\x02\x02\xEF\xD4\x03\x02\x02\x02\xEF\xD7" +
+		"\x03\x02\x02\x02\xEF\xDA\x03\x02\x02\x02\xEF\xDD\x03\x02\x02\x02\xEF\xE0" +
+		"\x03\x02\x02\x02\xEF\xE3\x03\x02\x02\x02\xEF\xE6\x03\x02\x02\x02\xEF\xE9" +
+		"\x03\x02\x02\x02\xEF\xEC\x03\x02\x02\x02\xF0\xF3\x03\x02\x02\x02\xF1\xEF" +
+		"\x03\x02\x02\x02\xF1\xF2\x03\x02\x02\x02\xF2\x19\x03\x02\x02\x02\xF3\xF1" +
+		"\x03\x02\x02\x02\xF4\xF6\x05\x16\f\x02\xF5\xF4\x03\x02\x02\x02\xF6\xF9" +
+		"\x03\x02\x02\x02\xF7\xF5\x03\x02\x02\x02\xF7\xF8\x03\x02\x02\x02\xF8\x1B" +
+		"\x03\x02\x02\x02\xF9\xF7\x03\x02\x02\x02\xFA\xFB\x07\x05\x02\x02\xFB\xFC" +
+		"\x05\x18\r\x02\xFC\xFD\x07\x06\x02\x02\xFD\x1D\x03\x02\x02\x02\xFE\xFF" +
+		"\x07/\x02\x02\xFF\u0100\t\x02\x02\x02\u0100\x1F\x03\x02\x02\x02\u0101" +
+		"\u0102\x05\x18\r\x02\u0102\u0103\x07\x07\x02\x02\u0103\u0104\x05\x18\r" +
+		"\x02\u0104\u0105\x07\b\x02\x02\u0105\u0106\x05\x18\r\x02\u0106!\x03\x02" +
+		"\x02\x02\u0107\u0109\x07\t\x02\x02\u0108\u010A\x05\x18\r\x02\u0109\u0108" +
+		"\x03\x02\x02\x02\u0109\u010A\x03\x02\x02\x02\u010A\u010B\x03\x02\x02\x02" +
+		"\u010B\u010C\x07\n\x02\x02\u010C#\x03\x02\x02\x02\u010D\u010E\x05\x18" +
+		"\r\x02\u010E\u010F\x07\n\x02\x02\u010F%\x03\x02\x02\x02\u0110\u0111\x07" +
+		"\v\x02\x02\u0111\u0112\x07\x05\x02\x02\u0112\u0113\x05\x18\r\x02\u0113" +
+		"\u0114\x07\x06\x02\x02\u0114\u0115\x07\f\x02\x02\u0115\u0116\x05\x1A\x0E" +
+		"\x02\u0116\u011F\x07\r\x02\x02\u0117\u011D\x07\x0E\x02\x02\u0118\u0119" +
+		"\x07\f\x02\x02\u0119\u011A\x05\x1A\x0E\x02\u011A\u011B\x07\r\x02\x02\u011B" +
+		"\u011E\x03\x02\x02\x02\u011C\u011E\x05&\x14\x02\u011D\u0118\x03\x02\x02" +
+		"\x02\u011D\u011C\x03\x02\x02\x02\u011E\u0120\x03\x02\x02\x02\u011F\u0117" +
+		"\x03\x02\x02\x02\u011F\u0120\x03\x02\x02\x02\u0120\'\x03\x02\x02\x02\u0121" +
+		"\u0125\x05*\x16\x02\u0122\u0125\x05,\x17\x02\u0123\u0125\x05.\x18\x02" +
+		"\u0124\u0121\x03\x02\x02\x02\u0124\u0122\x03\x02\x02\x02\u0124\u0123\x03" +
+		"\x02\x02\x02\u0125)\x03\x02\x02\x02\u0126\u0127\x07\x0F\x02\x02\u0127" +
+		"\u0128\x07\x05\x02\x02\u0128\u0129\x05\x18\r\x02\u0129\u012A\x07\x06\x02" +
+		"\x02\u012A\u012B\x07\f\x02\x02\u012B\u012C\x05\x1A\x0E\x02\u012C\u012D" +
+		"\x07\r\x02\x02\u012D+\x03\x02\x02\x02\u012E\u012F\x07\x10\x02\x02\u012F" +
+		"\u0130\x07\f\x02\x02\u0130\u0131\x05\x1A\x0E\x02\u0131\u0132\x07\r\x02" +
+		"\x02\u0132\u0133\x07\x0F\x02\x02\u0133\u0134\x07\x05\x02\x02\u0134\u0135" +
+		"\x05\x18\r\x02\u0135\u0136\x07\x06\x02\x02\u0136\u0137\x07\n\x02\x02\u0137" +
+		"-\x03\x02\x02\x02\u0138\u0139\x07\x11\x02\x02\u0139\u013A\x07\x05\x02" +
+		"\x02\u013A\u013B\x050\x19\x02\u013B\u013C\x07\x06\x02\x02\u013C\u013D" +
+		"\x07\f\x02\x02\u013D\u013E\x05\x1A\x0E\x02\u013E\u013F\x07\r\x02\x02\u013F" +
+		"/\x03\x02\x02\x02\u0140\u0141\x05\x18\r\x02\u0141\u0143\x07\n\x02\x02" +
+		"\u0142\u0144\x05\x18\r\x02\u0143\u0142\x03\x02\x02\x02\u0143\u0144\x03" +
+		"\x02\x02\x02\u0144\u0145\x03\x02\x02\x02\u0145\u0146\x07\n\x02\x02\u0146" +
+		"\u0147\x05\x18\r\x02\u01471\x03\x02\x02\x02\u0148\u0149\x05\n\x06\x02" +
+		"\u0149\u014A\x07/\x02\x02\u014A\u014C\x07\x12\x02\x02\u014B\u014D\x07" +
+		"1\x02\x02\u014C\u014B\x03\x02\x02\x02\u014C\u014D\x03\x02\x02\x02\u014D" +
+		"\u014E\x03\x02\x02\x02\u014E\u014F\x07\x13\x02\x02\u014F3\x03\x02\x02" +
+		"\x02\u0150\u0151\x07/\x02\x02\u0151\u0153\x07\x12\x02\x02\u0152\u0154" +
+		"\x071\x02\x02\u0153\u0152\x03\x02\x02\x02\u0153\u0154\x03\x02\x02\x02" +
+		"\u0154\u0155\x03\x02\x02\x02\u0155\u0156\x07\x13\x02\x02\u01565\x03\x02" +
+		"\x02\x02\u0157\u015B\x07\f\x02\x02\u0158\u015C\x05\x14\v\x02\u0159\u015C" +
+		"\x05\x12\n\x02\u015A\u015C\x05\x0E\b\x02\u015B\u0158\x03\x02\x02\x02\u015B" +
+		"\u0159\x03\x02\x02\x02\u015B\u015A\x03\x02\x02\x02\u015C\u015D\x03\x02" +
+		"\x02\x02\u015D\u015E\x07\r\x02\x02\u015E7\x03\x02\x02\x02\u015F\u0163" +
+		"\x052\x1A\x02\u0160\u0161\x07\x1E\x02\x02\u0161\u0164\x056\x1C\x02\u0162" +
+		"\u0164\x05\x04\x03\x02\u0163\u0160\x03\x02\x02\x02\u0163\u0162\x03\x02" +
+		"\x02\x02\u0163\u0164\x03\x02\x02\x02\u01649\x03\x02\x02\x02\u0165\u0166" +
+		"\x05\n\x06\x02\u0166\u0167\x07\x15\x02\x02\u0167\u0168\x07/\x02\x02\u0168" +
+		";\x03\x02\x02\x02\u0169\u016A\x07\x15\x02\x02\u016A\u016B\x07/\x02\x02" +
+		"\u016B=\x03\x02\x02\x02\u016C\u016D\x07%\x02\x02\u016D\u016E\x07/\x02" +
+		"\x02\u016E?\x03\x02\x02\x02\u016F\u0170\x05B\"\x02\u0170A\x03\x02\x02" +
+		"\x02\u0171\u0172\x05\n\x06\x02\u0172\u0173\x07/\x02\x02\u0173\u0175\x07" +
+		"\x05\x02\x02\u0174\u0176\x05\f\x07\x02\u0175\u0174\x03\x02\x02\x02\u0175" +
+		"\u0176\x03\x02\x02\x02\u0176\u0177\x03\x02\x02\x02\u0177\u0178\x07\x06" +
+		"\x02\x02\u0178\u0179\x03\x02\x02\x02\u0179\u017A\x07\f\x02\x02\u017A\u017B" +
+		"\x05\x1A\x0E\x02\u017B\u017C\x07\r\x02\x02\u017CC\x03\x02\x02\x02\u017D" +
+		"\u017E\x07/\x02\x02\u017E\u017F\x07\x05\x02\x02\u017F\u0180\x05F$\x02" +
+		"\u0180\u0181\x07\x06\x02\x02\u0181E\x03\x02\x02\x02\u0182\u0183\x05\x10" +
+		"\t\x02\u0183G\x03\x02\x02\x02\u0184\u0189\x07\x14\x02\x02\u0185\u0188" +
+		"\x05\x04\x03\x02\u0186\u0188\x070\x02\x02\u0187\u0185\x03\x02\x02\x02" +
+		"\u0187\u0186\x03\x02\x02\x02\u0188\u018B\x03\x02\x02\x02\u0189\u0187\x03" +
+		"\x02\x02\x02\u0189\u018A\x03\x02\x02\x02\u018A\u018C\x03\x02\x02\x02\u018B" +
+		"\u0189\x03\x02\x02\x02\u018C\u018D\x07\x04\x02\x02\u018D\u018E\x05\x0E" +
+		"\b\x02\u018E\u018F\x07\x06\x02\x02\u018FI\x03\x02\x02\x02\x1CMR[bks{\x83" +
+		"\x8B\x93\xAE\xEF\xF1\xF7\u0109\u011D\u011F\u0124\u0143\u014C\u0153\u015B" +
+		"\u0163\u0175\u0187\u0189";
 	public static __ATN: ATN;
 	public static get _ATN(): ATN {
 		if (!ClangParser.__ATN) {
@@ -3041,6 +3052,35 @@ export class ArrayInitialisationExpressionContext extends ExpressionContext {
 	public accept<Result>(visitor: ClangVisitor<Result>): Result {
 		if (visitor.visitArrayInitialisationExpression) {
 			return visitor.visitArrayInitialisationExpression(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+export class ArrayIdentifierExpressionContext extends ExpressionContext {
+	public arrayIdentifier(): ArrayIdentifierContext {
+		return this.getRuleContext(0, ArrayIdentifierContext);
+	}
+	constructor(ctx: ExpressionContext) {
+		super(ctx.parent, ctx.invokingState);
+		this.copyFrom(ctx);
+	}
+	// @Override
+	public enterRule(listener: ClangListener): void {
+		if (listener.enterArrayIdentifierExpression) {
+			listener.enterArrayIdentifierExpression(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: ClangListener): void {
+		if (listener.exitArrayIdentifierExpression) {
+			listener.exitArrayIdentifierExpression(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: ClangVisitor<Result>): Result {
+		if (visitor.visitArrayIdentifierExpression) {
+			return visitor.visitArrayIdentifierExpression(this);
 		} else {
 			return visitor.visitChildren(this);
 		}
