@@ -5,7 +5,6 @@ import { TAG_TO_TYPE, TYPE_TO_TAG } from '../memory/tags'
 import { ExpressionStatement, Identifier, Node } from '../parser/types'
 import { typeCheck } from '../typeChecker/typeChecker'
 import { ClosureInstruction, Command, Context, Value, WhileStatementInstruction } from '../types'
-import { builtin_functions } from './defaults/functions'
 import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
 import { handleRuntimeError, InterpreterError } from './errors'
 import {
@@ -364,13 +363,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    const global_frame = {}
-
-    for (const key in builtin_functions) global_frame[key] = { type: 'Builtin', name: key }
-
     // Create global environment.
     context.numberOfOuterEnvironments += 1
-    const environment = createBlockEnvironment(context, 'globalEnvironment', global_frame)
+    const environment = createBlockEnvironment(context, 'globalEnvironment')
     pushEnvironment(context, environment)
 
     // Call main at the end.
@@ -601,6 +596,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     checkNumberOfArguments(context, command, lambda)
 
     const agendaTop = agenda.peek() as Command
+
     if (agenda.length() === 0 || agendaTop.type === 'EnvironmentRestoration_i') {
       agenda.push({ type: 'Mark_i' })
     } else if (agendaTop.type === 'ReturnStatement_i') {

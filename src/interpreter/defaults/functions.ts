@@ -2,6 +2,10 @@ import { FLOAT_PRECISION } from '../../constants'
 
 const REGEX = /%[c,f,d]+/g
 
+export const arity = (f: Function) => {
+  return f.length
+}
+
 export const builtin_functions = {
   printf: (x: string, ...args: any[]) => console.log(printf(x, args))
 }

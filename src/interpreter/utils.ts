@@ -3,6 +3,7 @@ import * as errors from '../errors/errors'
 import { Node } from '../parser/types'
 import { Value } from '../types'
 import { CallInstruction, ClosureInstruction, Command, Context, Environment } from '../types'
+import { builtin_functions } from './defaults/functions'
 import { currentEnvironment } from './environment'
 import { handleRuntimeError } from './errors'
 
@@ -13,6 +14,7 @@ export function checkNumberOfArguments(
   command: CallInstruction,
   lambda: ClosureInstruction
 ) {
+  console.log(lambda)
   if (lambda.parameters == undefined) {
     return handleRuntimeError(context, new errors.CallingNonFunctionValue(undefined, command))
   }
@@ -74,3 +76,6 @@ export function getVariable(context: Context, name: string) {
   }
   return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
 }
+
+export const apply_builtin = (builtin_symbol: string, args: any[]) =>
+  builtin_functions[builtin_symbol](...args)

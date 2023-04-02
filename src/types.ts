@@ -177,6 +177,7 @@ export type Command =
   | CallInstruction
   | MarkInstruction
   | ClosureInstruction
+  | Builtin
 
 type Instruction = {
   loc?: SourceLocation
@@ -253,18 +254,18 @@ export interface LambdaExpressionInstruction extends Instruction {
   typeDeclaration: Type
 }
 
-export interface CallInstruction {
+export interface CallInstruction extends Instruction {
   type: 'CallExpression_i'
   arity: number
   loc?: SourceLocation
 }
 
-export interface MarkInstruction {
+export interface MarkInstruction extends Instruction {
   type: 'Mark_i'
   loc?: SourceLocation
 }
 
-export interface ClosureInstruction {
+export interface ClosureInstruction extends Instruction {
   type: 'Closure_i'
   parameters: Array<Expression>
   body: BlockStatement
@@ -272,6 +273,8 @@ export interface ClosureInstruction {
   typeDeclaration: Type
 }
 
-export interface Builtin {
+export interface Builtin extends Instruction {
   type: 'Builtin'
+  name: string
+  args: Array<any>
 }

@@ -44,7 +44,9 @@ MINUSMINUS: '--';
 
 start: (statement)*;
 
-stringLiteral: '"' (IDENTIFIER | FORMATSPECIFIERS)* '"';
+identifiersAndSpecifiers: IDENTIFIER | FORMATSPECIFIERS;
+
+stringLiteral: '"' identifiersAndSpecifiers* '"';
 
 stringLiteralList: stringLiteral (',' stringLiteral)*;
 

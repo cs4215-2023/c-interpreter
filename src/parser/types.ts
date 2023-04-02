@@ -123,6 +123,7 @@ export type Expression =
   | CallExpression
   | AssignmentExpression
   | TypedIdentifier
+  | StringLiteral
 
 export type BaseExpression = BaseNode
 
@@ -207,6 +208,11 @@ export interface ConditionalExpression extends BaseExpression {
 export interface SequenceExpression extends BaseExpression {
   type: 'SequenceExpression'
   expressions: Array<Expression>
+}
+
+export interface StringLiteral extends BaseExpression {
+  type: 'StringLiteral'
+  string: string
 }
 
 export type Pattern = Identifier | PointerIdentifier
