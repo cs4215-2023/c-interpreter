@@ -3,25 +3,24 @@
 
 import { ATN } from "antlr4ts/atn/ATN";
 import { ATNDeserializer } from "antlr4ts/atn/ATNDeserializer";
-import { FailedPredicateException } from "antlr4ts/FailedPredicateException";
+import { ParserATNSimulator } from "antlr4ts/atn/ParserATNSimulator";
 import { NotNull } from "antlr4ts/Decorators";
-import { NoViableAltException } from "antlr4ts/NoViableAltException";
 import { Override } from "antlr4ts/Decorators";
+import { FailedPredicateException } from "antlr4ts/FailedPredicateException";
+import * as Utils from "antlr4ts/misc/Utils";
+import { NoViableAltException } from "antlr4ts/NoViableAltException";
 import { Parser } from "antlr4ts/Parser";
 import { ParserRuleContext } from "antlr4ts/ParserRuleContext";
-import { ParserATNSimulator } from "antlr4ts/atn/ParserATNSimulator";
-import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
-import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
 import { RecognitionException } from "antlr4ts/RecognitionException";
 import { RuleContext } from "antlr4ts/RuleContext";
-//import { RuleVersion } from "antlr4ts/RuleVersion";
-import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Token } from "antlr4ts/Token";
 import { TokenStream } from "antlr4ts/TokenStream";
+import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
+import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
+//import { RuleVersion } from "antlr4ts/RuleVersion";
+import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 import { Vocabulary } from "antlr4ts/Vocabulary";
 import { VocabularyImpl } from "antlr4ts/VocabularyImpl";
-
-import * as Utils from "antlr4ts/misc/Utils";
 
 import { ClangListener } from "./ClangListener";
 import { ClangVisitor } from "./ClangVisitor";
@@ -174,7 +173,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public start(): StartContext {
-		let _localctx: StartContext = new StartContext(this._ctx, this.state);
+		const _localctx: StartContext = new StartContext(this._ctx, this.state);
 		this.enterRule(_localctx, 0, ClangParser.RULE_start);
 		let _la: number;
 		try {
@@ -212,7 +211,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public stringLiteral(): StringLiteralContext {
-		let _localctx: StringLiteralContext = new StringLiteralContext(this._ctx, this.state);
+		const _localctx: StringLiteralContext = new StringLiteralContext(this._ctx, this.state);
 		this.enterRule(_localctx, 2, ClangParser.RULE_stringLiteral);
 		let _la: number;
 		try {
@@ -250,7 +249,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public stringLiteralList(): StringLiteralListContext {
-		let _localctx: StringLiteralListContext = new StringLiteralListContext(this._ctx, this.state);
+		const _localctx: StringLiteralListContext = new StringLiteralListContext(this._ctx, this.state);
 		this.enterRule(_localctx, 4, ClangParser.RULE_stringLiteralList);
 		let _la: number;
 		try {
@@ -292,7 +291,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public identifierWithType(): IdentifierWithTypeContext {
-		let _localctx: IdentifierWithTypeContext = new IdentifierWithTypeContext(this._ctx, this.state);
+		const _localctx: IdentifierWithTypeContext = new IdentifierWithTypeContext(this._ctx, this.state);
 		this.enterRule(_localctx, 6, ClangParser.RULE_identifierWithType);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -319,7 +318,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public type(): TypeContext {
-		let _localctx: TypeContext = new TypeContext(this._ctx, this.state);
+		const _localctx: TypeContext = new TypeContext(this._ctx, this.state);
 		this.enterRule(_localctx, 8, ClangParser.RULE_type);
 		let _la: number;
 		try {
@@ -355,7 +354,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public identifierWithTypeList(): IdentifierWithTypeListContext {
-		let _localctx: IdentifierWithTypeListContext = new IdentifierWithTypeListContext(this._ctx, this.state);
+		const _localctx: IdentifierWithTypeListContext = new IdentifierWithTypeListContext(this._ctx, this.state);
 		this.enterRule(_localctx, 10, ClangParser.RULE_identifierWithTypeList);
 		let _la: number;
 		try {
@@ -397,7 +396,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public identifierList(): IdentifierListContext {
-		let _localctx: IdentifierListContext = new IdentifierListContext(this._ctx, this.state);
+		const _localctx: IdentifierListContext = new IdentifierListContext(this._ctx, this.state);
 		this.enterRule(_localctx, 12, ClangParser.RULE_identifierList);
 		let _la: number;
 		try {
@@ -439,7 +438,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public expressionList(): ExpressionListContext {
-		let _localctx: ExpressionListContext = new ExpressionListContext(this._ctx, this.state);
+		const _localctx: ExpressionListContext = new ExpressionListContext(this._ctx, this.state);
 		this.enterRule(_localctx, 14, ClangParser.RULE_expressionList);
 		let _la: number;
 		try {
@@ -481,7 +480,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public numberList(): NumberListContext {
-		let _localctx: NumberListContext = new NumberListContext(this._ctx, this.state);
+		const _localctx: NumberListContext = new NumberListContext(this._ctx, this.state);
 		this.enterRule(_localctx, 16, ClangParser.RULE_numberList);
 		let _la: number;
 		try {
@@ -523,7 +522,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public pointerList(): PointerListContext {
-		let _localctx: PointerListContext = new PointerListContext(this._ctx, this.state);
+		const _localctx: PointerListContext = new PointerListContext(this._ctx, this.state);
 		this.enterRule(_localctx, 18, ClangParser.RULE_pointerList);
 		let _la: number;
 		try {
@@ -565,7 +564,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public statement(): StatementContext {
-		let _localctx: StatementContext = new StatementContext(this._ctx, this.state);
+		const _localctx: StatementContext = new StatementContext(this._ctx, this.state);
 		this.enterRule(_localctx, 20, ClangParser.RULE_statement);
 		try {
 			this.state = 145;
@@ -635,11 +634,11 @@ export class ClangParser extends Parser {
 			_p = 0;
 		}
 
-		let _parentctx: ParserRuleContext = this._ctx;
-		let _parentState: number = this.state;
+		const _parentctx: ParserRuleContext = this._ctx;
+		const _parentState: number = this.state;
 		let _localctx: ExpressionContext = new ExpressionContext(this._ctx, _parentState);
 		let _prevctx: ExpressionContext = _localctx;
-		let _startState: number = 22;
+		const _startState: number = 22;
 		this.enterRecursionRule(_localctx, 22, ClangParser.RULE_expression, _p);
 		try {
 			let _alt: number;
@@ -1213,7 +1212,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public statementBlock(): StatementBlockContext {
-		let _localctx: StatementBlockContext = new StatementBlockContext(this._ctx, this.state);
+		const _localctx: StatementBlockContext = new StatementBlockContext(this._ctx, this.state);
 		this.enterRule(_localctx, 24, ClangParser.RULE_statementBlock);
 		let _la: number;
 		try {
@@ -1251,7 +1250,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public parenthesesExpression(): ParenthesesExpressionContext {
-		let _localctx: ParenthesesExpressionContext = new ParenthesesExpressionContext(this._ctx, this.state);
+		const _localctx: ParenthesesExpressionContext = new ParenthesesExpressionContext(this._ctx, this.state);
 		this.enterRule(_localctx, 26, ClangParser.RULE_parenthesesExpression);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -1280,7 +1279,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public postFix(): PostFixContext {
-		let _localctx: PostFixContext = new PostFixContext(this._ctx, this.state);
+		const _localctx: PostFixContext = new PostFixContext(this._ctx, this.state);
 		this.enterRule(_localctx, 28, ClangParser.RULE_postFix);
 		let _la: number;
 		try {
@@ -1318,7 +1317,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public conditionalExpression(): ConditionalExpressionContext {
-		let _localctx: ConditionalExpressionContext = new ConditionalExpressionContext(this._ctx, this.state);
+		const _localctx: ConditionalExpressionContext = new ConditionalExpressionContext(this._ctx, this.state);
 		this.enterRule(_localctx, 30, ClangParser.RULE_conditionalExpression);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -1351,7 +1350,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public returnStatement(): ReturnStatementContext {
-		let _localctx: ReturnStatementContext = new ReturnStatementContext(this._ctx, this.state);
+		const _localctx: ReturnStatementContext = new ReturnStatementContext(this._ctx, this.state);
 		this.enterRule(_localctx, 32, ClangParser.RULE_returnStatement);
 		let _la: number;
 		try {
@@ -1389,7 +1388,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public expressionStatement(): ExpressionStatementContext {
-		let _localctx: ExpressionStatementContext = new ExpressionStatementContext(this._ctx, this.state);
+		const _localctx: ExpressionStatementContext = new ExpressionStatementContext(this._ctx, this.state);
 		this.enterRule(_localctx, 34, ClangParser.RULE_expressionStatement);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -1416,7 +1415,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public conditionalStatement(): ConditionalStatementContext {
-		let _localctx: ConditionalStatementContext = new ConditionalStatementContext(this._ctx, this.state);
+		const _localctx: ConditionalStatementContext = new ConditionalStatementContext(this._ctx, this.state);
 		this.enterRule(_localctx, 36, ClangParser.RULE_conditionalStatement);
 		let _la: number;
 		try {
@@ -1486,7 +1485,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public iterationStatement(): IterationStatementContext {
-		let _localctx: IterationStatementContext = new IterationStatementContext(this._ctx, this.state);
+		const _localctx: IterationStatementContext = new IterationStatementContext(this._ctx, this.state);
 		this.enterRule(_localctx, 38, ClangParser.RULE_iterationStatement);
 		try {
 			this.state = 290;
@@ -1533,7 +1532,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public whileLoop(): WhileLoopContext {
-		let _localctx: WhileLoopContext = new WhileLoopContext(this._ctx, this.state);
+		const _localctx: WhileLoopContext = new WhileLoopContext(this._ctx, this.state);
 		this.enterRule(_localctx, 40, ClangParser.RULE_whileLoop);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -1570,7 +1569,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public doWhileLoop(): DoWhileLoopContext {
-		let _localctx: DoWhileLoopContext = new DoWhileLoopContext(this._ctx, this.state);
+		const _localctx: DoWhileLoopContext = new DoWhileLoopContext(this._ctx, this.state);
 		this.enterRule(_localctx, 42, ClangParser.RULE_doWhileLoop);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -1611,7 +1610,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public forLoop(): ForLoopContext {
-		let _localctx: ForLoopContext = new ForLoopContext(this._ctx, this.state);
+		const _localctx: ForLoopContext = new ForLoopContext(this._ctx, this.state);
 		this.enterRule(_localctx, 44, ClangParser.RULE_forLoop);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -1648,7 +1647,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public forCondition(): ForConditionContext {
-		let _localctx: ForConditionContext = new ForConditionContext(this._ctx, this.state);
+		const _localctx: ForConditionContext = new ForConditionContext(this._ctx, this.state);
 		this.enterRule(_localctx, 46, ClangParser.RULE_forCondition);
 		let _la: number;
 		try {
@@ -1690,7 +1689,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public arrayIdentifierWithType(): ArrayIdentifierWithTypeContext {
-		let _localctx: ArrayIdentifierWithTypeContext = new ArrayIdentifierWithTypeContext(this._ctx, this.state);
+		const _localctx: ArrayIdentifierWithTypeContext = new ArrayIdentifierWithTypeContext(this._ctx, this.state);
 		this.enterRule(_localctx, 48, ClangParser.RULE_arrayIdentifierWithType);
 		let _la: number;
 		try {
@@ -1732,7 +1731,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public arrayIdentifier(): ArrayIdentifierContext {
-		let _localctx: ArrayIdentifierContext = new ArrayIdentifierContext(this._ctx, this.state);
+		const _localctx: ArrayIdentifierContext = new ArrayIdentifierContext(this._ctx, this.state);
 		this.enterRule(_localctx, 50, ClangParser.RULE_arrayIdentifier);
 		let _la: number;
 		try {
@@ -1745,10 +1744,10 @@ export class ClangParser extends Parser {
 			this.state = 337;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
-			if (_la === ClangParser.NUMBER) {
+			if ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << ClangParser.T__0) | (1 << ClangParser.T__2) | (1 << ClangParser.T__17) | (1 << ClangParser.MUL) | (1 << ClangParser.ADD) | (1 << ClangParser.SUB))) !== 0) || ((((_la - 34)) & ~0x1F) === 0 && ((1 << (_la - 34)) & ((1 << (ClangParser.NOT - 34)) | (1 << (ClangParser.BITWISEAND - 34)) | (1 << (ClangParser.PRIMITIVETYPE - 34)) | (1 << (ClangParser.SIGNEDTYPE - 34)) | (1 << (ClangParser.IDENTIFIER - 34)) | (1 << (ClangParser.NUMBER - 34)) | (1 << (ClangParser.CHAR - 34)) | (1 << (ClangParser.FLOAT - 34)))) !== 0)) {
 				{
 				this.state = 336;
-				_localctx._size = this.match(ClangParser.NUMBER);
+				_localctx._size = this.expression(0);
 				}
 			}
 
@@ -1772,7 +1771,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public arrayContent(): ArrayContentContext {
-		let _localctx: ArrayContentContext = new ArrayContentContext(this._ctx, this.state);
+		const _localctx: ArrayContentContext = new ArrayContentContext(this._ctx, this.state);
 		this.enterRule(_localctx, 52, ClangParser.RULE_arrayContent);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -1824,7 +1823,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public arrayInitialisation(): ArrayInitialisationContext {
-		let _localctx: ArrayInitialisationContext = new ArrayInitialisationContext(this._ctx, this.state);
+		const _localctx: ArrayInitialisationContext = new ArrayInitialisationContext(this._ctx, this.state);
 		this.enterRule(_localctx, 54, ClangParser.RULE_arrayInitialisation);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -1868,7 +1867,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public pointer(): PointerContext {
-		let _localctx: PointerContext = new PointerContext(this._ctx, this.state);
+		const _localctx: PointerContext = new PointerContext(this._ctx, this.state);
 		this.enterRule(_localctx, 56, ClangParser.RULE_pointer);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -1897,7 +1896,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public pointerDerefernce(): PointerDerefernceContext {
-		let _localctx: PointerDerefernceContext = new PointerDerefernceContext(this._ctx, this.state);
+		const _localctx: PointerDerefernceContext = new PointerDerefernceContext(this._ctx, this.state);
 		this.enterRule(_localctx, 58, ClangParser.RULE_pointerDerefernce);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -1924,7 +1923,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public pointerReference(): PointerReferenceContext {
-		let _localctx: PointerReferenceContext = new PointerReferenceContext(this._ctx, this.state);
+		const _localctx: PointerReferenceContext = new PointerReferenceContext(this._ctx, this.state);
 		this.enterRule(_localctx, 60, ClangParser.RULE_pointerReference);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -1951,7 +1950,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public functionDeclaration(): FunctionDeclarationContext {
-		let _localctx: FunctionDeclarationContext = new FunctionDeclarationContext(this._ctx, this.state);
+		const _localctx: FunctionDeclarationContext = new FunctionDeclarationContext(this._ctx, this.state);
 		this.enterRule(_localctx, 62, ClangParser.RULE_functionDeclaration);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -1976,7 +1975,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public function(): FunctionContext {
-		let _localctx: FunctionContext = new FunctionContext(this._ctx, this.state);
+		const _localctx: FunctionContext = new FunctionContext(this._ctx, this.state);
 		this.enterRule(_localctx, 64, ClangParser.RULE_function);
 		let _la: number;
 		try {
@@ -2026,7 +2025,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public functionCall(): FunctionCallContext {
-		let _localctx: FunctionCallContext = new FunctionCallContext(this._ctx, this.state);
+		const _localctx: FunctionCallContext = new FunctionCallContext(this._ctx, this.state);
 		this.enterRule(_localctx, 66, ClangParser.RULE_functionCall);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -2057,7 +2056,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public functionCallParameters(): FunctionCallParametersContext {
-		let _localctx: FunctionCallParametersContext = new FunctionCallParametersContext(this._ctx, this.state);
+		const _localctx: FunctionCallParametersContext = new FunctionCallParametersContext(this._ctx, this.state);
 		this.enterRule(_localctx, 68, ClangParser.RULE_functionCallParameters);
 		try {
 			this.enterOuterAlt(_localctx, 1);
@@ -2082,7 +2081,7 @@ export class ClangParser extends Parser {
 	}
 	// @RuleVersion(0)
 	public printf(): PrintfContext {
-		let _localctx: PrintfContext = new PrintfContext(this._ctx, this.state);
+		const _localctx: PrintfContext = new PrintfContext(this._ctx, this.state);
 		this.enterRule(_localctx, 70, ClangParser.RULE_printf);
 		let _la: number;
 		try {
@@ -2376,7 +2375,7 @@ export class ClangParser extends Parser {
 		"1\x02\x02\u014C\u014B\x03\x02\x02\x02\u014C\u014D\x03\x02\x02\x02\u014D" +
 		"\u014E\x03\x02\x02\x02\u014E\u014F\x07\x13\x02\x02\u014F3\x03\x02\x02" +
 		"\x02\u0150\u0151\x07/\x02\x02\u0151\u0153\x07\x12\x02\x02\u0152\u0154" +
-		"\x071\x02\x02\u0153\u0152\x03\x02\x02\x02\u0153\u0154\x03\x02\x02\x02" +
+		"\x05\x18\r\x02\u0153\u0152\x03\x02\x02\x02\u0153\u0154\x03\x02\x02\x02" +
 		"\u0154\u0155\x03\x02\x02\x02\u0155\u0156\x07\x13\x02\x02\u01565\x03\x02" +
 		"\x02\x02\u0157\u015B\x07\f\x02\x02\u0158\u015C\x05\x14\v\x02\u0159\u015C" +
 		"\x05\x12\n\x02\u015A\u015C\x05\x0E\b\x02\u015B\u0158\x03\x02\x02\x02\u015B" +
@@ -4665,9 +4664,11 @@ export class ArrayIdentifierWithTypeContext extends ParserRuleContext {
 
 export class ArrayIdentifierContext extends ParserRuleContext {
 	public _id!: Token;
-	public _size!: Token;
+	public _size!: ExpressionContext;
 	public IDENTIFIER(): TerminalNode { return this.getToken(ClangParser.IDENTIFIER, 0); }
-	public NUMBER(): TerminalNode | undefined { return this.tryGetToken(ClangParser.NUMBER, 0); }
+	public expression(): ExpressionContext | undefined {
+		return this.tryGetRuleContext(0, ExpressionContext);
+	}
 	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
 		super(parent, invokingState);
 	}

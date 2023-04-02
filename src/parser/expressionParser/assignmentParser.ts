@@ -7,7 +7,6 @@ export const parserAssignmentExpression = <T extends Constructable>(
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
     visitAssignment(ctx: AssignmentContext): Expression {
-      console.log('assignmentexpression')
       return {
         type: 'AssignmentExpression',
         operator: '=',

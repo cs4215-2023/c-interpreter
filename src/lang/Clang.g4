@@ -156,7 +156,7 @@ arrayIdentifierWithType:
 	idType = type id = IDENTIFIER '[' size = NUMBER? ']';
 
 arrayIdentifier:
-	id = IDENTIFIER '[' size = NUMBER? ']';
+	id = IDENTIFIER '[' size = expression? ']';
 
 arrayContent:
 	'{' (pointerList | numberList | identifierList) '}';

@@ -105,6 +105,7 @@ export type Expression =
   | PointerDeclarationExpression
   | ArrayDeclarationExpression
   | ArrayExpression
+  | ArrayIdentifier
   | Literal
   | Identifier
   | UnaryExpression
@@ -203,12 +204,19 @@ export interface SequenceExpression extends BaseExpression {
   expressions: Array<Expression>
 }
 
-export type Pattern = Identifier
+export type Pattern = Identifier | ArrayIdentifier
 
 export interface Identifier extends BaseExpression {
   type: 'Identifier'
   name: string
   isPointer: boolean | undefined
+}
+
+export interface ArrayIdentifier extends BaseExpression {
+  type: 'ArrayIdentifier'
+  name: string
+  index: Expression
+  isPointer: true
 }
 
 export interface TypedIdentifier extends BaseExpression {

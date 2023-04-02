@@ -1,6 +1,7 @@
 import {
   ArrayContentContext,
   ArrayIdentifierContext,
+  ArrayIdentifierExpressionContext,
   ArrayIdentifierWithTypeContext,
   ArrayInitialisationContext,
   ArrayInitialisationExpressionContext,
@@ -8,7 +9,7 @@ import {
   NumberListContext
 } from '../../lang/ClangParser'
 import { TypeParser } from '../typeParser'
-import { ArrayDeclarationExpression, Expression, Identifier, Literal } from '../types'
+import { ArrayDeclarationExpression, ArrayIdentifier, Expression, Identifier, Literal } from '../types'
 import { Constructable, tokenToIdentifierWrapper } from '../util'
 
 export const parserArrayExpression = <T extends Constructable>(
@@ -56,9 +57,16 @@ export const parserArrayExpression = <T extends Constructable>(
       })
       return identifier
     }
-    visitArrayIdentifier(ctx: ArrayIdentifierContext) {
-      console.log('visit array identifier')
+
+    visitArrayIdentifierExpression(ctx: ArrayIdentifierExpressionContext): ArrayIdentifier {
+      return {
+        type: 'ArrayIdentifier',
+        name: ctx.arrayIdentifier().IDENTIFIER()!.text,
+        index: this.visit(ctx.arrayIdentifier().expression()),
+        isPointer: true
+      }
     }
+
     visitNumberList(ctx: NumberListContext): Expression[] {
       if (ctx === undefined) {
         return []
