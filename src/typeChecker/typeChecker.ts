@@ -1,4 +1,5 @@
-import { FLOAT_TYPE, INT_TYPE, VOID_TYPE } from '../constants'
+import { FLOAT_TYPE, INT_POINTER_TYPE, INT_TYPE, VOID_TYPE } from '../constants'
+import { InvalidTypeError } from '../errors/errors'
 import { arity, builtin_functions } from '../interpreter/defaults/functions'
 import { handleRuntimeError, InterpreterError } from '../interpreter/errors'
 import { Identifier, Node } from '../parser/types'
@@ -63,7 +64,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
 
     checkIdentifierNotUndefined(node)
-    return getVariableType(context, node.name).valueType
+    return getVariableType(context, node.name)
   },
 
   TypedIdentifier: function* (command: Command, context: Context) {
@@ -73,6 +74,21 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     checkIdentifierNotUndefined(command)
     return command.typeDeclaration.valueType
+  },
+
+  PointerDeclarationExpression: function* (node: Node, context: Context) {
+    if (node.type != 'PointerDeclarationExpression') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+
+    const identifier = node.pointer as Identifier
+
+    if (identifier.isPointer !== true) {
+      throw InvalidTypeError
+    } //pointer assertion
+
+    declareIdentifierType(context, identifier.name, node)
+    return getVariableType(context, identifier.name)
   },
 
   ArrayDeclarationExpression: function* (node: Node, context: Context) {
@@ -100,7 +116,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     if (node.type != 'ArrayIdentifier') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    return getVariableType(context, node.name).valueType
+    return getVariableType(context, node.name)
   },
 
   CallExpression: function* (node: Node, context: Context) {
@@ -155,7 +171,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
     if (node.operator == '&' || node.operator == '*') {
-      throw new Error('Pointer not implemented yet')
+      return yield* typeCheck(node.argument, context)
     }
 
     const argumentType = yield* typeCheck(node.argument, context)

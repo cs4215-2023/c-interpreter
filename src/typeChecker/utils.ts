@@ -1,3 +1,4 @@
+import { pointerTypeMappings, typeMappings } from '../constants'
 import * as errors from '../errors/errors'
 import { handleRuntimeError } from '../interpreter/errors'
 import { TypedIdentifier } from '../parser/types'
@@ -54,12 +55,13 @@ export function declareIdentifierType(context: Context, name: string, node: Node
       new errors.ExceptionError(new Error('Redeclared'), node.loc!)
     )
   }
+
   if (node.type == 'VariableDeclarationExpression') {
-    typeEnvironment.head[name] = node.identifierType
+    typeEnvironment.head[name] = typeMappings[node.identifierType.valueType]
   } else if (node.type == 'ArrayDeclarationExpression') {
-    typeEnvironment.head[name] = node.arrayType
+    typeEnvironment.head[name] = typeMappings[node.arrayType.valueType]
   } else if (node.type == 'PointerDeclarationExpression') {
-    typeEnvironment.head[name] = node.pointerType
+    typeEnvironment.head[name] = typeMappings[node.pointerType.valueType]
   }
   return typeEnvironment
 }

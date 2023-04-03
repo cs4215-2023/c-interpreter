@@ -76,4 +76,36 @@ describe('Type checking', () => {
       expect(castError.received).toBe('int')
     }
   })
+
+  it('Check pointer type', async () => {
+    const code = `
+	void main() {
+		int* a = 1.5;
+	}`
+    try {
+      const context = createContext(Variant.DEFAULT, undefined, undefined)
+      await sourceRunner(code, context)
+    } catch (e) {
+      expect(e).toBeInstanceOf(TypeError)
+      const castError = e as TypeError
+      expect(castError.expected).toBe('int')
+      expect(castError.received).toBe('float')
+    }
+  })
+
+  it('Return pointer reference', async () => {
+    const code = `
+	int main() {
+		int a = 4; 
+		int* c = &a; 
+		return *c;
+	}`
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(4)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
 })
