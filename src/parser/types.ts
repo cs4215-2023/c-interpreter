@@ -215,7 +215,7 @@ export type Pattern = Identifier | ArrayIdentifier
 export interface Identifier extends BaseExpression {
   type: 'Identifier'
   name: string
-  isPointer: boolean | undefined
+  isPointer?: boolean
 }
 
 export interface ArrayIdentifier extends BaseExpression {

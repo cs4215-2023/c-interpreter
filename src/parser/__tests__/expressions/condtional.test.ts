@@ -50,7 +50,8 @@ describe('Conditional expression tests', () => {
                 test: {
                   left: {
                     name: 'a',
-                    type: 'Identifier'
+                    type: 'Identifier',
+                    isPointer: false
                   },
                   loc: {
                     end: {
@@ -140,7 +141,8 @@ describe('Conditional expression tests', () => {
                   test: {
                     left: {
                       name: 'a',
-                      type: 'Identifier'
+                      type: 'Identifier',
+                      isPointer: false
                     },
                     loc: {
                       end: {
@@ -190,7 +192,8 @@ describe('Conditional expression tests', () => {
                 test: {
                   left: {
                     name: 'a',
-                    type: 'Identifier'
+                    type: 'Identifier',
+                    isPointer: false
                   },
                   loc: {
                     end: {
