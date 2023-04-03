@@ -65,7 +65,8 @@ describe('Arrays and Pointer', () => {
   })
   it('Array assignment 2', async () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
-    const code = 'int main() {int c[5]; c[0] = 12; c[1] =15; c[2] = 3; c[3]=4; c[4]=5; return c[3];}'
+    const code =
+      'int main() {int c[5]; c[0] = 12; c[1] =15; c[2] = 3; c[3]=4; c[4]=5; return c[3];}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(4)
@@ -75,7 +76,8 @@ describe('Arrays and Pointer', () => {
   })
   it('Loop array', async () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
-    const code = 'int main() {int c[4]={1,2,3,4}; int sum = 0; for (int i = 0; i < 4; i++){sum=sum+c[i];} return sum;}'
+    const code =
+      'int main() {int c[4]={1,2,3,4}; int sum = 0; for (int i = 0; i < 4; i++){sum=sum+c[i];} return sum;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(10)

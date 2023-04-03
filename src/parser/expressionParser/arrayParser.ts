@@ -9,7 +9,13 @@ import {
   NumberListContext
 } from '../../lang/ClangParser'
 import { TypeParser } from '../typeParser'
-import { ArrayDeclarationExpression, ArrayIdentifier, Expression, Identifier, Literal } from '../types'
+import {
+  ArrayDeclarationExpression,
+  ArrayIdentifier,
+  Expression,
+  Identifier,
+  Literal
+} from '../types'
 import { Constructable, tokenToIdentifierWrapper } from '../util'
 
 export const parserArrayExpression = <T extends Constructable>(

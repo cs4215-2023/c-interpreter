@@ -82,7 +82,8 @@ describe('String', () => {
                     ],
                     callee: {
                       name: 'printf',
-                      type: 'Identifier'
+                      type: 'Identifier',
+                      isPointer: false
                     },
                     type: 'CallExpression'
                   }

@@ -84,11 +84,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.runtime.agenda.push(...node.expressions)
   },
 
-  // TODO
-  ArrayExpression: function* (node: Node, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
-  },
-
   VariableDeclarationExpression: function* (node: Node, context: Context) {
     if (node.type != 'VariableDeclarationExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
@@ -109,9 +104,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    // if (node.identifier.type == 'TypedIdentifier') {
-    //   node.identifierType = node.identifier.typeDeclaration
-    // }
     const identifier = node.pointer as Identifier
 
     if (identifier.isPointer !== true) {
@@ -129,7 +121,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
     //if elements are already declared
-    let size: number
+    let size
     if (node.size === undefined) {
       size = node.array!.elements.length
     } else {
@@ -189,7 +181,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const identifier = getVariable(context, node.name)
     console.log('load identifier ' + node.name + ' at addr ' + identifier)
-    const [type, val] = memory.mem_read(identifier)
+    memory.mem_read(identifier)
     context.runtime.stash.push(identifier)
   },
 
@@ -233,10 +225,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    // if (node.operator == '&' || node.operator == '*') {
-    //   console.log("pointer unary")
-    //   console.log(node.argument)
-    // }
     context.runtime.agenda.push(
       { type: 'UnaryExpression_i', operator: node.operator },
       node.argument
