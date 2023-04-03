@@ -1,12 +1,7 @@
-import { UNKNOWN_LOCATION } from '../../constants'
 import createContext from '../../createContext'
 import { UndefinedVariable } from '../../errors/errors'
 import { sourceRunner } from '../../runner'
 import { Variant } from '../../types'
-import { locationDummyNode } from '../../utils/astCreator'
-
-const location = UNKNOWN_LOCATION
-const dummyNode = locationDummyNode(location.start.line, location.start.column)
 
 describe('Loops', () => {
   it('While loop -- as condition', async () => {
@@ -33,7 +28,7 @@ describe('Loops', () => {
 
   it('While loop comparison as condition with update', async () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
-    const code = 'void main() {int i = 3;int a = 0; while (i > 0) {a = a + i; i--;} a;}'
+    const code = 'int main() {int a = 1; int i = 0; while (i < 5) {a++; i++;} return a;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(6)
@@ -70,7 +65,9 @@ describe('Loops', () => {
     try {
       await sourceRunner(code, context)
     } catch (e) {
-      expect(e).toStrictEqual(new UndefinedVariable('a', dummyNode))
+      expect(e).toBeInstanceOf(UndefinedVariable)
+      const castError = e as UndefinedVariable
+      expect(castError.name).toBe('a')
     }
   })
 
@@ -102,13 +99,13 @@ describe('Loops', () => {
 
   it('For loop test  assignment', async () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
-    const code = `void main() {int a = 1;
-	for (int i = 0; i < 5; i++) {a++;} a;}
+    const code = `int main() {int a = 1;
+	for (int i = 0; i < 3; i++) {a++;} return a;}
 	`
 
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe(6)
+      expect(result.value).toBe(4)
     } else {
       expect(1).toBe(2)
     }

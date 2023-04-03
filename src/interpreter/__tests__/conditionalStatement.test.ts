@@ -7,7 +7,7 @@ describe('Conditional statements test', () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
 
     const code = `
-	void main() {
+	int main() {
 		int a = 1;
 		return a > 0 ? 2 : 3;
 	}
@@ -24,7 +24,7 @@ describe('Conditional statements test', () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
 
     const code = `
-	void main() {
+	int main() {
 		int a = 1;
 		return a > 5 ? 2 : 3;
 	}
@@ -41,7 +41,7 @@ describe('Conditional statements test', () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
 
     const code = `
-	void main() {
+	int main() {
 		int a = 5;
 		return a < 0 ? 2 : a < 6 ? 3 : 4;
 	}

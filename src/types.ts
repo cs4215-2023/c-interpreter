@@ -20,7 +20,6 @@ import {
   Type,
   UnaryOperator
 } from '../src/parser/types'
-import { EnvTree, TypeEnvTree } from './createContext'
 import { Stack } from './utils/stack'
 
 /**
@@ -75,10 +74,8 @@ export interface Context<T = any> {
     break: boolean
     debuggerOn: boolean
     isRunning: boolean
-    environmentTree: EnvTree
     environments: Environment[]
     typeEnv: TypeEnvironment[]
-    typeEnvTree: TypeEnvTree
     nodes: Node[]
     agenda: Stack<T>
     stash: Stack<T>
@@ -262,18 +259,18 @@ export interface LambdaExpressionInstruction extends Instruction {
   typeDeclaration: Type
 }
 
-export interface CallInstruction {
+export interface CallInstruction extends Instruction {
   type: 'CallExpression_i'
   arity: number
   loc?: SourceLocation
 }
 
-export interface MarkInstruction {
+export interface MarkInstruction extends Instruction {
   type: 'Mark_i'
   loc?: SourceLocation
 }
 
-export interface ClosureInstruction {
+export interface ClosureInstruction extends Instruction {
   type: 'Closure_i'
   parameters: Array<Expression>
   body: BlockStatement

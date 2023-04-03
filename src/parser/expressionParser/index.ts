@@ -19,6 +19,7 @@ import { parserLogicalOpExpression } from './logicalOpParser'
 import { parserPointerExpression } from './pointerParser'
 import { parserPostFixExpression } from './postFixParser'
 import { parserPrimitiveExpression } from './primitiveParser'
+import { parserStringLiteral } from './stringParser'
 import { parserUnaryOpExpression } from './unaryOpParser'
 
 class BaseParser extends AbstractParseTreeVisitor<Expression> implements ClangVisitor<Expression> {
@@ -73,7 +74,8 @@ const ParsingBehaviors = flow(
   parserArrayExpression,
   parserPointerExpression,
   parserFunctionCallExpression,
-  parserConditionalExpression
+  parserConditionalExpression,
+  parserStringLiteral
 )(BaseParser)
 
 export default class ExpressionParser extends ParsingBehaviors {}

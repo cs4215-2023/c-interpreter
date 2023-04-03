@@ -1,119 +1,57 @@
+import { DECLARED_BUT_NOT_YET_ASSIGNED } from '../constants'
 import * as errors from '../errors/errors'
-import { Expression, ExpressionStatement, Identifier, Node, Statement, Type } from '../parser/types'
-import {
-  CallInstruction,
-  ClosureInstruction,
-  Command,
-  Context,
-  Environment,
-  Frame,
-  TypeEnvironment
-} from '../types'
-import { checkType } from '../utils/runtime/checkType'
+import { TAG_TO_TYPE } from '../memory/tags'
+import { Node } from '../parser/types'
+import { Builtin } from '../typeChecker/types'
+import { Value } from '../types'
+import { CallInstruction, Command, Context, Environment } from '../types'
+import { builtin_functions } from './defaults/functions'
 import { currentEnvironment } from './environment'
 import { handleRuntimeError } from './errors'
-import { currentTypeEnvironment } from './typeEnvironment'
+
+export const isNumber = (v: Value) => typeof v === 'number'
 
 export function checkNumberOfArguments(
   context: Context,
   command: CallInstruction,
-  lambda: ClosureInstruction
+  lambda: Command | Builtin
 ) {
-  if (lambda.parameters == undefined) {
+  console.log(lambda)
+  if (lambda.type == 'Closure_i') {
+    if (lambda.parameters == undefined) {
+      return handleRuntimeError(context, new errors.CallingNonFunctionValue(undefined, command))
+    }
+    if (lambda.parameters.length != command.arity) {
+      return handleRuntimeError(
+        context,
+        new errors.InvalidNumberOfArguments(command, lambda.parameters.length, command.arity)
+      )
+    }
+    return undefined
+  } else if (lambda.type == 'Builtin') {
+    if (lambda.hasVarArgs && command.arity - lambda.arity >= 0) {
+      return undefined
+    } else if (command.arity != lambda.arity) {
+      return handleRuntimeError(
+        context,
+        new errors.InvalidNumberOfArguments(command, lambda.arity, command.arity)
+      )
+    }
+    return undefined
+  } else {
     return handleRuntimeError(context, new errors.CallingNonFunctionValue(undefined, command))
   }
-  if (lambda.parameters.length != command.arity) {
-    return handleRuntimeError(
-      context,
-      new errors.InvalidNumberOfArguments(command, lambda.parameters.length, command.arity)
-    )
-  }
-
-  return undefined
-}
-
-export function scanFrameVariables(nodes: Statement[]): [Frame, Frame] {
-  let var_arr = {}
-  let type_arr = {}
-  for (let node of nodes) {
-    node = node as ExpressionStatement
-    const values = makeVariableDeclarations(node)
-    const types = getFrameTypes(node)
-    var_arr = { ...var_arr, ...values }
-    type_arr = { ...type_arr, ...types }
-  }
-  // var_arr = var_arr.filter((item, pos) => var_arr.indexOf(item) === pos)
-  return [var_arr, type_arr]
-}
-
-// TODO: Add identifier type to type environment
-export function makeVariableDeclarations(node: Statement | Expression): Frame {
-  let arr = {}
-  if (node.type == 'SequenceExpression') {
-    for (const expr of node.expressions) {
-      const res = makeVariableDeclarations(expr)
-      arr = { ...arr, ...res }
-    }
-  } else if (node.type == 'ExpressionStatement') {
-    return makeVariableDeclarations(node.expression)
-  } else if (node.type == 'AssignmentExpression') {
-    const left = node.left as Identifier
-
-    arr[left.name] = DECLARED_BUT_NOT_YET_ASSIGNED
-  } else if (node.type == 'Identifier') {
-    arr[node.name] = DECLARED_BUT_NOT_YET_ASSIGNED
-  }
-  return arr
-}
-
-export function getFrameTypes(node: Statement | Expression): Frame {
-  let arr = {}
-  if (node.type == 'SequenceExpression') {
-    for (const expr of node.expressions) {
-      const res = getFrameTypes(expr)
-      arr = { ...arr, ...res }
-    }
-  } else if (node.type == 'ExpressionStatement') {
-    return getFrameTypes(node.expression)
-  } else if (node.type == 'AssignmentExpression') {
-    return getFrameTypes(node.left)
-  } else if (node.type == 'VariableDeclarationExpression') {
-    //might want to do for functions soon)
-    arr[node.identifier.name] = node.identifierType
-  } else if (node.type == 'ArrayDeclarationExpression') {
-    arr[node.identifier.name] = node.arrayType //maybe should just combine w vardeclaration lmao
-  }
-  return arr
-}
-
-/* 
-Gets a variable from the environment based on the name.
-*/
-export const getIdentifierValueFromEnvironment = (context: Context, name: string) => {
-  let environment: Environment | null = currentEnvironment(context)
-  while (environment) {
-    if (environment.head.hasOwnProperty(name)) {
-      console.log(environment.head)
-      return environment.head[name]
-    } else {
-      environment = environment.tail
-    }
-  }
-  return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
 }
 
 export const setValueToIdentifier = (
   command: Command,
   context: Context,
   name: string,
-  value: any,
-  type: Type
+  value: any
 ) => {
   let environment: Environment | null = currentEnvironment(context)
   while (environment) {
     if (environment.head.hasOwnProperty(name)) {
-      const typeExpected = getType(context, name) as Type
-      checkType(context, typeExpected, type, command)
       environment.head[name] = value
       return value
     } else {
@@ -123,11 +61,8 @@ export const setValueToIdentifier = (
   return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
 }
 
-const DECLARED_BUT_NOT_YET_ASSIGNED = Symbol('Used to implement hoisting')
-
 export function declareIdentifier(context: Context, name: string, node: Node, addr: number) {
   const environment = currentEnvironment(context)
-  const typeEnvironment = currentTypeEnvironment(context)
   if (environment.head.hasOwnProperty(name)) {
     return handleRuntimeError(
       context,
@@ -135,13 +70,6 @@ export function declareIdentifier(context: Context, name: string, node: Node, ad
     )
   }
   environment.head[name] = addr
-  if (node.type == 'VariableDeclarationExpression') {
-    typeEnvironment.head[name] = node.identifierType
-  } else if (node.type == 'ArrayDeclarationExpression') {
-    typeEnvironment.head[name] = node.arrayType
-  } else if (node.type == 'PointerDeclarationExpression') {
-    typeEnvironment.head[name] = node.pointerType
-  }
   return environment
 }
 
@@ -164,14 +92,18 @@ export function getVariable(context: Context, name: string) {
   return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
 }
 
-export function getType(context: Context, name: string): Type {
-  let environment: TypeEnvironment | null = currentTypeEnvironment(context)
-  while (environment) {
-    if (environment.head.hasOwnProperty(name)) {
-      return environment.head[name]
+export const apply_builtin = (builtin_symbol: string, args: any[]) => {
+  const resolvedArgs = []
+
+  for (const arg of args) {
+    const [type, value] = arg
+    if (TAG_TO_TYPE[type] == 'char') {
+      resolvedArgs.push(String.fromCharCode(value))
     } else {
-      environment = environment.tail
+      resolvedArgs.push(value)
     }
   }
-  return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
+
+  resolvedArgs.reverse()
+  builtin_functions[builtin_symbol].apply(...args)
 }

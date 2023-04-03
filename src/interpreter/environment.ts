@@ -21,7 +21,6 @@ export function currentEnvironment(context: Context): Environment {
 
 export function replaceEnvironment(context: Context, environment: Environment): void {
   context.runtime.environments[0] = environment
-  context.runtime.environmentTree.insert(environment)
 }
 
 export function popEnvironment(context: Context): Environment | undefined {
@@ -30,5 +29,4 @@ export function popEnvironment(context: Context): Environment | undefined {
 
 export function pushEnvironment(context: Context, environment: Environment): void {
   context.runtime.environments.unshift(environment)
-  context.runtime.environmentTree.insert(environment)
 }

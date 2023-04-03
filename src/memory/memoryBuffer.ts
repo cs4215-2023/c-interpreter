@@ -1,5 +1,3 @@
-import { stringify } from 'querystring'
-
 import { TAGS } from './tags'
 //gives
 export default class MemoryBuffer {

@@ -4,7 +4,7 @@ import { Context, Frame, TypeEnvironment } from '../types'
 
 export function createBlockTypeEnvironment(
   context: Context,
-  name = 'blockEnvironment',
+  name = 'blocktypeEnvironment',
   head: Frame = {}
 ): TypeEnvironment {
   return {
@@ -21,7 +21,6 @@ export function currentTypeEnvironment(context: Context): TypeEnvironment {
 
 export function replaceTypeEnvironment(context: Context, environment: TypeEnvironment): void {
   context.runtime.typeEnv[0] = environment
-  // context.runtime.typeEnvTree.insert(environment)
 }
 
 export function popTypeEnvironment(context: Context): TypeEnvironment | undefined {
@@ -30,5 +29,4 @@ export function popTypeEnvironment(context: Context): TypeEnvironment | undefine
 
 export function pushTypeEnvironment(context: Context, environment: TypeEnvironment): void {
   context.runtime.typeEnv.unshift(environment)
-  // context.runtime.typeEnvTree.insert(environment)
 }

@@ -33,13 +33,7 @@ SIGNEDTYPE: 'signed' | 'unsigned';
 
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
-FORMATSPECIFIERS:
-	'"' '%d' '"'
-	| '"' '%i' '"'
-	| '"' '%c' '"'
-	| '"' '%f' '"'
-	| '"' '%s' '"'
-	| '"' '%p' '"';
+FORMATSPECIFIERS: '%d' | '%i' | '%c' | '%f' | '%s' | '%p';
 
 NUMBER: [0-9_]+;
 CHAR: '\'' ~[\])] '\'';
@@ -50,9 +44,11 @@ MINUSMINUS: '--';
 
 start: (statement)*;
 
-stringLiteral: '"' IDENTIFIER? '"';
+identifiersAndSpecifiers: IDENTIFIER | FORMATSPECIFIERS;
 
-stringLiteralList: stringLiteral (',' stringLiteral)*;
+string: StringLiteral+;
+
+stringLiteralList: string (',' string)*;
 
 identifierWithType: idType = type id = IDENTIFIER;
 
@@ -81,7 +77,7 @@ expression:
 	| NUMBER																# NumberExpression
 	| CHAR																	# CharExpression
 	| FLOAT																	# FloatExpression
-	| stringLiteral															# StringLiteralExpression
+	| string																# StringExpression
 	| IDENTIFIER															# IdentifierExpression
 	| postFix																# PostFixNotationExpression
 	| arrayInitialisation													# ArrayInitialisationExpression
@@ -91,7 +87,6 @@ expression:
 	| pointerDerefernce														# PointerDereferenceExpression
 	| pointerReference														# PointerReferenceExpression
 	| functionCall															# FunctionCallExpression
-	| printf																# PrintfExpression
 	| left = expression operator = MUL right = expression					# Multiplication
 	| left = expression operator = DIV right = expression					# Division
 	| left = expression operator = MOD right = expression					# ModulusDivision
@@ -164,7 +159,7 @@ arrayContent:
 arrayInitialisation:
 	arrayIdentifierWithType (
 		operator = '=' array = arrayContent
-		| stringLiteral
+		| string
 	)?;
 
 pointer: idType = type '*' id = IDENTIFIER;
@@ -184,9 +179,6 @@ functionCall:
 	func = IDENTIFIER '(' args = functionCallParameters ')';
 
 functionCallParameters: expressionList;
-
-printf:
-	'printf(' (stringLiteral | FORMATSPECIFIERS)* ',' identifierList ')';
 
 // primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 
@@ -415,10 +407,24 @@ printf:
 
 // fragment SimpleEscapeSequence: '\\' ['"?abfnrtv\\];
 
-// StringLiteral: EncodingPrefix? '"' SCharSequence? '"';
-
-// fragment EncodingPrefix: 'u8' | 'u' | 'U' | 'L';
+// // fragment EncodingPrefix: 'u8' | 'u' | 'U' | 'L';
 
 // fragment SCharSequence: SChar+;
 
 // fragment SChar: ~["\\\r\n] | EscapeSequence | '\\\n' // Added line | '\\\r\n'; // Added line
+
+StringLiteral: '"' SCharSequence? '"';
+
+fragment CChar: ~['\\\r\n] | EscapeSequence;
+
+fragment EscapeSequence: SimpleEscapeSequence;
+
+fragment SimpleEscapeSequence: '\\' ['"?abfnrtv\\];
+
+fragment SCharSequence: SChar+;
+
+fragment SChar:
+	~["\\\r\n]
+	| EscapeSequence
+	| '\\\n' // Added line
+	| '\\\r\n';

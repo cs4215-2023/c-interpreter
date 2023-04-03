@@ -5,10 +5,10 @@ import { Variant } from '../../types'
 describe('Arrays and Pointer', () => {
   it('Pointer assignment ', async () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
-    const code = 'int main() {int a = 4; int* c = &a; return c;}'
+    const code = 'int main() {int a = 4; int* c = &a; return *c;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe(12)
+      expect(result.value).toBe(4)
     } else {
       expect(1).toBe(2)
     }

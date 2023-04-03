@@ -1,4 +1,4 @@
-import { StackOverflowError } from '../../../errors/errors'
+import { StackOverflowError } from '../../errors/errors'
 import Stack from '../stack'
 import { TAGS } from '../tags'
 

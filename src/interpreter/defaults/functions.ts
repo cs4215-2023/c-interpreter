@@ -1,13 +1,25 @@
-import { FLOAT_PRECISION } from '../../constants'
+import { FLOAT_PRECISION, VOID_TYPE } from '../../constants'
 
-export const builtin_functions = {
-  printf: (x: string, ...args: any[]) => console.log(printf(x, args))
+const REGEX = /%[c,f,d]+/g
+
+export const arity = (f: Function) => {
+  return f.length
 }
 
-const regex = /%[c,f,d]+/g
+export const builtin_functions = {
+  printf: {
+    type: 'Builtin',
+    returnType: VOID_TYPE,
+    apply: (x: string, ...args: any[]): void => console.log(printfFunction(x, args)),
+    arity: 0,
+    hasVarArgs: true,
+    name: 'printf'
+  }
+}
 
-export const printf = (stringInput: string, ...args: any[]) => {
-  const found = stringInput.match(regex)
+export const printfFunction = (stringInput: string, ...args: any[]) => {
+  console.log(stringInput)
+  const found = stringInput.match(REGEX)
   if (found == null) {
     return stringInput
   }
@@ -42,6 +54,6 @@ export const printf = (stringInput: string, ...args: any[]) => {
     }
   }
 
-  const replacedString = stringInput.replace(regex, replaceTokens)
+  const replacedString = stringInput.replace(REGEX, replaceTokens)
   return replacedString
 }

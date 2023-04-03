@@ -27,7 +27,7 @@ describe('Functions', () => {
 		return 1;
 	}
 
-	void main() {
+	int main() {
 		return foo(3);
 	}
  	`
@@ -47,7 +47,7 @@ describe('Functions', () => {
 		return a;
 	}
 
-	void main() {
+	int main() {
 		return foo(2);
 	}`
     const result = await sourceRunner(code, context)
