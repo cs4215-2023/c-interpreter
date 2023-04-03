@@ -6,6 +6,7 @@
 /* tslint:disable:max-classes-per-file */
 
 import {
+  ArrayIdentifier,
   BinaryOperator,
   BlockStatement,
   CallExpression,
@@ -164,6 +165,7 @@ export type TypeEnvironment = {
 
 export type Command =
   | Node
+  | ArrayIdentifierInstruction
   | UnaryExpressionInstruction
   | BinaryExpressionInstruction
   | ConditionalExpressionInstruction
@@ -183,6 +185,10 @@ export type Command =
 
 type Instruction = {
   loc?: SourceLocation
+}
+
+export interface ArrayIdentifierInstruction extends Instruction {
+  type: 'ArrayIdentifier_i'
 }
 
 export interface UnaryExpressionInstruction extends Instruction {
@@ -208,7 +214,7 @@ export interface LogicalExpressionInstruction extends Instruction {
 
 export interface AssignmentExpressionInstruction extends Instruction {
   type: 'AssignmentExpression_i'
-  symbol?: Identifier
+  symbol?: Identifier | ArrayIdentifier
 }
 
 export interface IfStatementInstruction extends Instruction {

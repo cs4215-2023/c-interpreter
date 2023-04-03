@@ -85,6 +85,7 @@ expression:
 	| IDENTIFIER															# IdentifierExpression
 	| postFix																# PostFixNotationExpression
 	| arrayInitialisation													# ArrayInitialisationExpression
+	| arrayIdentifier														# ArrayIdentifierExpression
 	| '(' inner = expression ')'											# ParenthesisExpression
 	| pointer																# PointerDeclarationExpression
 	| pointerDerefernce														# PointerDereferenceExpression
@@ -149,10 +150,13 @@ forLoop:
 	'for' '(' innerForCondition = forCondition ')' '{' body = statementBlock '}';
 
 forCondition:
-	initialise = expression ';' test = expression? ';' update = expression;
+	initialise = expression ';' test = expression? ';' update = expression;  
 
 arrayIdentifierWithType:
 	idType = type id = IDENTIFIER '[' size = NUMBER? ']';
+
+arrayIdentifier:
+	id = IDENTIFIER '[' size = expression? ']';
 
 arrayContent:
 	'{' (pointerList | numberList | identifierList) '}';

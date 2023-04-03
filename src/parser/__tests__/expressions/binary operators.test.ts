@@ -678,7 +678,8 @@ describe('Binary Operator Tests', () => {
               {
                 left: {
                   name: 'a',
-                  type: 'Identifier'
+                  type: 'Identifier',
+                  isPointer: false
                 },
                 loc: {
                   end: {

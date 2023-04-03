@@ -1,7 +1,12 @@
 /* tslint:disable:max-classes-per-file */
 
-import { ExpressionStatement, Identifier, Node, Type } from '../parser/types'
+import { write } from 'fs'
+import { type } from 'os'
+
+import { InvalidTypeError } from '../errors/errors'
+import { ArrayIdentifier, ExpressionStatement, Identifier, Literal, Node, Type } from '../parser/types'
 import { ClosureInstruction, Command, Context, Value, WhileStatementInstruction } from '../types'
+import { identifier } from '../utils/astCreator'
 import { checkBinaryExpression } from '../utils/runtime/checkBinaryExp'
 import { checkIdentifier } from '../utils/runtime/checkIdentifier'
 import { checkLogicalExpression } from '../utils/runtime/checkLogicalExp'
@@ -12,7 +17,7 @@ import { isNumber } from '../utils/runtime/utils'
 import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
 import { handleRuntimeError, InterpreterError } from './errors'
 import MemoryModel from './memory/memoryModel'
-import { TAG_TO_TYPE, TYPE_TO_TAG } from './memory/tags'
+import { TAG_TO_TYPE, TAGS, TYPE_TO_TAG } from './memory/tags'
 import {
   evaluateBinaryExpression,
   evaluateLogicalExpression,
@@ -37,7 +42,7 @@ const STACK_SIZE = 500
 const STACK_BEGIN = 0
 const HEAP_SIZE = 100
 const HEAP_BEGIN = STACK_BEGIN + STACK_SIZE + 1
-const memory = new MemoryModel(STACK_SIZE, STACK_BEGIN, HEAP_SIZE, HEAP_BEGIN)
+let memory = new MemoryModel(STACK_SIZE, STACK_BEGIN, HEAP_SIZE, HEAP_BEGIN)
 
 function* evaluateBlockStatement(context: Context, node: Node) {
   if (node.type != 'BlockStatement') {
@@ -125,6 +130,82 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.runtime.stash.push(identifier)
   },
 
+  PointerDeclarationExpression: function* (node: Node, context: Context) {
+    if (node.type != 'PointerDeclarationExpression') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+
+    // if (node.identifier.type == 'TypedIdentifier') {
+    //   node.identifierType = node.identifier.typeDeclaration
+    // }
+    const identifier = node.pointer as Identifier
+
+    if (identifier.isPointer !== true) {
+      throw InvalidTypeError
+    } //pointer assertion
+
+    const address = memory.mem_stack_allocate_one()
+    declareIdentifier(context, identifier.name, node, address)
+    console.log('allocated address ' + address + ' to pointer ' + identifier.name)
+    context.runtime.stash.push(identifier)
+  },
+
+  ArrayDeclarationExpression: function* (node: Node, context: Context) {
+    if (node.type != 'ArrayDeclarationExpression') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+    //if elements are already declared
+    let size: number
+    if (node.size === undefined) {
+      size = node.array!.elements.length
+    } else {
+      size = node.size
+    }
+    const address = memory.mem_stack_allocate_n(2 * size) //allocate memory for both address and content
+    const type = node.arrayType.valueType
+    declareIdentifier(context, node.identifier.name, node, address)
+
+    //write pointers to memory
+    for (let i = 0; i < size; i++) {
+      const pointer_addr = i * memory.stack.word_size + address
+      const value_addr = i * memory.stack.word_size + size * memory.stack.word_size + address
+      memory.mem_write_to_address(pointer_addr, TYPE_TO_TAG[type] + 3, value_addr)
+
+    }
+    if (node.array === undefined) {
+      context.runtime.stash.push(node.identifier)
+    } else {
+      for (let i = node.array.elements.length - 1; i >= 0; i--) {
+        const expression = {
+          type: "Literal",
+          valueType: 'int',
+          value: i
+        } as Literal
+        const pointer_identifier: ArrayIdentifier = { type: "ArrayIdentifier", name: node.identifier.name, index: expression, isPointer: true }
+        const assignmentExpression = {
+          type: 'AssignmentExpression',
+          operator: '=',
+          left: pointer_identifier,
+          right: node.array.elements[i]
+        }
+        context.runtime.agenda.push(assignmentExpression)
+      }
+    }
+  },
+
+  ArrayIdentifier: function* (node: Node, context: Context) {
+    if (node.type != 'ArrayIdentifier') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+    const identifier = getVariable(context, node.name)
+    // const [type, valAddr] = memory.mem_read(identifier + memory.stack.word_size * node.index)
+    context.runtime.agenda.push({ type: "ArrayIdentifier_i" })
+    context.runtime.stash.push(identifier)
+    context.runtime.agenda.push(node.index)
+
+  },
+
+
   Identifier: function* (node: Node, context: Context) {
     if (node.type != 'Identifier') {
       throw handleRuntimeError(context, new InterpreterError(node))
@@ -134,7 +215,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const identifier = getVariable(context, node.name)
     console.log('load identifier ' + node.name + ' at addr ' + identifier)
-
+    const [type, val] = memory.mem_read(identifier)
     context.runtime.stash.push(identifier)
   },
 
@@ -178,9 +259,10 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    if (node.operator == '&' || node.operator == '*') {
-      throw new Error('Pointer not implemented yet')
-    }
+    // if (node.operator == '&' || node.operator == '*') {
+    //   console.log("pointer unary")
+    //   console.log(node.argument)
+    // }
     context.runtime.agenda.push(
       { type: 'UnaryExpression_i', operator: node.operator },
       node.argument
@@ -254,7 +336,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'AssignmentExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-
     //Assignment here refers to =
     if (node.left.type == 'Identifier') {
       context.runtime.agenda.push(
@@ -262,7 +343,15 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
         { type: 'AssignmentExpression_i', symbol: node.left },
         node.right
       )
-    } else {
+    } else if (node.left.type == 'ArrayIdentifier') {
+      context.runtime.agenda.push(
+        { type: 'Pop_i' },
+        { type: 'AssignmentExpression_i', symbol: node.left },
+        node.left.index,
+        node.right
+      )
+    }
+    else {
       context.runtime.agenda.push(
         { type: 'Pop_i' },
         { type: 'AssignmentExpression_i' },
@@ -412,7 +501,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       type: 'ExpressionStatement',
       expression: {
         type: 'CallExpression',
-        callee: { type: 'Identifier', name: 'main' },
+        callee: { type: 'Identifier', name: 'main', isPointer: false },
         arguments: []
       }
     })
@@ -423,6 +512,17 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
   },
 
   // INSTRUCTIONS
+  ArrayIdentifier_i: function* (command: Command, context: Context) {
+    if (command.type != 'ArrayIdentifier_i') {
+      throw handleRuntimeError(context, new InterpreterError(command as Node))
+    }
+    const index_addr = context.runtime.stash.pop()
+    const array_addr = context.runtime.stash.pop()
+    const [type, index] = memory.mem_read(index_addr)
+    const [typeVal, val] = memory.mem_read(index * memory.stack.word_size + array_addr)
+    context.runtime.stash.push(val)
+
+  },
 
   BinaryExpression_i: function* (command: Command, context: Context) {
     if (command.type != 'BinaryExpression_i') {
@@ -431,14 +531,23 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const stash = context.runtime.stash
     const left_addr = stash.pop()
     const right_addr = stash.pop()
-    const [type_left, left] = memory.mem_read(left_addr)
-    const [type_right, right] = memory.mem_read(right_addr)
+    let [type_left, left] = memory.mem_read(left_addr)
+    let [type_right, right] = memory.mem_read(right_addr)
     const operator = command.operator
     console.log(right, operator, left)
-    console.log(command)
     checkBinaryExpression(command, type_left, type_right)
+
+    //pointer arithmetic
+    if (type_left > type_right) { //the assumption is that one of these will be a pointer
+      right *= memory.stack.word_size
+      type_right = type_left
+    }
+    else if (type_left < type_right) {
+      left *= memory.stack.word_size
+      type_left = type_right
+    }
+
     const result = evaluateBinaryExpression(command, operator, right, left)
-    console.log(result)
     const push_addr = memory.mem_stack_push(type_left, result)
     stash.push(push_addr)
   },
@@ -453,13 +562,28 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const address = stash.pop()
     //get address here
     const [type, value] = memory.mem_read(address)
-    if (operator == '&' || operator == '*') {
-      throw new Error('Pointer not implemented yet')
+    if (operator == '&') {
+      console.log('since pointer referencing, pushing address ' + address)
+      //maybe write the address to stack, then push that address instead and read the addr from the address
+      const push_addr = memory.mem_stack_push(type + 3, address as number) //pointer type is offset by 3
+      stash.push(push_addr)
+    } else if (operator == '*') {
+      if (
+        type === TAGS.char_pointer_tag ||
+        type === TAGS.int_pointer_tag ||
+        type === TAGS.float_pointer_tag
+      ) {
+        stash.push(value)
+      } else {
+        throw InvalidTypeError
+      }
+    } else {
+      checkUnaryExpression(command, type, context)
+      const result = evaluateUnaryExpression(operator, value)
+      //get new address
+      const push_addr = memory.mem_stack_push(type, result as number)
+      stash.push(push_addr)
     }
-    checkUnaryExpression(command, type, context)
-    const result = evaluateUnaryExpression(operator, value)
-    const push_addr = memory.mem_stack_push(type, result as number)
-    stash.push(push_addr)
   },
 
   ConditionalExpression_i: function* (command: Command, context: Context) {
@@ -543,23 +667,49 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (command.symbol == undefined) {
       identifier = stash.pop()
     }
-
-    const addr = stash.peek()
-    if (addr.type != 'Closure_i') {
-      const var_addr = getVariable(context, identifier!.name) //get addr
+    let addr = stash.peek()
+    console.log("AssignmentExpression_i")
+    if (identifier!.type === "ArrayIdentifier") {
+      const index_addr = stash.pop()
+      addr = stash.peek()
+      const id = identifier as ArrayIdentifier
+      const var_addr = getVariable(context, id.name) //get addr
       const [valueType, newVal] = memory.mem_read(addr)
-      memory.mem_write_to_address(var_addr, valueType, newVal)
-      console.log(
-        'setting ' + newVal + ' to identifier ' + identifier!.name + ' at addr ' + var_addr
-      )
-      setValueToIdentifier(command, context, identifier!.name, var_addr, {
-        type: 'PrimitiveType',
-        valueType: TAG_TO_TYPE[valueType],
-        signed: undefined
-      } as Type)
+      const [type, write_addr] = memory.mem_read(var_addr)
+      const [itype, index] = memory.mem_read(index_addr)
+      memory.mem_write_to_address(write_addr + index * memory.stack.word_size, valueType, newVal)
+
+    }
+    else if (addr.type != 'Closure_i') {
+      const [valueType, newVal] = memory.mem_read(addr)
+      const var_addr = getVariable(context, identifier!.name) //get addr
+      if (identifier?.isPointer) {
+        const actualAddr = newVal //just to make it clear this is an address
+        memory.mem_write_to_address(var_addr, valueType, actualAddr) //don't write new val here, but write addr
+        console.log(
+          'setting address' + actualAddr + ' to pointer ' + identifier!.name + ' at addr ' + var_addr
+        )
+        setValueToIdentifier(command, context, identifier!.name, var_addr, {
+          type: 'PrimitiveType',
+          valueType: TAG_TO_TYPE[valueType],
+          signed: undefined
+        } as Type)
+      }
+      else {
+        memory.mem_write_to_address(var_addr, valueType, newVal)
+        console.log(
+          'setting ' + newVal + ' to identifier ' + identifier!.name + ' at addr ' + var_addr
+        )
+        setValueToIdentifier(command, context, identifier!.name, var_addr, {
+          type: 'PrimitiveType',
+          valueType: TAG_TO_TYPE[valueType],
+          signed: undefined
+        } as Type)
+      }
     } else {
       setValueToIdentifier(command, context, identifier!.name, addr, addr.typeDeclaration)
     }
+    memory.stack.print()
   },
 
   EnvironmentRestoration_i: function* (command: Command, context: Context) {
@@ -685,6 +835,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 // tslint:enable:object-literal-shorthand
 
 export function* evaluate(node: Node, context: Context) {
+  memory = new MemoryModel(STACK_SIZE, STACK_BEGIN, HEAP_SIZE, HEAP_BEGIN)
   // compile the program to instructions
   yield* evaluators[node.type](node, context)
   const agenda = context.runtime.agenda

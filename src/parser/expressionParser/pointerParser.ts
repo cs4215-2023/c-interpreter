@@ -7,7 +7,7 @@ import {
   PointerReferenceExpressionContext
 } from '../../lang/ClangParser'
 import { TypeParser } from '../typeParser'
-import { Expression, PointerIdentifier } from '../types'
+import { Expression, Identifier, PointerIdentifier, UnaryExpression } from '../types'
 import { Constructable } from '../util'
 
 export const parserPointerExpression = <T extends Constructable>(
@@ -15,15 +15,12 @@ export const parserPointerExpression = <T extends Constructable>(
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
     typeParser = new TypeParser()
-    visitPointer(ctx: PointerContext): PointerIdentifier {
+    visitPointer(ctx: PointerContext): Identifier {
       console.log('pointercontext')
       return {
         type: 'Identifier',
         name: ctx.IDENTIFIER().text,
-        pointerAddress: undefined,
-        pointingAddress: undefined,
-        isReferenced: false,
-        isDereferenced: false
+        isPointer: true
       }
     }
     visitPointerDeclarationExpression(ctx: PointerDeclarationExpressionContext): Expression {
@@ -35,33 +32,37 @@ export const parserPointerExpression = <T extends Constructable>(
         pointerType: type
       }
     }
-    visitPointerDereferenceExpression(ctx: PointerDereferenceExpressionContext): PointerIdentifier {
+    visitPointerDereferenceExpression(ctx: PointerDereferenceExpressionContext): UnaryExpression {
       return this.visit(ctx.pointerDerefernce())
     }
 
-    visitPointerDerefernce(ctx: PointerDerefernceContext): PointerIdentifier {
+    visitPointerDerefernce(ctx: PointerDerefernceContext): UnaryExpression {
       console.log('pointerdereferencecontext')
-      return {
+      const identifier = {
         type: 'Identifier',
         name: ctx.IDENTIFIER().text,
-        pointerAddress: undefined,
-        pointingAddress: undefined,
-        isReferenced: false,
-        isDereferenced: true
+        isPointer: true
+      }
+      return {
+        type: 'UnaryExpression',
+        operator: '*',
+        argument: identifier as Identifier
       }
     }
     visitPointerReferenceExpression(ctx: PointerReferenceExpressionContext): PointerIdentifier {
       return this.visit(ctx.pointerReference())
     }
-    visitPointerReference(ctx: PointerReferenceContext): PointerIdentifier {
+    visitPointerReference(ctx: PointerReferenceContext): UnaryExpression {
       console.log('pointerreferencecontext')
-      return {
+      const identifier = {
         type: 'Identifier',
         name: ctx.IDENTIFIER().text,
-        pointerAddress: undefined,
-        pointingAddress: undefined,
-        isReferenced: true,
-        isDereferenced: false
+        isPointer: undefined //can't tell from & whether u are referencing pointer or variable
+      }
+      return {
+        type: 'UnaryExpression',
+        operator: '&',
+        argument: identifier as Identifier
       }
     }
   }

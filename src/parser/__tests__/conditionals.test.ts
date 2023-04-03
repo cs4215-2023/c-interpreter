@@ -22,7 +22,8 @@ describe('Conditional Statements', () => {
                     {
                       argument: {
                         name: 'b',
-                        type: 'Identifier'
+                        type: 'Identifier',
+                        isPointer: false
                       },
                       operator: '--',
                       type: 'UpdateExpression'
@@ -47,7 +48,8 @@ describe('Conditional Statements', () => {
                     {
                       argument: {
                         name: 'a',
-                        type: 'Identifier'
+                        type: 'Identifier',
+                        isPointer: false
                       },
                       operator: '--',
                       type: 'UpdateExpression'
@@ -105,7 +107,8 @@ describe('Conditional Statements', () => {
                       {
                         argument: {
                           name: 'b',
-                          type: 'Identifier'
+                          type: 'Identifier',
+                          isPointer: false
                         },
                         operator: '--',
                         type: 'UpdateExpression'
@@ -147,7 +150,8 @@ describe('Conditional Statements', () => {
                     {
                       argument: {
                         name: 'a',
-                        type: 'Identifier'
+                        type: 'Identifier',
+                        isPointer: false
                       },
                       operator: '--',
                       type: 'UpdateExpression'
