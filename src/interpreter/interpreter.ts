@@ -4,7 +4,9 @@ import MemoryModel from '../memory/memoryModel'
 import { TAG_TO_TYPE, TYPE_TO_TAG } from '../memory/tags'
 import { ExpressionStatement, Identifier, Node } from '../parser/types'
 import { typeCheck } from '../typeChecker/typeChecker'
+import { Builtin } from '../typeChecker/types'
 import { ClosureInstruction, Command, Context, Value, WhileStatementInstruction } from '../types'
+import { arity, builtin_functions } from './defaults/functions'
 import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
 import { handleRuntimeError, InterpreterError } from './errors'
 import {
@@ -12,7 +14,7 @@ import {
   evaluateLogicalExpression,
   evaluateUnaryExpression
 } from './operators'
-import { isNumber } from './utils'
+import { apply_builtin, isNumber } from './utils'
 import {
   checkNumberOfArguments,
   declareIdentifier,
@@ -62,6 +64,15 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       )
       context.runtime.stash.push(address)
     }
+  },
+
+  StringLiteral: function* (node: Node, context: Context) {
+    if (node.type != 'StringLiteral') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+
+    // TODO: integrate with memory?
+    context.runtime.stash.push(node.string)
   },
 
   SequenceExpression: function* (node: Node, context: Context) {
@@ -363,9 +374,16 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
+    const global_frame = {}
+    for (const key in builtin_functions) {
+      const builtin = builtin_functions[key] as Builtin
+      builtin.arity = arity(builtin.apply)
+      global_frame[key] = builtin
+    }
+
     // Create global environment.
     context.numberOfOuterEnvironments += 1
-    const environment = createBlockEnvironment(context, 'globalEnvironment')
+    const environment = createBlockEnvironment(context, 'globalEnvironment', global_frame)
     pushEnvironment(context, environment)
 
     // Call main at the end.
@@ -591,11 +609,15 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const args = []
 
     for (let i = arity - 1; i >= 0; i--) args[i] = memory.mem_read(stash.pop())
-    const lambda = stash.pop() as ClosureInstruction
+    const lambda = stash.pop()
 
     checkNumberOfArguments(context, command, lambda)
 
     const agendaTop = agenda.peek() as Command
+
+    if (lambda.type == 'Builtin') {
+      const result = apply_builtin(lambda.name, args)
+    }
 
     if (agenda.length() === 0 || agendaTop.type === 'EnvironmentRestoration_i') {
       agenda.push({ type: 'Mark_i' })

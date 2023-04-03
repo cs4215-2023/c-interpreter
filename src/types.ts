@@ -177,7 +177,6 @@ export type Command =
   | CallInstruction
   | MarkInstruction
   | ClosureInstruction
-  | Builtin
 
 type Instruction = {
   loc?: SourceLocation
@@ -271,10 +270,4 @@ export interface ClosureInstruction extends Instruction {
   body: BlockStatement
   loc?: SourceLocation
   typeDeclaration: Type
-}
-
-export interface Builtin extends Instruction {
-  type: 'Builtin'
-  name: string
-  args: Array<any>
 }

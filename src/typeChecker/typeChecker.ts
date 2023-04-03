@@ -1,4 +1,5 @@
 import { FLOAT_TYPE, INT_TYPE, VOID_TYPE } from '../constants'
+import { arity, builtin_functions } from '../interpreter/defaults/functions'
 import { handleRuntimeError, InterpreterError } from '../interpreter/errors'
 import { Identifier, Node } from '../parser/types'
 import { Command, Context } from '../types'
@@ -11,7 +12,7 @@ import {
   popTypeEnvironment,
   pushTypeEnvironment
 } from './typeEnvironment'
-import { ClosureType } from './types'
+import { Builtin, ClosureType } from './types'
 import { assignFunctionType, declareIdentifierType, getVariableType } from './utils'
 
 export type TypeChecker<T extends Node> = (node: T, context: Context) => any
@@ -84,6 +85,11 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
 
     const closure = getVariableType(context, (node.callee as Identifier).name)
+
+    if (closure.type == 'Builtin') {
+      return
+    }
+
     const args = []
     for (const expression of node.arguments) {
       if (expression.type != 'EmptyExpression') {
@@ -359,8 +365,15 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
+    const global_frame = {}
+    for (const key in builtin_functions) {
+      const builtin = builtin_functions[key] as Builtin
+      builtin.arity = arity(builtin.apply)
+      global_frame[key] = builtin
+    }
+
     // Create global environment
-    const type_env = createBlockTypeEnvironment(context, 'globalTypeEnvironment')
+    const type_env = createBlockTypeEnvironment(context, 'globalTypeEnvironment', global_frame)
     pushTypeEnvironment(context, type_env)
 
     for (const statement of node.body) {
