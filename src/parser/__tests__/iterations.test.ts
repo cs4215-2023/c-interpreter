@@ -10,22 +10,26 @@ const intType: PrimitiveType = { type: 'PrimitiveType', signed: undefined, value
 
 const identifierI: Identifier = {
   name: 'i',
-  type: 'Identifier'
+  type: 'Identifier',
+  isPointer: false
 }
 
 const identifierB: Identifier = {
   name: 'b',
-  type: 'Identifier'
+  type: 'Identifier',
+  isPointer: false
 }
 
 const identifierA: Identifier = {
   name: 'a',
-  type: 'Identifier'
+  type: 'Identifier',
+  isPointer: false
 }
 
 const identifierC: Identifier = {
   name: 'c',
-  type: 'Identifier'
+  type: 'Identifier',
+  isPointer: false
 }
 
 describe('Iterative Statements', () => {
@@ -311,7 +315,8 @@ describe('Iterative Statements', () => {
           test: {
             argument: {
               name: 'i',
-              type: 'Identifier'
+              type: 'Identifier',
+              isPointer: false
             },
             operator: '--',
             type: 'UpdateExpression'
@@ -468,7 +473,8 @@ describe('Iterative Statements', () => {
           test: {
             argument: {
               name: 'i',
-              type: 'Identifier'
+              type: 'Identifier',
+              isPointer: false
             },
             operator: '--',
             type: 'UpdateExpression'

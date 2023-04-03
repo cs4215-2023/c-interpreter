@@ -3,10 +3,12 @@ export enum TAGS {
   float_tag = 1,
   int_tag = 2,
   char_tag = 3,
-  pointer_tag = 4,
-  identifier_tag = 5,
-  Unassigned_tag = 6,
-  base_pointer_tag = 7
+  float_pointer_tag = 4,
+  int_pointer_tag = 5,
+  char_pointer_tag = 6,
+  pointer_tag = 7,
+  Unassigned_tag = 8,
+  base_pointer_tag = 9
 }
 export const TYPE_TO_TAG = {
   void: TAGS.void_tag,

@@ -15,12 +15,14 @@ const parameterA: TypedIdentifier = {
 
 const idVoidType: Identifier = {
   name: 'foo',
-  type: 'Identifier'
+  type: 'Identifier',
+  isPointer: false
 }
 
 const idIntType: Identifier = {
   name: 'foo',
-  type: 'Identifier'
+  type: 'Identifier',
+  isPointer: false
 }
 
 describe('Return statements', () => {

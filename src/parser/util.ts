@@ -19,7 +19,8 @@ export function contextToLocation(ctx: ExpressionContext): SourceLocation {
 export function tokenToIdentifierWrapper(token: Token): Identifier {
   return {
     type: 'Identifier',
-    name: token.text!
+    name: token.text!,
+    isPointer: false
   }
 }
 

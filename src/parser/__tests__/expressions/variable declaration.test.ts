@@ -20,7 +20,7 @@ describe('Variable declarations', () => {
           expression: {
             expressions: [
               {
-                identifier: { name: 'a', type: 'Identifier' },
+                identifier: { name: 'a', type: 'Identifier', isPointer: false },
                 type: 'VariableDeclarationExpression',
                 identifierType: { type: 'PrimitiveType', signed: undefined, valueType: 'int' }
               },
@@ -44,12 +44,14 @@ describe('Variable declarations', () => {
 
     const identifierA: Identifier = {
       name: 'a',
-      type: 'Identifier'
+      type: 'Identifier',
+      isPointer: false
     }
 
     const identifierB: Identifier = {
       name: 'b',
-      type: 'Identifier'
+      type: 'Identifier',
+      isPointer: false
     }
 
     const expectedProg: Program = {
