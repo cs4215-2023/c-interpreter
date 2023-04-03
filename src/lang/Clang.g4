@@ -46,9 +46,9 @@ start: (statement)*;
 
 identifiersAndSpecifiers: IDENTIFIER | FORMATSPECIFIERS;
 
-stringLiteral: '"' identifiersAndSpecifiers* '"';
+string: StringLiteral+;
 
-stringLiteralList: stringLiteral (',' stringLiteral)*;
+stringLiteralList: string (',' string)*;
 
 identifierWithType: idType = type id = IDENTIFIER;
 
@@ -77,7 +77,7 @@ expression:
 	| NUMBER																# NumberExpression
 	| CHAR																	# CharExpression
 	| FLOAT																	# FloatExpression
-	| stringLiteral															# StringLiteralExpression
+	| string																# StringExpression
 	| IDENTIFIER															# IdentifierExpression
 	| postFix																# PostFixNotationExpression
 	| arrayInitialisation													# ArrayInitialisationExpression
@@ -155,7 +155,7 @@ arrayContent:
 arrayInitialisation:
 	arrayIdentifierWithType (
 		operator = '=' array = arrayContent
-		| stringLiteral
+		| string
 	)?;
 
 pointer: idType = type '*' id = IDENTIFIER;
@@ -403,10 +403,24 @@ functionCallParameters: expressionList;
 
 // fragment SimpleEscapeSequence: '\\' ['"?abfnrtv\\];
 
-// StringLiteral: EncodingPrefix? '"' SCharSequence? '"';
-
-// fragment EncodingPrefix: 'u8' | 'u' | 'U' | 'L';
+// // fragment EncodingPrefix: 'u8' | 'u' | 'U' | 'L';
 
 // fragment SCharSequence: SChar+;
 
 // fragment SChar: ~["\\\r\n] | EscapeSequence | '\\\n' // Added line | '\\\r\n'; // Added line
+
+StringLiteral: '"' SCharSequence? '"';
+
+fragment CChar: ~['\\\r\n] | EscapeSequence;
+
+fragment EscapeSequence: SimpleEscapeSequence;
+
+fragment SimpleEscapeSequence: '\\' ['"?abfnrtv\\];
+
+fragment SCharSequence: SChar+;
+
+fragment SChar:
+	~["\\\r\n]
+	| EscapeSequence
+	| '\\\n' // Added line
+	| '\\\r\n';

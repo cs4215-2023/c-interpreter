@@ -18,7 +18,7 @@ describe('String', () => {
           expression: {
             expressions: [
               {
-                string: 'helloworld',
+                string: '"hello world"',
                 type: 'StringLiteral'
               },
               {
@@ -45,7 +45,7 @@ describe('String', () => {
           expression: {
             expressions: [
               {
-                string: 'helloworld%d',
+                string: '"hello world%d"',
                 type: 'StringLiteral'
               },
               {
@@ -76,7 +76,7 @@ describe('String', () => {
                   {
                     arguments: [
                       {
-                        string: 'helloworld',
+                        string: '"hello world"',
                         type: 'StringLiteral'
                       }
                     ],
