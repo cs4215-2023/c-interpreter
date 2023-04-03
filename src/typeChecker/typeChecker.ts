@@ -43,10 +43,6 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     return result
   },
 
-  ArrayExpression: function* (node: Node, context: Context) {
-    throw new Error(`not supported yet: ${node.type}`)
-  },
-
   VariableDeclarationExpression: function* (node: Node, context: Context) {
     if (node.type != 'VariableDeclarationExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
@@ -77,6 +73,34 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     checkIdentifierNotUndefined(command)
     return command.typeDeclaration.valueType
+  },
+
+  ArrayDeclarationExpression: function* (node: Node, context: Context) {
+    if (node.type != 'ArrayDeclarationExpression') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+
+    const arrayType = node.arrayType.valueType
+    declareIdentifierType(context, node.identifier.name, node)
+
+    if (node.array === undefined) {
+      context.runtime.stash.push(node.identifier)
+    } else {
+      const arrayElements = node.array.elements
+      for (let i = arrayElements.length - 1; i >= 0; i--) {
+        const elementType = yield* typeCheck(arrayElements[i]!, context)
+        if (elementType != arrayType) {
+          throw handleRuntimeError(context, new TypeError(node, arrayType, elementType))
+        }
+      }
+    }
+  },
+
+  ArrayIdentifier: function* (node: Node, context: Context) {
+    if (node.type != 'ArrayIdentifier') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+    return getVariableType(context, node.name).valueType
   },
 
   CallExpression: function* (node: Node, context: Context) {

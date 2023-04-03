@@ -168,7 +168,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
     const identifier = getVariable(context, node.name)
-    // const [type, valAddr] = memory.mem_read(identifier + memory.stack.word_size * node.index)
     context.runtime.agenda.push({ type: 'ArrayIdentifier_i' })
     context.runtime.stash.push(identifier)
     context.runtime.agenda.push(node.index)

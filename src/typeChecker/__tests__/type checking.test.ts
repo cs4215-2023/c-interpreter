@@ -1,7 +1,7 @@
 import createContext from '../../createContext'
 import { sourceRunner } from '../../runner'
-import { TypeError } from '../../typeChecker/errors'
 import { Variant } from '../../types'
+import { TypeError } from '../errors'
 
 describe('Type checking', () => {
   it('Int to float assignment throws error ', async () => {
@@ -43,6 +43,36 @@ describe('Type checking', () => {
       expect(e).toBeInstanceOf(TypeError)
       const castError = e as TypeError
       expect(castError.expected).toBe('void')
+      expect(castError.received).toBe('int')
+    }
+  })
+
+  it('Check array all matching elements', async () => {
+    const code = `
+	void main() {
+		int c[4]={1,2,3,4};
+	}`
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBeUndefined()
+    } else {
+      expect(1).toBe(2)
+    }
+  })
+
+  it('Check array non type throws error', async () => {
+    const code = `
+	void main() {
+		char c[4]={1,2,3,4};
+	}`
+    try {
+      const context = createContext(Variant.DEFAULT, undefined, undefined)
+      await sourceRunner(code, context)
+    } catch (e) {
+      expect(e).toBeInstanceOf(TypeError)
+      const castError = e as TypeError
+      expect(castError.expected).toBe('char')
       expect(castError.received).toBe('int')
     }
   })
