@@ -99,9 +99,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     const arrayType = node.arrayType.valueType
     declareIdentifierType(context, node.identifier.name, node)
 
-    if (node.array === undefined) {
-      context.runtime.stash.push(node.identifier)
-    } else {
+    if (node.array !== undefined) {
       const arrayElements = node.array.elements
       for (let i = arrayElements.length - 1; i >= 0; i--) {
         const elementType = yield* typeCheck(arrayElements[i]!, context)
@@ -256,7 +254,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     if (node.type != 'AssignmentExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    console.log("assignmentexpr")
+    console.log('assignmentexpr')
     console.log(node.left)
     console.log(node.right)
     const left = yield* typeCheck(node.left, context)
