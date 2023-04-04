@@ -235,7 +235,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     if (node.type != 'StringLiteral') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    return "char"
+    return 'char'
   },
 
   ForStatement: function* (node: Node, context: Context) {

@@ -76,8 +76,7 @@ describe('Arrays and Pointer', () => {
   })
   it('Array assignment char', async () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
-    const code =
-      "char main() {char c[] = {'h','e','l','l','o'}; return c[4];}"
+    const code = "char main() {char c[] = {'h','e','l','l','o'}; return c[4];}"
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(String.fromCharCode(result.value)).toBe('o')
@@ -98,8 +97,7 @@ describe('Arrays and Pointer', () => {
   })
   it('Array assignment string', async () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
-    const code =
-      'char main() {char c[] = "hello world!"; return c[4];}'
+    const code = 'char main() {char c[] = "hello world!"; return c[4];}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(String.fromCharCode(result.value)).toBe('o')

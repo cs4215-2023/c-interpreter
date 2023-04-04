@@ -54,8 +54,7 @@ export const parserArrayExpression = <T extends Constructable>(
           let charList
           if (ctx.charList() === undefined && ctx.string()) {
             charList = this.visitStringContext(ctx.string()!)
-          }
-          else {
+          } else {
             charList = this.visitCharList(ctx.charList()!)
           }
           const identifierList = this.visitIdentifierList(ctx.identifierList()!)
@@ -117,7 +116,7 @@ export const parserArrayExpression = <T extends Constructable>(
       if (ctx === undefined) {
         return []
       }
-      console.log("visitCharList")
+      console.log('visitCharList')
       const tokens = ctx.CHAR()
       const numbers: Expression[] | Literal[] = []
       tokens.forEach(token => {
