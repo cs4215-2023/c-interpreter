@@ -1,3 +1,5 @@
+import { forEach } from 'lodash'
+
 import {
   ArrayContentContext,
   ArrayIdentifierExpressionContext,
@@ -7,7 +9,8 @@ import {
   CharListContext,
   FloatListContext,
   IdentifierListContext,
-  NumberListContext
+  NumberListContext,
+  StringContext
 } from '../../lang/ClangParser'
 import { TypeParser } from '../typeParser'
 import {
@@ -48,7 +51,13 @@ export const parserArrayExpression = <T extends Constructable>(
           const identifierList = this.visitIdentifierList(ctx.identifierList()!)
           return numberList.length !== 0 ? numberList : identifierList
         } else if (type === 'char') {
-          const charList = this.visitCharList(ctx.charList()!)
+          let charList
+          if (ctx.charList() === undefined && ctx.string()) {
+            charList = this.visitStringContext(ctx.string()!)
+          }
+          else {
+            charList = this.visitCharList(ctx.charList()!)
+          }
           const identifierList = this.visitIdentifierList(ctx.identifierList()!)
           return charList.length !== 0 ? charList : identifierList
         } else if (type === 'float') {
@@ -108,6 +117,7 @@ export const parserArrayExpression = <T extends Constructable>(
       if (ctx === undefined) {
         return []
       }
+      console.log("visitCharList")
       const tokens = ctx.CHAR()
       const numbers: Expression[] | Literal[] = []
       tokens.forEach(token => {
@@ -119,6 +129,18 @@ export const parserArrayExpression = <T extends Constructable>(
         })
       })
       return numbers
+    }
+
+    visitStringContext(ctx: StringContext): Expression[] {
+      const chars = [...ctx.StringLiteral().toString()]
+      const ret: Literal[] = []
+      console.log(chars)
+      chars.forEach((c, i) => {
+        if (i !== 0 && i !== chars.length - 1) {
+          ret.push({ type: 'Literal', value: c, valueType: 'char' })
+        }
+      })
+      return ret
     }
 
     visitFloatList(ctx: FloatListContext): Expression[] {

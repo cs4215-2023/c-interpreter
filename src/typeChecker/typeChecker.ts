@@ -108,6 +108,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
         }
       }
     }
+    return arrayType
   },
 
   ArrayIdentifier: function* (node: Node, context: Context) {
@@ -234,7 +235,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     if (node.type != 'StringLiteral') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    return node.string
+    return "char"
   },
 
   ForStatement: function* (node: Node, context: Context) {
@@ -254,12 +255,8 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     if (node.type != 'AssignmentExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    console.log('assignmentexpr')
-    console.log(node.left)
-    console.log(node.right)
     const left = yield* typeCheck(node.left, context)
     const right = yield* typeCheck(node.right, context)
-    console.log(left)
     if (left != right) {
       throw handleRuntimeError(context, new TypeError(node, left, right))
     }

@@ -54,14 +54,14 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       const address = memory.mem_stack_push(TYPE_TO_TAG[node.valueType], node.value)
       console.log(
         'storing literal ' +
-          node.value +
-          ' with address ' +
-          address +
-          ' as ' +
-          node.valueType +
-          '(' +
-          TYPE_TO_TAG[node.valueType] +
-          ')'
+        node.value +
+        ' with address ' +
+        address +
+        ' as ' +
+        node.valueType +
+        '(' +
+        TYPE_TO_TAG[node.valueType] +
+        ')'
       )
       context.runtime.stash.push(address)
     }
@@ -72,8 +72,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    // TODO: integrate with memory?
-    context.runtime.stash.push(node.string)
+    // if pushed like this, how to support binary expressions?
+    const chars = [...node.string]
+    chars.reverse().forEach((c, i) => {
+      if (i !== 0 && i !== chars.length - 1) {
+        context.runtime.stash.push({ type: 'Literal', value: c, valueType: 'char' })
+      }
+    })
   },
 
   SequenceExpression: function* (node: Node, context: Context) {
@@ -159,8 +164,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
           left: pointer_identifier,
           right: node.array.elements[i]
         }
-        console.log('here')
-        console.log(assignmentExpression)
         context.runtime.agenda.push(assignmentExpression)
       }
     }
@@ -237,6 +240,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'BinaryExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
+
     context.runtime.agenda.push(
       { type: 'BinaryExpression_i', operator: node.operator },
       node.right,
@@ -648,11 +652,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
         memory.mem_write_to_address(var_addr, valueType, actualAddr) //don't write new val here, but write addr
         console.log(
           'setting address' +
-            actualAddr +
-            ' to pointer ' +
-            identifier!.name +
-            ' at addr ' +
-            var_addr
+          actualAddr +
+          ' to pointer ' +
+          identifier!.name +
+          ' at addr ' +
+          var_addr
         )
         setValueToIdentifier(command, context, identifier!.name, var_addr)
       } else {

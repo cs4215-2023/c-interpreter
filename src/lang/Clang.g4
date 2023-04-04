@@ -158,12 +158,11 @@ arrayIdentifier:
 	id = IDENTIFIER '[' size = expression? ']';
 
 arrayContent:
-	'{' (pointerList | numberList | identifierList | floatList | charList) '}';
+	'{' (pointerList | numberList | identifierList | floatList | charList) '}' | string;
 
 arrayInitialisation:
 	arrayIdentifierWithType (
 		operator = '=' array = arrayContent
-		| string
 	)?;
 
 pointer: idType = type '*' id = IDENTIFIER;
