@@ -1,7 +1,7 @@
 import { CHAR_POINTER_TYPE, CHAR_TYPE, DECLARED_BUT_NOT_YET_ASSIGNED } from '../constants'
 import * as errors from '../errors/errors'
 import MemoryModel from '../memory/memoryModel'
-import { TAGS, TAG_TO_TYPE } from '../memory/tags'
+import { TAG_TO_TYPE, TAGS } from '../memory/tags'
 import { Node } from '../parser/types'
 import { Builtin } from '../typeChecker/types'
 import { Value } from '../types'
