@@ -78,6 +78,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
         context.runtime.agenda.push({ type: 'Literal', value: c, valueType: 'char' })
       }
     })
+    context.runtime.agenda.push({ type: 'Literal', value: '\0', valueType: 'char' })
   },
 
   SequenceExpression: function* (node: Node, context: Context) {
@@ -204,18 +205,21 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     const agenda = context.runtime.agenda
+    let actualArgLength = 0
 
     const callArguments = []
     for (const expression of node.arguments) {
       if (expression.type != 'EmptyExpression') {
         callArguments.push(expression)
+        if (expression.type == 'StringLiteral') {
+          // less 2 aprostrophes at the end
+          actualArgLength += expression.string.length - 1
+        } else {
+          actualArgLength += 1
+        }
       }
     }
-    agenda.push(
-      { type: 'CallExpression_i', arity: callArguments.length },
-      ...callArguments,
-      node.callee
-    )
+    agenda.push({ type: 'CallExpression_i', arity: actualArgLength }, ...callArguments, node.callee)
   },
 
   EmptyExpression: function* (node: Node, context: Context) {
@@ -756,6 +760,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     if (lambda.type == 'Builtin') {
       const result = apply_builtin(lambda.name, args)
+      return
     }
 
     if (agenda.length() === 0 || agendaTop.type === 'EnvironmentRestoration_i') {

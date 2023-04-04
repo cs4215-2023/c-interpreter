@@ -93,7 +93,7 @@ export function getVariable(context: Context, name: string) {
 }
 
 export const apply_builtin = (builtin_symbol: string, args: any[]) => {
-  const resolvedArgs = []
+  let resolvedArgs = []
 
   for (const arg of args) {
     const [type, value] = arg
@@ -104,6 +104,13 @@ export const apply_builtin = (builtin_symbol: string, args: any[]) => {
     }
   }
 
+  const nullIndex = resolvedArgs.findIndex(v => v === '\0')
+  if (nullIndex != -1) {
+    const stringInput = resolvedArgs.slice(nullIndex + 1).join('')
+    const parameters = resolvedArgs.slice(0, nullIndex)
+    resolvedArgs = [...parameters, stringInput]
+  }
   resolvedArgs.reverse()
-  builtin_functions[builtin_symbol].apply(...args)
+
+  builtin_functions[builtin_symbol].apply(...resolvedArgs)
 }

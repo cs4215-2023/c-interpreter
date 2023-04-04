@@ -1,4 +1,5 @@
 import { FLOAT_PRECISION, VOID_TYPE } from '../../constants'
+import { PrintfError } from '../../errors/errors'
 
 const REGEX = /%[c,f,d]+/g
 
@@ -10,7 +11,7 @@ export const builtin_functions = {
   printf: {
     type: 'Builtin',
     returnType: VOID_TYPE,
-    apply: (x: string, ...args: any[]): void => console.log(printfFunction(x, args)),
+    apply: (x: string, ...args: any[]): void => console.log(printfFunction(x, ...args)),
     arity: 0,
     hasVarArgs: true,
     name: 'printf'
@@ -18,14 +19,13 @@ export const builtin_functions = {
 }
 
 export const printfFunction = (stringInput: string, ...args: any[]) => {
-  console.log(stringInput)
   const found = stringInput.match(REGEX)
   if (found == null) {
     return stringInput
   }
 
   if (found.length != args.length) {
-    return new Error()
+    throw new PrintfError()
   }
 
   let index = 0
@@ -37,7 +37,7 @@ export const printfFunction = (stringInput: string, ...args: any[]) => {
         if (currentArg.length == 1) {
           return currentArg
         } else {
-          throw new Error()
+          throw new PrintfError()
         }
       }
       return String.fromCharCode(currentArg)
@@ -48,7 +48,7 @@ export const printfFunction = (stringInput: string, ...args: any[]) => {
       return Math.floor(currentArg)
     } else {
       if (typeof currentArg == 'string' && Number.isInteger(currentArg)) {
-        return new Error()
+        throw new PrintfError()
       }
       return currentArg.toFixed(FLOAT_PRECISION)
     }
