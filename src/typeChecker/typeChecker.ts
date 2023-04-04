@@ -232,6 +232,13 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     return left == FLOAT_TYPE || right == FLOAT_TYPE ? FLOAT_TYPE : INT_TYPE
   },
 
+  StringLiteral: function* (node: Node, context: Context) {
+    if (node.type != 'StringLiteral') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+    return node.string
+  },
+
   ForStatement: function* (node: Node, context: Context) {
     if (node.type != 'ForStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
@@ -249,9 +256,12 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     if (node.type != 'AssignmentExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-
+    console.log("assignmentexpr")
+    console.log(node.left)
+    console.log(node.right)
     const left = yield* typeCheck(node.left, context)
     const right = yield* typeCheck(node.right, context)
+    console.log(left)
     if (left != right) {
       throw handleRuntimeError(context, new TypeError(node, left, right))
     }
