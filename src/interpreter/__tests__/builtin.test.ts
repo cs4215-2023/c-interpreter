@@ -7,10 +7,10 @@ describe('Builtin functions test', () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
 
     const code = `
-	void main() {
-		printf("h%dllo w%drl%c", 3, 0, 'd');
-	}
-	`
+  	void main() {
+  		printf("h%dllo w%drl%c", 3, 0, 'd');
+  	}
+  	`
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
       expect(result.value).toBe(2)

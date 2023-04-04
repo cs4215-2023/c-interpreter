@@ -75,7 +75,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const chars = [...node.string]
     chars.reverse().forEach((c, i) => {
       if (i !== 0 && i !== chars.length - 1) {
-        context.runtime.stash.push({ type: 'Literal', value: c, valueType: 'char' })
+        context.runtime.agenda.push({ type: 'Literal', value: c, valueType: 'char' })
       }
     })
   },
