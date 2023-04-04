@@ -1,6 +1,5 @@
 import {
   ArrayContentContext,
-  ArrayIdentifierContext,
   ArrayIdentifierExpressionContext,
   ArrayIdentifierWithTypeContext,
   ArrayInitialisationContext,
@@ -48,18 +47,17 @@ export const parserArrayExpression = <T extends Constructable>(
           const numberList = this.visitNumberList(ctx.numberList()!)
           const identifierList = this.visitIdentifierList(ctx.identifierList()!)
           return numberList.length !== 0 ? numberList : identifierList
-        }
-        else if (type === 'char') {
+        } else if (type === 'char') {
           const charList = this.visitCharList(ctx.charList()!)
           const identifierList = this.visitIdentifierList(ctx.identifierList()!)
           return charList.length !== 0 ? charList : identifierList
-        }
-        else if (type === 'float') {
+        } else if (type === 'float') {
           const floatList = this.visitFloatList(ctx.floatList()!)
           const identifierList = this.visitIdentifierList(ctx.identifierList()!)
           return floatList.length !== 0 ? floatList : identifierList
+        } else {
+          throw TypeError('not a valid type for array!')
         }
-        else { throw TypeError("not a valid type for array!") }
       }
     }
     visitIdentifierList(ctx: IdentifierListContext): Expression[] {
