@@ -2,7 +2,6 @@ import createContext from '../../createContext'
 import { PrintfError } from '../../errors/errors'
 import { sourceRunner } from '../../runner'
 import { Variant } from '../../types'
-import { printfFunction } from '../defaults/functions'
 
 describe('Builtin functions test', () => {
   it('Printf test', async () => {

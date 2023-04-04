@@ -5,7 +5,7 @@ import { Node } from '../parser/types'
 import { Builtin } from '../typeChecker/types'
 import { Value } from '../types'
 import { CallInstruction, Command, Context, Environment } from '../types'
-import { builtin_functions } from './defaults/functions'
+import { builtin_functions } from './defaults'
 import { currentEnvironment } from './environment'
 import { handleRuntimeError } from './errors'
 

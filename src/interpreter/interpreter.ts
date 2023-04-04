@@ -7,7 +7,7 @@ import { ArrayIdentifier, ExpressionStatement, Identifier, Literal, Node } from 
 import { typeCheck } from '../typeChecker/typeChecker'
 import { Builtin } from '../typeChecker/types'
 import { Command, Context, Value, WhileStatementInstruction } from '../types'
-import { arity, builtin_functions } from './defaults/functions'
+import { arity, builtin_functions } from './defaults'
 import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
 import { handleRuntimeError, InterpreterError } from './errors'
 import {
