@@ -99,9 +99,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     const arrayType = node.arrayType.valueType
     declareIdentifierType(context, node.identifier.name, node)
 
-    if (node.array === undefined) {
-      context.runtime.stash.push(node.identifier)
-    } else {
+    if (node.array !== undefined) {
       const arrayElements = node.array.elements
       for (let i = arrayElements.length - 1; i >= 0; i--) {
         const elementType = yield* typeCheck(arrayElements[i]!, context)
@@ -110,6 +108,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
         }
       }
     }
+    return arrayType
   },
 
   ArrayIdentifier: function* (node: Node, context: Context) {
@@ -232,6 +231,13 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     return left == FLOAT_TYPE || right == FLOAT_TYPE ? FLOAT_TYPE : INT_TYPE
   },
 
+  StringLiteral: function* (node: Node, context: Context) {
+    if (node.type != 'StringLiteral') {
+      throw handleRuntimeError(context, new InterpreterError(node))
+    }
+    return 'char'
+  },
+
   ForStatement: function* (node: Node, context: Context) {
     if (node.type != 'ForStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
@@ -249,7 +255,6 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     if (node.type != 'AssignmentExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-
     const left = yield* typeCheck(node.left, context)
     const right = yield* typeCheck(node.right, context)
     if (left != right) {

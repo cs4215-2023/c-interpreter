@@ -74,6 +74,37 @@ describe('Arrays and Pointer', () => {
       expect(1).toBe(2)
     }
   })
+  it('Array assignment char', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const code = "char main() {char c[] = {'h','e','l','l','o'}; return c[4];}"
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(String.fromCharCode(result.value)).toBe('o')
+    } else {
+      expect(1).toBe(2)
+    }
+  })
+  it('Array assignment char 2', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const code =
+      "char main() {char c[5]; c[0] = 'h'; c[1] = 'e'; c[2]='l'; c[3]='l'; c[4]='o'; return c[4];}"
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(String.fromCharCode(result.value)).toBe('o')
+    } else {
+      expect(1).toBe(2)
+    }
+  })
+  it('Array assignment string', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const code = 'char main() {char c[] = "hello world!"; return c[4];}'
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(String.fromCharCode(result.value)).toBe('o')
+    } else {
+      expect(1).toBe(2)
+    }
+  })
   it('Loop array', async () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code =

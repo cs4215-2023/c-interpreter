@@ -72,8 +72,12 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    // TODO: integrate with memory?
-    context.runtime.stash.push(node.string)
+    const chars = [...node.string]
+    chars.reverse().forEach((c, i) => {
+      if (i !== 0 && i !== chars.length - 1) {
+        context.runtime.stash.push({ type: 'Literal', value: c, valueType: 'char' })
+      }
+    })
   },
 
   SequenceExpression: function* (node: Node, context: Context) {
@@ -130,7 +134,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const address = memory.mem_stack_allocate_n(2 * size) //allocate memory for both address and content
     const type = node.arrayType.valueType
     declareIdentifier(context, node.identifier.name, node, address)
-
     //write pointers to memory
     for (let i = 0; i < size; i++) {
       const pointer_addr = i * memory.stack.word_size + address
@@ -140,6 +143,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.array === undefined) {
       context.runtime.stash.push(node.identifier)
     } else {
+      console.log('start')
+      console.log(node.array.elements.length)
       for (let i = node.array.elements.length - 1; i >= 0; i--) {
         const expression = {
           type: 'Literal',
@@ -234,6 +239,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'BinaryExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
+
     context.runtime.agenda.push(
       { type: 'BinaryExpression_i', operator: node.operator },
       node.right,
@@ -795,6 +801,7 @@ export function* evaluate(node: Node, context: Context) {
   const stash = context.runtime.stash
   while (agenda.length()) {
     const command = agenda.pop() as Node
+    console.log(command)
     yield* evaluators[command.type](command, context)
   }
 

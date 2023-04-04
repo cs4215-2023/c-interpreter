@@ -84,6 +84,7 @@ export default class Stack extends MemoryBuffer {
   }
 
   public push_char(x: string) {
+    console.log('pushing ' + x + ' as char, convert to ascii is ' + x.charCodeAt(0))
     assert(x.length == 1) //should be a char and not string
     return this.push(TAGS.char_tag, x.charCodeAt(0))
   }

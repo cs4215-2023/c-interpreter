@@ -51,6 +51,8 @@ import { IdentifierWithTypeListContext } from './ClangParser'
 import { IdentifierListContext } from './ClangParser'
 import { ExpressionListContext } from './ClangParser'
 import { NumberListContext } from './ClangParser'
+import { CharListContext } from './ClangParser'
+import { FloatListContext } from './ClangParser'
 import { PointerListContext } from './ClangParser'
 import { StatementContext } from './ClangParser'
 import { ExpressionContext } from './ClangParser'
@@ -466,6 +468,20 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
    * @return the visitor result
    */
   visitNumberList?: (ctx: NumberListContext) => Result
+
+  /**
+   * Visit a parse tree produced by `ClangParser.charList`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitCharList?: (ctx: CharListContext) => Result
+
+  /**
+   * Visit a parse tree produced by `ClangParser.floatList`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitFloatList?: (ctx: FloatListContext) => Result
 
   /**
    * Visit a parse tree produced by `ClangParser.pointerList`.

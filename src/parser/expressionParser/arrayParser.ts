@@ -1,12 +1,16 @@
+import { forEach } from 'lodash'
+
 import {
   ArrayContentContext,
-  ArrayIdentifierContext,
   ArrayIdentifierExpressionContext,
   ArrayIdentifierWithTypeContext,
   ArrayInitialisationContext,
   ArrayInitialisationExpressionContext,
+  CharListContext,
+  FloatListContext,
   IdentifierListContext,
-  NumberListContext
+  NumberListContext,
+  StringContext
 } from '../../lang/ClangParser'
 import { TypeParser } from '../typeParser'
 import {
@@ -30,20 +34,38 @@ export const parserArrayExpression = <T extends Constructable>(
       const arrayInitialisor = this.visitArrayIdentifierWithType(
         ctx.arrayIdentifierWithType()
       ) as ArrayDeclarationExpression
+      const type = ctx.arrayIdentifierWithType()._idType.PRIMITIVETYPE().text
       const expressions = []
-      const content = this.visitArrayContent(ctx.arrayContent()!)
+      const content = this.visitArrayContent(ctx.arrayContent()!, type)
       expressions.push(...content)
       arrayInitialisor.array = { type: 'ArrayExpression', elements: expressions }
       return arrayInitialisor
     }
-    visitArrayContent(ctx: ArrayContentContext): Expression[] {
+    visitArrayContent(ctx: ArrayContentContext, type: string): Expression[] {
       console.log('visit array content')
       if (ctx === undefined) {
         return []
       } else {
-        const numberList = this.visitNumberList(ctx.numberList()!)
-        const identifierList = this.visitIdentifierList(ctx.identifierList()!)
-        return numberList.length !== 0 ? numberList : identifierList
+        if (type === 'int') {
+          const numberList = this.visitNumberList(ctx.numberList()!)
+          const identifierList = this.visitIdentifierList(ctx.identifierList()!)
+          return numberList.length !== 0 ? numberList : identifierList
+        } else if (type === 'char') {
+          let charList
+          if (ctx.charList() === undefined && ctx.string()) {
+            charList = this.visitStringContext(ctx.string()!)
+          } else {
+            charList = this.visitCharList(ctx.charList()!)
+          }
+          const identifierList = this.visitIdentifierList(ctx.identifierList()!)
+          return charList.length !== 0 ? charList : identifierList
+        } else if (type === 'float') {
+          const floatList = this.visitFloatList(ctx.floatList()!)
+          const identifierList = this.visitIdentifierList(ctx.identifierList()!)
+          return floatList.length !== 0 ? floatList : identifierList
+        } else {
+          throw TypeError('not a valid type for array!')
+        }
       }
     }
     visitIdentifierList(ctx: IdentifierListContext): Expression[] {
@@ -85,6 +107,53 @@ export const parserArrayExpression = <T extends Constructable>(
           type: 'Literal',
           value: parseInt(token.text),
           valueType: 'int'
+        })
+      })
+      return numbers
+    }
+
+    visitCharList(ctx: CharListContext): Expression[] {
+      if (ctx === undefined) {
+        return []
+      }
+      console.log('visitCharList')
+      const tokens = ctx.CHAR()
+      const numbers: Expression[] | Literal[] = []
+      tokens.forEach(token => {
+        console.log(token.text)
+        numbers.push({
+          type: 'Literal',
+          value: token.text[1],
+          valueType: 'char'
+        })
+      })
+      return numbers
+    }
+
+    visitStringContext(ctx: StringContext): Expression[] {
+      const chars = [...ctx.StringLiteral().toString()]
+      const ret: Literal[] = []
+      console.log(chars)
+      chars.forEach((c, i) => {
+        if (i !== 0 && i !== chars.length - 1) {
+          ret.push({ type: 'Literal', value: c, valueType: 'char' })
+        }
+      })
+      return ret
+    }
+
+    visitFloatList(ctx: FloatListContext): Expression[] {
+      if (ctx === undefined) {
+        return []
+      }
+      const tokens = ctx.FLOAT()
+      const numbers: Expression[] | Literal[] = []
+      tokens.forEach(token => {
+        console.log(token.text)
+        numbers.push({
+          type: 'Literal',
+          value: parseFloat(token.text),
+          valueType: 'float'
         })
       })
       return numbers

@@ -64,6 +64,10 @@ expressionList: expression (',' expression)*;
 
 numberList: NUMBER (',' NUMBER)*;
 
+charList: CHAR (',' CHAR)*;
+
+floatList: FLOAT (',' FLOAT)*;
+
 pointerList: pointer (',' pointer)*;
 statement:
 	expressionStatement
@@ -154,12 +158,11 @@ arrayIdentifier:
 	id = IDENTIFIER '[' size = expression? ']';
 
 arrayContent:
-	'{' (pointerList | numberList | identifierList) '}';
+	'{' (pointerList | numberList | identifierList | floatList | charList) '}' | string;
 
 arrayInitialisation:
 	arrayIdentifierWithType (
 		operator = '=' array = arrayContent
-		| string
 	)?;
 
 pointer: idType = type '*' id = IDENTIFIER;
