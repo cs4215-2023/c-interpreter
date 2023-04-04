@@ -33,4 +33,21 @@ describe('Builtin functions test', () => {
       expect(e).toBeInstanceOf(PrintfError)
     }
   })
+
+  it('Printf test from variable', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+
+    const code = `
+	void main() {
+		char c[] = "hello world!";
+		printf(c,3, 0, 'd');
+	}
+	`
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBeUndefined()
+    } else {
+      expect(1).toBe(2)
+    }
+  })
 })

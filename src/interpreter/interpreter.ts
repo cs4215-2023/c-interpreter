@@ -759,7 +759,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const agendaTop = agenda.peek() as Command
 
     if (lambda.type == 'Builtin') {
-      const result = apply_builtin(lambda.name, args)
+      const result = apply_builtin(lambda.name, args, memory)
       return
     }
 

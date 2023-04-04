@@ -1,6 +1,7 @@
-import { DECLARED_BUT_NOT_YET_ASSIGNED } from '../constants'
+import { CHAR_POINTER_TYPE, CHAR_TYPE, DECLARED_BUT_NOT_YET_ASSIGNED } from '../constants'
 import * as errors from '../errors/errors'
-import { TAG_TO_TYPE } from '../memory/tags'
+import MemoryModel from '../memory/memoryModel'
+import { TAGS, TAG_TO_TYPE } from '../memory/tags'
 import { Node } from '../parser/types'
 import { Builtin } from '../typeChecker/types'
 import { Value } from '../types'
@@ -92,15 +93,30 @@ export function getVariable(context: Context, name: string) {
   return handleRuntimeError(context, new errors.UndefinedVariable(name, context.runtime.nodes[0]))
 }
 
-export const apply_builtin = (builtin_symbol: string, args: any[]) => {
+export const apply_builtin = (builtin_symbol: string, args: any[], memory: MemoryModel) => {
   let resolvedArgs = []
 
   for (const arg of args) {
-    const [type, value] = arg
-    if (TAG_TO_TYPE[type] == 'char') {
-      resolvedArgs.push(String.fromCharCode(value))
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, prefer-const
+    let [memType, addr] = arg
+    let [type, value] = memory.mem_read(addr)
+    if (memType == TAGS.char_pointer_tag) {
+      let s = ''
+      s += String.fromCharCode(value)
+      addr += 4
+      while (
+        memory.mem_read(addr)[1] !== 0 &&
+        TAG_TO_TYPE[memory.mem_read(addr)[0]] === CHAR_TYPE
+      ) {
+        ;[type, value] = memory.mem_read(addr)
+        s += String.fromCharCode(value)
+        addr += 4
+      }
+      resolvedArgs.push(s)
+    } else if (TAG_TO_TYPE[memType] == CHAR_TYPE) {
+      resolvedArgs.push(String.fromCharCode(addr))
     } else {
-      resolvedArgs.push(value)
+      resolvedArgs.push(addr)
     }
   }
 
