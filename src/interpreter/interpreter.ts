@@ -54,14 +54,14 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       const address = memory.mem_stack_push(TYPE_TO_TAG[node.valueType], node.value)
       console.log(
         'storing literal ' +
-        node.value +
-        ' with address ' +
-        address +
-        ' as ' +
-        node.valueType +
-        '(' +
-        TYPE_TO_TAG[node.valueType] +
-        ')'
+          node.value +
+          ' with address ' +
+          address +
+          ' as ' +
+          node.valueType +
+          '(' +
+          TYPE_TO_TAG[node.valueType] +
+          ')'
       )
       context.runtime.stash.push(address)
     }
@@ -72,7 +72,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
 
-    // if pushed like this, how to support binary expressions?
     const chars = [...node.string]
     chars.reverse().forEach((c, i) => {
       if (i !== 0 && i !== chars.length - 1) {
@@ -652,11 +651,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
         memory.mem_write_to_address(var_addr, valueType, actualAddr) //don't write new val here, but write addr
         console.log(
           'setting address' +
-          actualAddr +
-          ' to pointer ' +
-          identifier!.name +
-          ' at addr ' +
-          var_addr
+            actualAddr +
+            ' to pointer ' +
+            identifier!.name +
+            ' at addr ' +
+            var_addr
         )
         setValueToIdentifier(command, context, identifier!.name, var_addr)
       } else {
