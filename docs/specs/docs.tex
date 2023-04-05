@@ -1,0 +1,148 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amstext}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color,soul}
+\usepackage{tikz}
+\usepackage{listings, lstautogobble}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{multirow}
+
+% For code listing %
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Rule Commands
+\newcommand{\Rule}[2]{\genfrac{}{}{0.7pt}{}{{\setlength{\fboxrule}{0pt}\setlength{\fboxsep}{3mm}\fbox{$#1$}}}{{\setlength{\fboxrule}{0pt}\setlength{\fboxsep}{3mm}\fbox{$#2$}}}}
+\newcommand{\Rulee}[3]{\genfrac{}{}{0.7pt}{}{{\setlength{\fboxrule}{0pt}\setlength{\fboxsep}{3mm}\fbox{$#1$}}}{{\setlength{\fboxrule}{0pt}\setlength{\fboxsep}{3mm}\fbox{$#2$}}}[#3]}
+\newcommand{\RuleWithName}[3]{\genfrac{}{}{0.7pt}{}{{\setlength{\fboxrule}{0pt}\setlength{\fboxsep}{3mm}\fbox{$#1$}}}{{\setlength{\fboxrule}{0pt}\setlength{\fboxsep}{3mm}\fbox{$#2$}}}[\text{#3}]}
+\newcommand{\transition}{\rightrightarrows_s}
+\newcommand{\translate}{\twoheadrightarrow}
+\newcommand{\translateaux}{\hookrightarrow}
+\newcommand{\Return}{\texttt{return}}
+\newcommand{\Recfun}{\texttt{recfun}}
+\newcommand{\If}{\texttt{if}}
+\newcommand{\Then}{\texttt{then}}
+\newcommand{\Else}{\texttt{else}}
+\newcommand{\End}{\texttt{end}}
+\newcommand{\Let}{\texttt{const}}
+\newcommand{\In}{\texttt{in}}
+\newcommand{\Rc}{\texttt{\}}}
+\newcommand{\Lc}{\texttt{\{}}
+\newcommand{\Times}{\texttt{*}}
+\newcommand{\Plus}{\texttt{+}}
+\newcommand{\TruE}{\texttt{true}}
+\newcommand{\FalsE}{\texttt{false}}
+\newcommand{\Int}{\texttt{int}}
+\newcommand{\Float}{\texttt{float}}
+\newcommand{\String}{\texttt{string}}
+\newcommand{\Char}{\texttt{char}}
+\newcommand{\Num}{\texttt{numeric}}
+\newcommand{\Contract}{\texttt{contract}}
+\newcommand{\Bool}{\texttt{bool}}
+\newcommand{\Undefined}{\texttt{undefined}}
+\newcommand{\X}{\texttt{x}}
+\newcommand{\F}{\texttt{f}}
+\newcommand{\LET}{\texttt{LET}}
+\newcommand{\END}{\texttt{END}}
+\newcommand{\IN}{\texttt{IN}}
+\newcommand{\eval}{\rightarrowtail}
+\newcommand{\evaL}{\rightarrowtail}
+\newcommand{\partfun}{\rightsquigarrow}
+\newcommand{\under}{\Vdash}
+\newcommand{\ErroR}{\bot}
+\newcommand{\Rp}{\texttt{)}}
+\newcommand{\Lp}{\texttt{(}}
+\newcommand{\Rb}{\texttt{\}}}
+\newcommand{\Lb}{\texttt{\{}}
+\newcommand{\blame}{\texttt{blame }}
+\newcommand{\flatCon}{\texttt{con}}
+\newcommand{\funCon}{\texttt{con1} \rightarrow \texttt{con2}}
+\newcommand{\isFlat}{\texttt{flat}}
+\newcommand{\conA}{\texttt{con1}}
+\newcommand{\conB}{\texttt{con2}}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=false,
+    captionpos=b,
+    keepspaces=false,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    autogobble=true
+}
+
+\lstset{style=mystyle}
+
+\evensidemargin 35pt % Align even and odd numbered pages
+\setlength{\parindent}{0in} % Paragraph Indentation
+\setlength{\parskip}{\medskipamount} % Spaces between paragraphs
+
+% Horizontal Margins
+\setlength{\oddsidemargin}{-0.25in} % Left margin 1 inch (0 + 1)
+\setlength{\textwidth}{6.75in} % Text width 6.5 inch (so right margin 1 inch).
+
+% Vertical Margins
+\setlength{\topmargin}{-0.75in} % Top margin 0.5 inch (-0.5 + 1)
+\setlength{\headheight}{0.25in} % Head height 0.25 inch (where page headers go)
+\setlength{\headsep}{0.25in} % Head separation 0.25 inch (between header and top line of text)
+\setlength{\textheight}{10.25in} % Text height 8.5 inch (so bottom margin 1.5 in)
+
+\title{A Realistic Explicit Control Evaluator for C}
+\author{Lui Wen-Jie, Benjamin (A0214362N), Lester Leong }
+\date{April 2022}
+
+\begin{document}
+\pagenumbering{gobble}% Remove page numbers (and reset to 1)
+
+% Cover Page %
+\begin{titlepage}
+    \begin{center}
+        \vspace*{1cm}
+
+        \Huge
+        \textbf{An Interpreter for C}
+
+        \vspace{0.5cm}
+        \LARGE
+        A Realistic Explicit Control Evaluator for C
+
+        \vspace{1.5cm}
+
+
+        \vfill
+
+        Project report for \textbf{CS4215}
+
+        \vspace{0.8cm}
+
+        \Large
+        \textbf{Lui Wen-Jie, Benjamin (A0214362N),\\Lester Leong ()}\\
+        School of Computing\\
+        National University of Singapore\\
+        April 2022
+
+    \end{center}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\pagenumbering{arabic}
+
+
+\end{document}
