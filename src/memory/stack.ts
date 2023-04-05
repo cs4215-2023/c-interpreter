@@ -11,7 +11,7 @@ export default class Stack extends MemoryBuffer {
   public stack_addr_begin: number
   //check what is happening here
   constructor(stack_size: number, stack_addr_begin: number) {
-    super(1, 1, 4, stack_size)
+    super(1, 1, 8, stack_size)
     this.stack_pointer = stack_addr_begin
     this.stack_addr_begin = stack_addr_begin
     this.base_pointer = stack_addr_begin
@@ -101,15 +101,15 @@ export default class Stack extends MemoryBuffer {
 
   public type_to_data = (tag: number, x: number | string) =>
     tag === TAGS.int_tag ||
-    tag === TAGS.int_pointer_tag ||
-    TAGS.char_pointer_tag ||
-    TAGS.float_pointer_tag
+      tag === TAGS.int_pointer_tag ||
+      TAGS.char_pointer_tag ||
+      TAGS.float_pointer_tag
       ? ~~x
       : tag === TAGS.char_tag
-      ? String.fromCharCode(x as number)
-      : tag === TAGS.float_tag
-      ? x
-      : Error('Tag is undefined')
+        ? String.fromCharCode(x as number)
+        : tag === TAGS.float_tag
+          ? x
+          : Error('Tag is undefined')
 
   //END DATA TYPES
 

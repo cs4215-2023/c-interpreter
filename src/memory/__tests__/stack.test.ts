@@ -3,6 +3,7 @@ import Stack from '../stack'
 import { TAGS } from '../tags'
 
 const STACK_ADDR_BEGIN = 0
+
 describe('stack tests', () => {
   it('push and pop int test', () => {
     const stack_size = 20
@@ -103,7 +104,7 @@ describe('stack tests', () => {
       stack.push_int(1)
     }
     expect(stack.size()).toBe(13)
-    const [type, val] = stack.stack_get_tag_and_value(12)
+    const [type, val] = stack.stack_get_tag_and_value(12 * 8)
     expect(val).toBe(1)
     expect(type).toBe(2)
   })
@@ -115,7 +116,7 @@ describe('stack tests', () => {
       stack.push_int(1)
     }
     expect(stack.size()).toBe(14)
-    const [type, val] = stack.stack_get_tag_and_value(52)
+    const [type, val] = stack.stack_get_tag_and_value(13 * 8)
     expect(val).toBe(1)
     expect(type).toBe(2)
   })
