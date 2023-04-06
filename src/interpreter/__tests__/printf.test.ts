@@ -1,4 +1,4 @@
-import { printfFunction } from '../defaults/functions'
+import { printfFunction } from '../defaults/printf'
 
 describe('printf tests', () => {
   it('printf with no arguments', async () => {

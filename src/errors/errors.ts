@@ -134,3 +134,17 @@ export class TypeMismatch extends RuntimeSourceError {
     return `Ensure that the types are the same.`
   }
 }
+
+export class PrintfError extends RuntimeSourceError {
+  constructor() {
+    super()
+  }
+
+  public explain() {
+    return `Argument mismatched detected. Is it possible that you passed a string as a parameter?`
+  }
+
+  public elaborate() {
+    return `Strings as arguments other than the first is currently not supported.`
+  }
+}
