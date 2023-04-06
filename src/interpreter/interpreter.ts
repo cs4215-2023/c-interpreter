@@ -54,14 +54,14 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       const address = memory.mem_stack_push(TYPE_TO_TAG[node.valueType], node.value)
       console.log(
         'storing literal ' +
-          node.value +
-          ' with address ' +
-          address +
-          ' as ' +
-          node.valueType +
-          '(' +
-          TYPE_TO_TAG[node.valueType] +
-          ')'
+        node.value +
+        ' with address ' +
+        address +
+        ' as ' +
+        node.valueType +
+        '(' +
+        TYPE_TO_TAG[node.valueType] +
+        ')'
       )
       context.runtime.stash.push(address)
     }
@@ -185,7 +185,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const identifier = getVariable(context, node.name)
     console.log('load identifier ' + node.name + ' at addr ' + identifier)
-    memory.mem_read(identifier)
+    if (typeof identifier === 'number') {
+      memory.mem_read(identifier)
+    }
     context.runtime.stash.push(identifier)
   },
 
@@ -651,11 +653,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
         memory.mem_write_to_address(var_addr, valueType, actualAddr) //don't write new val here, but write addr
         console.log(
           'setting address' +
-            actualAddr +
-            ' to pointer ' +
-            identifier!.name +
-            ' at addr ' +
-            var_addr
+          actualAddr +
+          ' to pointer ' +
+          identifier!.name +
+          ' at addr ' +
+          var_addr
         )
         setValueToIdentifier(command, context, identifier!.name, var_addr)
       } else {

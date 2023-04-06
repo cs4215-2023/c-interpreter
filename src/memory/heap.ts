@@ -1,4 +1,5 @@
 import { size } from 'lodash'
+
 import MemoryBuffer from './memoryBuffer'
 import { TAGS } from './tags'
 
@@ -30,64 +31,117 @@ export default class Heap extends MemoryBuffer {
       this.memoryView.setInt16(current, current + this.word_size)
       current += this.word_size
     }
-    this.memoryView.setInt16(current, -1)
+    this.memoryView.setInt16(current, TAGS.END_OF_FREE) //set end of heap to have a child of -1
   }
-  public allocate(tag: number, val: number) {
-
-    if (this.free === -1) {
-      Error('heap memory exhausted')
+  public allocate_one() {
+    if (this.free === TAGS.END_OF_FREE) {
+      throw Error('heap memory exhausted')
     }
     const address = this.free
     this.free = this.get_child(this.free)
-    this.memoryView.setInt8(address, tag)
-    this.memoryView.setFloat32(address + this.word_size / 2, val) //set 32bits = 4 bytes of data
+    this.set_child(address, TAGS.END_OF_MALLOC) //let heap know that this memory is at the end
+    // this.memoryView.setInt8(address, tag)
+
+    // this.memoryView.setFloat32(address + this.word_size / 2, val) //set 32bits = 4 bytes of data
     return address
+  }
+
+  public allocate_n(n: number) {
+    if (this.free === -1) {
+      throw Error('heap memory exhausted')
+    }
+    let index = 0
+    const initial_addr = this.free
+    while (index < n - 1) {
+      //get the current free node
+      // this.memoryView.setInt8(this.free, tag)
+      this.free = this.get_child(this.free)
+      if (this.free === TAGS.END_OF_FREE) {
+        throw Error('heap memory exhausted')
+      }
+      index++
+    }
+    //at the last allocated memory
+    const address = this.free
+    this.free = this.get_child(this.free)
+    this.set_child(address, TAGS.END_OF_MALLOC) //let heap know that this memory is at the end
+
+    //return start of memory allocated to the variable
+    return initial_addr
+  }
+
+  //free up memory to be reused by the system
+  public free_up_memory(address: number) {
+    //reset memory
+    const initial_free = this.free
+    this.print()
+    //set free to be start of memory that is freed up
+    this.free = address
+
+    //get the child address of the starting point
+    let child_addr = address
+    let prev_addr = address
+    while (true) {
+      prev_addr = child_addr
+      this.set_tag_and_value(child_addr, 0, 0)
+      child_addr = this.get_child(child_addr)
+      this.print()
+      if (child_addr === TAGS.END_OF_MALLOC) {
+        break
+      }
+    }
+    this.set_tag_and_value(prev_addr, 0, 0)
+    this.set_child(prev_addr, initial_free)
+
+
   }
 
   public get_child(address: number): number {
     return this.memoryView.getInt16(address)
   }
 
-  public get_tag_and_address(address: number) {
+  public set_child(address: number, child: number) {
+    this.memoryView.setInt16(address, child)
+  }
+
+  public get_tag_and_value(address: number): [number, number] {
     const type = this.memoryView.getInt8(address)
     const val = this.mem_get(address + this.word_size / 2)
     return ~~type !== TAGS.float_tag ? [~~type, ~~val] : [~~type, val]
   }
 
-  public allocate_literal_values = () => {
-    this.void = this.allocate(TAGS.void_tag, 1)
-    this.unassigned = this.allocate(TAGS.Unassigned_tag, 1)
+  public set_tag_and_value(address: number, tag: number, x: number) {
+    this.memoryView.setInt8(address, tag)
+    this.mem_set(address + this.word_size / 2, x)
   }
 
-  public heap_allocate_int = (n: number) => {
-    const number_address = this.allocate(TAGS.int_tag, 2)
-    this.mem_set(number_address + 1, n)
-    return number_address
-  }
-  public heap_allocate_char = (n: number) => {
-    const char_address = this.allocate(TAGS.char_tag, 2)
-    this.mem_set(char_address + 1, n)
-    return char_address
-  }
-  public heap_allocate_float = (n: number) => {
-    const float_address = this.allocate(TAGS.float_tag, 2)
-    this.mem_set(float_address + 1, n)
-    return float_address
-  }
+  //UTILS
   public print() {
     console.log(this.memoryView)
   }
+
+  public get_free_heap(): number {
+    let free = this.free
+    console.log(this.free)
+    let count = 0
+    while (free !== TAGS.END_OF_FREE) {
+      free = this.get_child(free)
+      count++
+      if (count > this.heap_size) {
+        throw Error("counting is going wrong")
+      }
+    }
+    return count
+  }
 }
 
-let word_size = 8
-let heap_size = 7
-//1 entry in Uint8Contents = 8bytes (8bits = 1 byte)
-//1 byte tag, 2 bytes children, 1 byte unused, 4 bytes payload (32 bits data)
-let heap = new Heap(word_size, heap_size)
-heap.init()
-heap.print()
-const address = heap.allocate(TAGS.int_tag, 1)
-heap.print()
-heap.allocate(TAGS.int_tag, 1)
-heap.print()
-console.log(heap.get_tag_and_address(address))
+// const heap_size = 20
+// const heap = new Heap(8, heap_size)
+// heap.init()
+// heap.print()
+// console.log(heap.get_free_heap())
+// const address = heap.allocate_one(TAGS.int_tag)
+// console.log(heap.get_free_heap())
+// heap.free_up_memory(address)
+// heap.print()
+// console.log(heap.get_free_heap())

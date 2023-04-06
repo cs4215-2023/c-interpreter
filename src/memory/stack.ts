@@ -19,24 +19,16 @@ export default class Stack extends MemoryBuffer {
   }
 
   //BASIC FUNCTIONALITY
-  public stack_get(address: number) {
-    return this.memoryView.getFloat32(address)
-  }
-
-  public stack_set(address: number, x: number) {
-    return this.memoryView.setFloat32(address, x)
-  }
-
   //this is to directly access and modify memory in the stack, might be useful for pointers
   public stack_get_tag_and_value(address: number): [number, number] {
-    const type = this.stack_get(address)
-    const val = this.stack_get(address + this.word_size / 2)
+    const type = this.mem_get(address)
+    const val = this.mem_get(address + this.word_size / 2)
     return ~~type !== TAGS.float_tag ? [~~type, ~~val] : [~~type, val]
   }
 
   public stack_set_tag_and_value(address: number, tag: number, x: number) {
-    this.stack_set(address, tag)
-    this.stack_set(address + this.word_size / 2, x)
+    this.mem_set(address, tag)
+    this.mem_set(address + this.word_size / 2, x)
   }
 
   public allocate_one() {
@@ -60,9 +52,9 @@ export default class Stack extends MemoryBuffer {
     }
     const address = this.stack_pointer
     //first is the type
-    this.stack_set(address, tag)
+    this.mem_set(address, tag)
     //second is the value
-    this.stack_set(address + this.word_size / 2, x)
+    this.mem_set(address + this.word_size / 2, x)
 
     this.stack_pointer += this.word_size
     return address
@@ -70,8 +62,8 @@ export default class Stack extends MemoryBuffer {
 
   public pop() {
     const address = this.stack_pointer
-    const val = this.stack_get(address - this.word_size / 2)
-    const type = this.stack_get(address - this.word_size)
+    const val = this.mem_get(address - this.word_size / 2)
+    const type = this.mem_get(address - this.word_size)
 
     this.stack_pointer -= this.word_size //move stack pointer backwards
     return [~~type, val]
@@ -94,7 +86,6 @@ export default class Stack extends MemoryBuffer {
     return this.push(TAGS.float_tag, x)
   }
 
-  //for arrays, i think the question now is where in the memory do we store the values?
   public push_pointer(tag: number, address: number) {
     return this.push(tag, address)
   }
