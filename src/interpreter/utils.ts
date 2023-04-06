@@ -129,7 +129,7 @@ export const apply_builtin = (builtin_symbol: string, args: any[], memory: Memor
   }
   resolvedArgs.reverse()
   console.log(resolvedArgs)
-  if (builtin_symbol === "malloc") {
+  if (builtin_symbol === 'malloc') {
     const value = resolvedArgs[0]
     return builtin_functions[builtin_symbol].apply_mem(value, memory)
   }

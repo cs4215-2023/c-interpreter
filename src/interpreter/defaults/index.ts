@@ -20,8 +20,10 @@ export const builtin_functions = {
   malloc: {
     type: 'Builtin',
     returnType: VOID_TYPE,
-    apply: (x: number): void => { },
-    apply_mem: (x: number, memory: MemoryModel): number => { return mallocFunction(x, memory) },
+    apply: (x: number): void => {},
+    apply_mem: (x: number, memory: MemoryModel): number => {
+      return mallocFunction(x, memory)
+    },
     arity: 0,
     hasVarArgs: false,
     name: 'malloc'
@@ -29,10 +31,12 @@ export const builtin_functions = {
   free: {
     type: 'Builtin',
     returnType: VOID_TYPE,
-    apply: (x: number): void => { },
-    apply_mem: (x: number, memory: MemoryModel) => { freeFunction(x, memory) },
+    apply: (x: number): void => {},
+    apply_mem: (x: number, memory: MemoryModel) => {
+      freeFunction(x, memory)
+    },
     arity: 1,
     hasVarArgs: false,
     name: 'free'
-  },
+  }
 }
