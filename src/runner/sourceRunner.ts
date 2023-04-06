@@ -1,9 +1,10 @@
 import { IOptions, Result } from '..'
+import { handleRuntimeError } from '../interpreter/errors'
 import { evaluate } from '../interpreter/interpreter'
 import { parse } from '../parser/parser'
 import { Program } from '../parser/types'
 import { PreemptiveScheduler } from '../schedulers'
-import { Context, Scheduler, Variant } from '../types'
+import { Context, Scheduler, SourceError, Variant } from '../types'
 import { resolvedErrorPromise } from './utils'
 
 const DEFAULT_SOURCE_OPTIONS: IOptions = {
@@ -18,12 +19,6 @@ const DEFAULT_SOURCE_OPTIONS: IOptions = {
   throwInfiniteLoops: true
 }
 
-function runInterpreter(program: Program, context: Context, options: IOptions): Promise<Result> {
-  const it = evaluate(program, context)
-  const scheduler: Scheduler = new PreemptiveScheduler(options.steps)
-  return scheduler.run(it, context)
-}
-
 export function sourceRunner(
   code: string,
   context: Context,
@@ -33,11 +28,19 @@ export function sourceRunner(
   context.variant = DEFAULT_SOURCE_OPTIONS.variant
   context.errors = []
 
-  // Parse and validate
-  const program: Program | undefined = parse(code, context)
-  if (!program) {
-    return resolvedErrorPromise
+  try {
+    const program: Program | undefined = parse(code, context)
+    if (!program) {
+      return resolvedErrorPromise
+    }
+    const it = evaluate(program, context)
+    const scheduler: Scheduler = new PreemptiveScheduler(theOptions.steps)
+    return scheduler.run(it, context)
+  } catch (e) {
+    context.errors.push(e as SourceError)
+    context.runtime.environments = context.runtime.environments.slice(
+      -context.numberOfOuterEnvironments
+    )
+    return Promise.resolve({ status: 'error', error: e as SourceError })
   }
-
-  return runInterpreter(program, context, theOptions)
 }

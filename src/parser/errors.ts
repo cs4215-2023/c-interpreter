@@ -1,7 +1,8 @@
-import { ErrorSeverity, ErrorType, SourceError } from '../types'
+import { RuntimeSourceError } from '../errors/runtimeSourceError'
+import { ErrorSeverity, ErrorType } from '../types'
 import { SourceLocation } from './types'
 
-export class FatalSyntaxError implements SourceError {
+export class FatalSyntaxError implements RuntimeSourceError {
   public type = ErrorType.SYNTAX
   public severity = ErrorSeverity.ERROR
   public constructor(public location: SourceLocation, public message: string) {}
