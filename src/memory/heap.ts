@@ -16,17 +16,19 @@ export default class Heap extends MemoryBuffer {
   public undefined: number
   public heap_size: number
   public heap_bottom: number
-  constructor(word_size: number, heap_size: number) {
+  public heap_end
+  constructor(word_size: number, heap_size: number, heap_start_addr: number) {
     super(2, 1, word_size, heap_size)
-    this.free = 0
+    this.free = heap_start_addr
     this.heap_size = heap_size * word_size
-    this.heap_bottom = 0
+    this.heap_end = this.heap_size + heap_start_addr
+    this.heap_bottom = heap_start_addr
   }
   //probably no need for most of these since we only need it for malloc
   //probably move this to heap
   public init() {
     let current = this.heap_bottom
-    while (current + this.word_size < this.heap_size) {
+    while (current + this.word_size < this.heap_end) {
       //set the next node for current address
       this.memoryView.setInt16(current, current + this.word_size)
       current += this.word_size
@@ -92,8 +94,6 @@ export default class Heap extends MemoryBuffer {
     }
     this.set_tag_and_value(prev_addr, 0, 0)
     this.set_child(prev_addr, initial_free)
-
-
   }
 
   public get_child(address: number): number {
@@ -128,7 +128,7 @@ export default class Heap extends MemoryBuffer {
       free = this.get_child(free)
       count++
       if (count > this.heap_size) {
-        throw Error("counting is going wrong")
+        throw Error('counting is going wrong')
       }
     }
     return count

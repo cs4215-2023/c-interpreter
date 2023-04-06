@@ -11,6 +11,7 @@ export default class MemoryModel {
   public heap: Heap
   public stack_addr_range: [number, number]
   public heap_addr_range: [number, number] //heap address should be after stack addresses
+  public word_size: number
   constructor(
     stack_size: number,
     stack_addr_begin: number,
@@ -18,14 +19,15 @@ export default class MemoryModel {
     heap_addr_begin: number
   ) {
     this.stack = new Stack(stack_size, stack_addr_begin)
-    this.heap = new Heap(8, heap_size)
+    this.word_size = 8
+    this.heap = new Heap(this.word_size, heap_size, heap_addr_begin)
     this.stack_addr_range = [
-      stack_addr_begin * this.stack.word_size,
-      (stack_size + stack_addr_begin) * this.stack.word_size
+      stack_addr_begin * this.word_size,
+      (stack_size + stack_addr_begin) * this.word_size
     ]
     this.heap_addr_range = [
-      heap_addr_begin * this.stack.word_size,
-      (heap_addr_begin + heap_size) * this.stack.word_size
+      heap_addr_begin * this.word_size,
+      (heap_addr_begin + heap_size) * this.word_size
     ]
     //heap goes here
   }
@@ -55,7 +57,6 @@ export default class MemoryModel {
       return this.heap.get_tag_and_value(address)
     }
     throw Error('Memory only supports heap and stack')
-
   }
 
   public mem_heap_allocate_one(): number {
