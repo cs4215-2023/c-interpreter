@@ -30,6 +30,7 @@ export function checkNumberOfArguments(
     }
     return undefined
   } else if (lambda.type == 'Builtin') {
+    console.log(command)
     if (lambda.hasVarArgs && command.arity - lambda.arity >= 0) {
       return undefined
     } else if (command.arity != lambda.arity) {
@@ -103,14 +104,14 @@ export const apply_builtin = (builtin_symbol: string, args: any[], memory: Memor
     if (memType == TAGS.char_pointer_tag) {
       let s = ''
       s += String.fromCharCode(value)
-      addr += 4
+      addr += memory.word_size
       while (
         memory.mem_read(addr)[1] !== 0 &&
         TAG_TO_TYPE[memory.mem_read(addr)[0]] === CHAR_TYPE
       ) {
         ;[type, value] = memory.mem_read(addr)
         s += String.fromCharCode(value)
-        addr += 4
+        addr += memory.word_size
       }
       resolvedArgs.push(s)
     } else if (TAG_TO_TYPE[memType] == CHAR_TYPE) {
@@ -127,6 +128,11 @@ export const apply_builtin = (builtin_symbol: string, args: any[], memory: Memor
     resolvedArgs = [...parameters, stringInput]
   }
   resolvedArgs.reverse()
-
+  console.log(resolvedArgs)
+  if (builtin_symbol === "malloc") {
+    const value = resolvedArgs[0]
+    return builtin_functions[builtin_symbol].apply_mem(value, memory)
+  }
   builtin_functions[builtin_symbol].apply(...resolvedArgs)
+  return 0
 }

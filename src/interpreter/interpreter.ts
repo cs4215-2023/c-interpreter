@@ -27,8 +27,8 @@ export type Evaluator<T extends Node> = (node: T, context: Context) => Value
 
 const STACK_SIZE = 500
 const STACK_BEGIN = 0
-const HEAP_SIZE = 100
-const HEAP_BEGIN = STACK_BEGIN + STACK_SIZE + 1
+const HEAP_SIZE = 200
+const HEAP_BEGIN = 600
 let memory = new MemoryModel(STACK_SIZE, STACK_BEGIN, HEAP_SIZE, HEAP_BEGIN)
 
 /**
@@ -137,8 +137,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     declareIdentifier(context, node.identifier.name, node, address)
     //write pointers to memory
     for (let i = 0; i < size; i++) {
-      const pointer_addr = i * memory.stack.word_size + address
-      const value_addr = i * memory.stack.word_size + size * memory.stack.word_size + address
+      const pointer_addr = i * memory.word_size + address
+      const value_addr = i * memory.word_size + size * memory.word_size + address
       memory.mem_write_to_address(pointer_addr, TYPE_TO_TAG[type] + 3, value_addr)
     }
     if (node.array === undefined) {
@@ -752,16 +752,20 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const agenda = context.runtime.agenda
     const arity = command.arity
     const args = []
-
     for (let i = arity - 1; i >= 0; i--) args[i] = memory.mem_read(stash.pop())
     const lambda = stash.pop()
-
+    console.log(lambda)
+    console.log(lambda.type === 'Builtin')
     checkNumberOfArguments(context, command, lambda)
 
     const agendaTop = agenda.peek() as Command
 
     if (lambda.type == 'Builtin') {
-      apply_builtin(lambda.name, args, memory)
+      const result = apply_builtin(lambda.name, args, memory)
+      console.log(result)
+      if (lambda.name === 'malloc') {
+        agenda.push({ type: 'Literal', value: result, valueType: 'int' })
+      }
       return
     }
 

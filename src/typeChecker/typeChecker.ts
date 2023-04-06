@@ -2,7 +2,7 @@ import { FLOAT_TYPE, INT_TYPE, VOID_TYPE } from '../constants'
 import { InvalidNumberOfArguments, InvalidTypeError } from '../errors/errors'
 import { arity, builtin_functions } from '../interpreter/defaults'
 import { handleRuntimeError, InterpreterError } from '../interpreter/errors'
-import { Identifier, Node } from '../parser/types'
+import { CallExpression, Identifier, Node } from '../parser/types'
 import { Command, Context } from '../types'
 import { TypeError } from './errors'
 import { checkLeftRightNotVoid } from './expressionChecks/checkBinaryOps'
@@ -124,9 +124,9 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
 
     const closure = getVariableType(context, (node.callee as Identifier).name)
-
+    console.log(closure)
     if (closure.type == 'Builtin') {
-      return
+      return closure.name
     }
 
     const args = []
