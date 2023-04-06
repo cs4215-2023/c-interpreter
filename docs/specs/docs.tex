@@ -161,10 +161,10 @@ T-diagrams of all major language processing steps that the project utilizes
 This section will list the various features that were implemented and certain design choices that we made. The system can be built and tested by following the instructions of the language processor repository, followed by the frontend repository accordingly. Alternatively, one can use the dedicated code editor at %insert github pages link here
 \\
 
-Note that the example programs shown are assumed to be running via the \texttt{repl} provided from the original template repository. 
+Comments are currently \textbf{not supported}, but for the clarity of code examples, they will be use just like how it is implemented in C. Not that these examples are \textbf{not valid programs} in RECEC because of the comments present.  
 
 \subsection{Primitive Type}
-RECEC supports the basic types present in C, primarily, \texttt{int}, \texttt{void}, \texttt{float}, \texttt{char} and their respective pointer and array types. Like the C language, booleans are represented as numbers, ie \texttt{0} for \texttt{false} and \texttt{1} for \texttt{true}.
+RECEC supports the basic types present in C, primarily, \texttt{int}, \texttt{void}, \texttt{float}, \texttt{char} and their respective pointer and array types.
 
 \subsection{Basic Operators}
 RECEC supports various basic operators.
@@ -177,7 +177,37 @@ RECEC supports various basic operators.
 	\item Update operators \texttt{++}, \texttt{--}
 \end{itemize}
 
+This is an example of how basic operators are used in RECEC: 
+
+\begin{verbatim}
+	!(1); // 0
+	!(0); // 1
+	int a = 1;
+	&a; // Gives address of variable a
+	*a; // Dereference variable a
+	a++; // Variable a contains the value of 2
+\end{verbatim}
+
+As we are not supporting \texttt{\_bool\_} type of C, logical operators and unary \texttt{!} will give an integer value of \texttt{1} if \texttt{true} and \texttt{0} otherwise. 
+
 For equality checking, \texttt{==} and \texttt{!=}, we check if the values are the same, regardless of whether they have the same address or not. 
+
+\subsection{Conditionals}
+
+There are 2 types of conditionals in C, namely \texttt{if-else} statements and conditional expressions. Example conditionals can be written as so:
+
+\begin{verbatim}
+	int a = 1;
+	// if-else statement
+	if (a == 0) {
+		// do something
+	} else {
+		// do something else
+	}
+
+	// conditional expressions
+	a == 0 ? 2 : 3;
+\end{verbatim}
 
 
 \end{document}
