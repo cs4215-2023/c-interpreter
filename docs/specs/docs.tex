@@ -166,5 +166,18 @@ Note that the example programs shown are assumed to be running via the \texttt{r
 \subsection{Primitive Type}
 RECEC supports the basic types present in C, primarily, \texttt{int}, \texttt{void}, \texttt{float}, \texttt{char} and their respective pointer and array types. Like the C language, booleans are represented as numbers, ie \texttt{0} for \texttt{false} and \texttt{1} for \texttt{true}.
 
+\subsection{Basic Operators}
+RECEC supports various basic operators.
+
+\begin{itemize}
+	\item Unary \texttt{!}, \texttt{\&}, \texttt{*}, \texttt{+} and \texttt{-}.
+	\item Arithmetic operators \texttt{+}, \texttt{-}, \texttt{/}, \texttt{*}, \texttt{\%}
+	\item Bitwise operators \texttt{\&}, \texttt{|}, \texttt{\^},  \texttt{>>}, \texttt{<<}
+	\item Logical operators \texttt{\&\&}, \texttt{||}, \texttt{\^}
+	\item Update operators \texttt{++}, \texttt{--}
+\end{itemize}
+
+For equality checking, \texttt{==} and \texttt{!=}, we check if the values are the same, regardless of whether they have the same address or not. 
+
 
 \end{document}
