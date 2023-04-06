@@ -149,21 +149,25 @@ forLoop:
 	'for' '(' innerForCondition = forCondition ')' '{' body = statementBlock '}';
 
 forCondition:
-	initialise = expression ';' test = expression? ';' update = expression;  
+	initialise = expression ';' test = expression? ';' update = expression;
 
 arrayIdentifierWithType:
 	idType = type id = IDENTIFIER '[' size = NUMBER? ']';
 
-arrayIdentifier:
-	id = IDENTIFIER '[' size = expression? ']';
+arrayIdentifier: id = IDENTIFIER '[' size = expression? ']';
 
 arrayContent:
-	'{' (pointerList | numberList | identifierList | floatList | charList) '}' | string;
+	'{' (
+		pointerList
+		| numberList
+		| identifierList
+		| floatList
+		| charList
+	) '}'
+	| string;
 
 arrayInitialisation:
-	arrayIdentifierWithType (
-		operator = '=' array = arrayContent
-	)?;
+	arrayIdentifierWithType (operator = '=' array = arrayContent)?;
 
 pointer: idType = type '*' id = IDENTIFIER;
 
@@ -181,7 +185,7 @@ function:
 functionCall:
 	func = IDENTIFIER '(' args = functionCallParameters ')';
 
-functionCallParameters: expressionList;
+functionCallParameters: expressionList?;
 
 // primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 

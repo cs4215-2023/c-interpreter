@@ -283,4 +283,41 @@ describe('Function related tests', () => {
     }
     expect(prog).toEqual(expectedProg)
   })
+
+  it('Test function call no params', () => {
+    const code = 'foo();'
+    const prog = parse(code, context)
+    const expectedProg: Program = {
+      type: 'Program',
+      body: [
+        {
+          expression: {
+            expressions: [
+              {
+                expressions: [
+                  {
+                    arguments: [],
+                    callee: {
+                      name: 'foo',
+                      type: 'Identifier',
+                      isPointer: false
+                    },
+                    type: 'CallExpression'
+                  }
+                ],
+                type: 'SequenceExpression'
+              },
+              {
+                type: 'EmptyExpression'
+              }
+            ],
+            type: 'SequenceExpression'
+          },
+          loc: undefined,
+          type: 'ExpressionStatement'
+        }
+      ]
+    }
+    expect(prog).toEqual(expectedProg)
+  })
 })

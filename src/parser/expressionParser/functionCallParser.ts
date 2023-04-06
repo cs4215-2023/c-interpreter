@@ -17,6 +17,9 @@ export const parserFunctionCallExpression = <T extends Constructable>(
 
     visitFunctionCallParameters(ctx: FunctionCallParametersContext): Expression[] {
       console.log('visitfunctionarguments')
+      if (ctx.expressionList() == undefined) {
+        return []
+      }
       // only one child
       const seqeuenceExpressions = this.visit(ctx.getChild(0)) as SequenceExpression
       return seqeuenceExpressions.expressions

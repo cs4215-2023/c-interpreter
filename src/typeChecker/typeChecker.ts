@@ -1,5 +1,5 @@
 import { FLOAT_TYPE, INT_TYPE, VOID_TYPE } from '../constants'
-import { InvalidTypeError } from '../errors/errors'
+import { InvalidNumberOfArguments, InvalidTypeError } from '../errors/errors'
 import { arity, builtin_functions } from '../interpreter/defaults'
 import { handleRuntimeError, InterpreterError } from '../interpreter/errors'
 import { Identifier, Node } from '../parser/types'
@@ -137,7 +137,10 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
 
     if (args.length != closure.parameterTypes.length) {
-      throw handleRuntimeError(context, new InterpreterError(node))
+      throw handleRuntimeError(
+        context,
+        new InvalidNumberOfArguments(node, args.length, closure.parameterTypes.length)
+      )
     }
 
     for (let i = 0; i < args.length; i++) {

@@ -1,4 +1,5 @@
 import createContext from '../../createContext'
+import { InvalidNumberOfArguments } from '../../errors/errors'
 import { sourceRunner } from '../../runner'
 import { Variant } from '../../types'
 import { TypeError } from '../errors'
@@ -112,6 +113,49 @@ describe('Type checking', () => {
       expect(result.value).toBe(4)
     } else {
       expect(1).toBe(2)
+    }
+  })
+
+  it('Mismatch function assignment', async () => {
+    const code = `
+	void foo() {
+		return;
+	}
+
+	int main() {
+		int a = foo();
+		return 0;
+	}`
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(4)
+    } else {
+      const e = result.error
+      expect(e).toBeInstanceOf(TypeError)
+      const castError = e as TypeError
+      expect(castError.expected).toBe('int')
+      expect(castError.received).toBe('void')
+    }
+  })
+
+  it('Mismatch function parameters', async () => {
+    const code = `
+	void foo() {
+		return;
+	}
+
+	int main() {
+		foo(1);
+		return 0;
+	}`
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(4)
+    } else {
+      const e = result.error
+      expect(e).toBeInstanceOf(InvalidNumberOfArguments)
     }
   })
 })
