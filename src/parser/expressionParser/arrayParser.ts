@@ -32,40 +32,39 @@ export const parserArrayExpression = <T extends Constructable>(
       const arrayInitialisor = this.visitArrayIdentifierWithType(
         ctx.arrayIdentifierWithType()
       ) as ArrayDeclarationExpression
-      const type = ctx.arrayIdentifierWithType()._idType.PRIMITIVETYPE().text
       const expressions = []
-      const content = this.visitArrayContent(ctx.arrayContent()!, type)
+      const content = this.visitArrayContent(ctx.arrayContent()!)
       expressions.push(...content)
       arrayInitialisor.array = { type: 'ArrayExpression', elements: expressions }
       return arrayInitialisor
     }
-    visitArrayContent(ctx: ArrayContentContext, type: string): Expression[] {
+    visitArrayContent(ctx: ArrayContentContext): Expression[] {
       console.log('visit array content')
       if (ctx === undefined) {
         return []
-      } else {
-        if (type === 'int') {
-          const numberList = this.visitNumberList(ctx.numberList()!)
-          const identifierList = this.visitIdentifierList(ctx.identifierList()!)
-          return numberList.length !== 0 ? numberList : identifierList
-        } else if (type === 'char') {
-          let charList
-          if (ctx.charList() === undefined && ctx.string()) {
-            charList = this.visitStringContext(ctx.string()!)
-          } else {
-            charList = this.visitCharList(ctx.charList()!)
-          }
-          const identifierList = this.visitIdentifierList(ctx.identifierList()!)
-          return charList.length !== 0 ? charList : identifierList
-        } else if (type === 'float') {
-          const floatList = this.visitFloatList(ctx.floatList()!)
-          const identifierList = this.visitIdentifierList(ctx.identifierList()!)
-          return floatList.length !== 0 ? floatList : identifierList
-        } else {
-          throw TypeError('not a valid type for array!')
-        }
       }
+
+      const numberList = ctx.numberList()
+      const charList = ctx.charList()
+      const floatList = ctx.floatList()
+      const identifierList = ctx.identifierList()
+      const string = ctx.string()
+
+      if (numberList != undefined) {
+        return this.visitNumberList(numberList)
+      } else if (charList != undefined) {
+        return this.visitCharList(charList)
+      } else if (floatList != undefined) {
+        return this.visitFloatList(floatList)
+      } else if (identifierList != undefined) {
+        return this.visitIdentifierList(identifierList)
+      } else if (string != undefined) {
+        return this.visitStringContext(string)
+      }
+
+      throw TypeError('not a valid type of array')
     }
+
     visitIdentifierList(ctx: IdentifierListContext): Expression[] {
       console.log('visit identifierlist')
       if (ctx === undefined) {
