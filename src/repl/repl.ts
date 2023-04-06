@@ -1,7 +1,9 @@
 #!/usr/bin/env node
-import { createContext, IOptions, parseError } from '../index'
+import { start } from 'repl'
+
+import { createContext, IOptions } from '../index'
 import { sourceRunner } from '../runner/sourceRunner'
-import { ExecutionMethod, Variant } from '../types'
+import { Context, ExecutionMethod, Variant } from '../types'
 
 function startRepl(
   executionMethod: ExecutionMethod = 'interpreter',
@@ -19,11 +21,21 @@ function startRepl(
     useSubst
   }
 
-  sourceRunner(prelude, context, options).then(preludeResult => {
-    if (preludeResult.status === 'finished') {
-      console.dir(preludeResult.value, { depth: null })
-    } else {
-      console.error(parseError(context.errors))
+  start({
+    eval: (
+      input: string,
+      _context: Context,
+      _fileName: string,
+      callback: (err: Error | null, result: any) => void
+    ) => {
+      sourceRunner(prelude, context, options).then(preludeResult => {
+        if (preludeResult.status === 'finished') {
+          callback(null, preludeResult.value)
+        } else {
+          callback(new Error('An error occurred!'), undefined)
+          return
+        }
+      })
     }
   })
 }

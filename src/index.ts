@@ -1,6 +1,7 @@
 import { SourceMapConsumer } from 'source-map'
 
 import createContext from './createContext'
+import { sourceRunner } from './runner'
 import { Context, ExecutionMethod, Result, SourceError, Variant } from './types'
 export { SourceDocumentation } from './editors/ace/docTooltip'
 
@@ -31,6 +32,15 @@ export function parseError(errors: SourceError[]): string {
     return line < 1 ? explanation : `Line ${line}: ${explanation}`
   })
   return errorMessagesArr.join('\n')
+}
+
+export async function runInContext(
+  code: string,
+  context: Context,
+  options: Partial<IOptions> = {}
+): Promise<Result> {
+  const defaultFilePath = '/default.js'
+  return sourceRunner(code, context, options)
 }
 
 export { createContext, Context, Result }

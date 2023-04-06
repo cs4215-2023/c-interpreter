@@ -143,7 +143,7 @@ export interface Finished {
 export type Result = Finished | Error
 
 export interface Scheduler {
-  run(it: IterableIterator<Value>, context: Context): Promise<Result>
+  run(it: Value, context: Context): Promise<Result>
 }
 
 /**

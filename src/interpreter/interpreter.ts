@@ -23,7 +23,7 @@ import {
   setValueToIdentifier
 } from './utils'
 
-export type Evaluator<T extends Node> = (node: T, context: Context) => IterableIterator<Value>
+export type Evaluator<T extends Node> = (node: T, context: Context) => Value
 
 const STACK_SIZE = 500
 const STACK_BEGIN = 0
@@ -44,7 +44,7 @@ let memory = new MemoryModel(STACK_SIZE, STACK_BEGIN, HEAP_SIZE, HEAP_BEGIN)
 // tslint:disable:object-literal-shorthand
 
 export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
-  Literal: function* (node: Node, context: Context) {
+  Literal: function (node: Node, context: Context) {
     if (node.type != 'Literal') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -67,7 +67,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
   },
 
-  StringLiteral: function* (node: Node, context: Context) {
+  StringLiteral: function (node: Node, context: Context) {
     if (node.type != 'StringLiteral') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -81,7 +81,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.runtime.agenda.push({ type: 'Literal', value: '\0', valueType: 'char' })
   },
 
-  SequenceExpression: function* (node: Node, context: Context) {
+  SequenceExpression: function (node: Node, context: Context) {
     if (node.type != 'SequenceExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -89,7 +89,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.runtime.agenda.push(...node.expressions)
   },
 
-  VariableDeclarationExpression: function* (node: Node, context: Context) {
+  VariableDeclarationExpression: function (node: Node, context: Context) {
     if (node.type != 'VariableDeclarationExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -104,7 +104,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.runtime.stash.push(identifier)
   },
 
-  PointerDeclarationExpression: function* (node: Node, context: Context) {
+  PointerDeclarationExpression: function (node: Node, context: Context) {
     if (node.type != 'PointerDeclarationExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -121,7 +121,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.runtime.stash.push(identifier)
   },
 
-  ArrayDeclarationExpression: function* (node: Node, context: Context) {
+  ArrayDeclarationExpression: function (node: Node, context: Context) {
     if (node.type != 'ArrayDeclarationExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -169,7 +169,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
   },
 
-  ArrayIdentifier: function* (node: Node, context: Context) {
+  ArrayIdentifier: function (node: Node, context: Context) {
     if (node.type != 'ArrayIdentifier') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -179,7 +179,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.runtime.agenda.push(node.index)
   },
 
-  Identifier: function* (node: Node, context: Context) {
+  Identifier: function (node: Node, context: Context) {
     if (node.type != 'Identifier') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -192,7 +192,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.runtime.stash.push(identifier)
   },
 
-  TypedIdentifier: function* (command: Command, context: Context) {
+  TypedIdentifier: function (command: Command, context: Context) {
     if (command.type != 'TypedIdentifier') {
       throw handleRuntimeError(context, new InterpreterError(command))
     }
@@ -201,7 +201,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.runtime.stash.push(identifier)
   },
 
-  CallExpression: function* (node: Node, context: Context) {
+  CallExpression: function (node: Node, context: Context) {
     if (node.type != 'CallExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -224,13 +224,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     agenda.push({ type: 'CallExpression_i', arity: actualArgLength }, ...callArguments, node.callee)
   },
 
-  EmptyExpression: function* (node: Node, context: Context) {
+  EmptyExpression: function (node: Node, context: Context) {
     if (node.type != 'EmptyExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
   },
 
-  UnaryExpression: function* (node: Node, context: Context) {
+  UnaryExpression: function (node: Node, context: Context) {
     if (node.type != 'UnaryExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -241,7 +241,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     )
   },
 
-  BinaryExpression: function* (node: Node, context: Context) {
+  BinaryExpression: function (node: Node, context: Context) {
     if (node.type != 'BinaryExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -253,7 +253,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     )
   },
 
-  ConditionalExpression: function* (node: Node, context: Context) {
+  ConditionalExpression: function (node: Node, context: Context) {
     if (node.type != 'ConditionalExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -264,7 +264,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     )
   },
 
-  LogicalExpression: function* (node: Node, context: Context) {
+  LogicalExpression: function (node: Node, context: Context) {
     if (node.type != 'LogicalExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -276,7 +276,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     )
   },
 
-  ForStatement: function* (node: Node, context: Context) {
+  ForStatement: function (node: Node, context: Context) {
     if (node.type != 'ForStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -305,7 +305,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     )
   },
 
-  AssignmentExpression: function* (node: Node, context: Context) {
+  AssignmentExpression: function (node: Node, context: Context) {
     if (node.type != 'AssignmentExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -334,7 +334,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
   },
 
-  UpdateExpression: function* (node: Node, context: Context) {
+  UpdateExpression: function (node: Node, context: Context) {
     if (node.type != 'UpdateExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -357,7 +357,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     agenda.push(node.argument, assignmentExpression)
   },
 
-  FunctionDeclaration: function* (node: Node, context: Context) {
+  FunctionDeclaration: function (node: Node, context: Context) {
     if (node.type != 'FunctionDeclaration') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -371,7 +371,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     })
   },
 
-  IfStatement: function* (node: Node, context: Context) {
+  IfStatement: function (node: Node, context: Context) {
     if (node.type != 'IfStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -382,14 +382,14 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     )
   },
 
-  ExpressionStatement: function* (node: Node, context: Context) {
+  ExpressionStatement: function (node: Node, context: Context) {
     if (node.type != 'ExpressionStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
     context.runtime.agenda.push(node.expression)
   },
 
-  ReturnStatement: function* (node: Node, context: Context) {
+  ReturnStatement: function (node: Node, context: Context) {
     if (node.type != 'ReturnStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -403,7 +403,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
   },
 
-  WhileStatement: function* (node: Node, context: Context) {
+  WhileStatement: function (node: Node, context: Context) {
     if (node.type != 'WhileStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -415,7 +415,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     )
   },
 
-  DoWhileStatement: function* (node: Node, context: Context) {
+  DoWhileStatement: function (node: Node, context: Context) {
     if (node.type != 'DoWhileStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -428,7 +428,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     )
   },
 
-  BlockStatement: function* (node: Node, context: Context) {
+  BlockStatement: function (node: Node, context: Context) {
     if (node.type != 'BlockStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -449,13 +449,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     memory.enter_scope()
   },
 
-  EmptyStatement: function* (node: Node, context: Context) {
+  EmptyStatement: function (node: Node, context: Context) {
     if (node.type != 'EmptyStatement') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
   },
 
-  Program: function* (node: Node, context: Context) {
+  Program: function (node: Node, context: Context) {
     if (node.type !== 'Program') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
@@ -488,7 +488,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
   },
 
   // INSTRUCTIONS
-  ArrayIdentifier_i: function* (command: Command, context: Context) {
+  ArrayIdentifier_i: function (command: Command, context: Context) {
     if (command.type != 'ArrayIdentifier_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -499,7 +499,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.runtime.stash.push(val)
   },
 
-  BinaryExpression_i: function* (command: Command, context: Context) {
+  BinaryExpression_i: function (command: Command, context: Context) {
     if (command.type != 'BinaryExpression_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -526,7 +526,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     stash.push(push_addr)
   },
 
-  UnaryExpression_i: function* (command: Command, context: Context) {
+  UnaryExpression_i: function (command: Command, context: Context) {
     if (command.type != 'UnaryExpression_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -559,7 +559,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
   },
 
-  ConditionalExpression_i: function* (command: Command, context: Context) {
+  ConditionalExpression_i: function (command: Command, context: Context) {
     if (command.type != 'ConditionalExpression_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -571,7 +571,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     agenda.push(bool ? command.consequent : command.alternate)
   },
 
-  IfStatement_i: function* (command: Command, context: Context) {
+  IfStatement_i: function (command: Command, context: Context) {
     if (command.type != 'IfStatement_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -583,7 +583,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     agenda.push(bool ? command.consequent : command.alternate)
   },
 
-  WhileStatement_i: function* (command: Command, context: Context) {
+  WhileStatement_i: function (command: Command, context: Context) {
     if (command.type != 'WhileStatement_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -596,7 +596,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
   },
 
-  DoWhileStatement_i: function* (command: Command, context: Context) {
+  DoWhileStatement_i: function (command: Command, context: Context) {
     if (command.type != 'DoWhileStatement_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -611,7 +611,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
   },
 
-  Pop_i: function* (command: Command, context: Context) {
+  Pop_i: function (command: Command, context: Context) {
     if (command.type != 'Pop_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -619,7 +619,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     stash.pop()
   },
 
-  ReturnStatement_i: function* (command: Command, context: Context) {
+  ReturnStatement_i: function (command: Command, context: Context) {
     if (command.type != 'ReturnStatement_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -627,7 +627,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     agenda.pop().type === 'Mark_i' ? memory.exit_scope() : agenda.push(command)
   },
 
-  AssignmentExpression_i: function* (command: Command, context: Context) {
+  AssignmentExpression_i: function (command: Command, context: Context) {
     if (command.type != 'AssignmentExpression_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -677,7 +677,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     memory.stack.print()
   },
 
-  EnvironmentRestoration_i: function* (command: Command, context: Context) {
+  EnvironmentRestoration_i: function (command: Command, context: Context) {
     if (command.type != 'EnvironmentRestoration_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -686,7 +686,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     context.numberOfOuterEnvironments -= 1
   },
 
-  LogicalExpression_i: function* (command: Command, context: Context) {
+  LogicalExpression_i: function (command: Command, context: Context) {
     if (command.type != 'LogicalExpression_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -703,7 +703,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     stash.push(push_addr)
   },
 
-  FunctionDeclaration_i: function* (command: Command, context: Context) {
+  FunctionDeclaration_i: function (command: Command, context: Context) {
     if (command.type != 'FunctionDeclaration_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -729,7 +729,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     )
   },
 
-  LambdaExpression_i: function* (command: Command, context: Context) {
+  LambdaExpression_i: function (command: Command, context: Context) {
     if (command.type != 'LambdaExpression_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -743,7 +743,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     })
   },
 
-  CallExpression_i: function* (command: Command, context: Context) {
+  CallExpression_i: function (command: Command, context: Context) {
     if (command.type != 'CallExpression_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -789,7 +789,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     memory.enter_scope()
   },
 
-  Mark_i: function* (command: Command, context: Context) {
+  Mark_i: function (command: Command, context: Context) {
     if (command.type != 'Mark_i') {
       throw handleRuntimeError(context, new InterpreterError(command as Node))
     }
@@ -799,17 +799,17 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
 // tslint:enable:object-literal-shorthand
 
-export function* evaluate(node: Node, context: Context) {
-  yield* typeCheck(node, context)
+export function evaluate(node: Node, context: Context) {
+  typeCheck(node, context)
   memory = new MemoryModel(STACK_SIZE, STACK_BEGIN, HEAP_SIZE, HEAP_BEGIN)
   // compile the program to instructions
-  yield* evaluators[node.type](node, context)
+  evaluators[node.type](node, context)
   const agenda = context.runtime.agenda
   const stash = context.runtime.stash
   while (agenda.length()) {
     const command = agenda.pop() as Node
     console.log(command)
-    yield* evaluators[command.type](command, context)
+    evaluators[command.type](command, context)
   }
 
   // By right C programs don't return anything, this should be undefined.

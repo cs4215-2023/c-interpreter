@@ -24,7 +24,7 @@ function runInterpreter(program: Program, context: Context, options: IOptions): 
   return scheduler.run(it, context)
 }
 
-export async function sourceRunner(
+export function sourceRunner(
   code: string,
   context: Context,
   options: Partial<IOptions> = {}
