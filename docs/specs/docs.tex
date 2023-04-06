@@ -123,7 +123,7 @@
         \vspace{3cm}
 
         \Large
-        \textbf{Lester Leong (), \\Lui Wen-Jie, Benjamin (A0214362N),}\\
+        \textbf{Lester Leong (), \\Lui Wen-Jie, Benjamin (A0214362N)}\\
         School of Computing\\
         National University of Singapore\\
         April 2022
@@ -145,7 +145,9 @@
 \section{Introduction}
 
 % Outline of the scope and objectives of the project.
-C is a programming language that has memory models present such as stack and heap. Thus, we decided to implement a realistic explicit control evaluator(RECE) for C to align closely with the memory models present. The first section, Section 2, will largly cover the features implemented. The second main section, Section 3, will include the technical specification of our RECE.
+C is a programming language that has memory models present such as stack and heap. Thus, we decided to implement a realistic explicit control evaluator for C (RECEC) to align closely with the memory models present. \\
+
+The first section, Section 2, will cover the features implemented. The second main section, Section 3, will include the technical specification of our RECEC.
 
 \subsection{T-Diagrams}
 
@@ -161,8 +163,8 @@ This section will list the various features that were implemented and certain de
 
 Note that the example programs shown are assumed to be running via the \texttt{repl} provided from the original template repository. 
 
-\subsection{Basic Operators}
-basic operators like addition
+\subsection{Primitive Type}
+RECEC supports the basic types present in C, primarily, \texttt{int}, \texttt{void}, \texttt{float}, \texttt{char} and their respective pointer and array types. Like the C language, booleans are represented as numbers, ie \texttt{0} for \texttt{false} and \texttt{1} for \texttt{true}.
 
 
 \end{document}
