@@ -62,9 +62,11 @@ describe('Loops', () => {
   it('Do while loop declaration in body', async () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = `void main() {int i = 3; do {int a = 0;a = a + i; i--;} while (i > 0);  a;}`
-    try {
-      await sourceRunner(code, context)
-    } catch (e) {
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(1).toBe(2)
+    } else {
+      const e = result.error
       expect(e).toBeInstanceOf(UndefinedVariable)
       const castError = e as UndefinedVariable
       expect(castError.name).toBe('a')

@@ -6,7 +6,7 @@ import { TAG_TO_TYPE, TAGS, TYPE_TO_TAG } from '../memory/tags'
 import { ArrayIdentifier, ExpressionStatement, Identifier, Literal, Node } from '../parser/types'
 import { typeCheck } from '../typeChecker/typeChecker'
 import { Builtin } from '../typeChecker/types'
-import { Command, Context, Value, WhileStatementInstruction } from '../types'
+import { Command, Context, Result, SourceError, Value, WhileStatementInstruction } from '../types'
 import { arity, builtin_functions } from './defaults'
 import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
 import { handleRuntimeError, InterpreterError } from './errors'
@@ -800,26 +800,30 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 // tslint:enable:object-literal-shorthand
 
 export function evaluate(node: Node, context: Context) {
-  typeCheck(node, context)
-  memory = new MemoryModel(STACK_SIZE, STACK_BEGIN, HEAP_SIZE, HEAP_BEGIN)
-  // compile the program to instructions
-  evaluators[node.type](node, context)
-  const agenda = context.runtime.agenda
-  const stash = context.runtime.stash
-  while (agenda.length()) {
-    const command = agenda.pop() as Node
-    console.log(command)
-    evaluators[command.type](command, context)
-  }
-
-  // By right C programs don't return anything, this should be undefined.
-
-  if (isNumber(stash.peek())) {
-    const [type, value] = memory.mem_read(stash.peek())
-    if (TAG_TO_TYPE[type] == 'float') {
-      return value.toFixed(6)
+  try {
+    typeCheck(node, context)
+    memory = new MemoryModel(STACK_SIZE, STACK_BEGIN, HEAP_SIZE, HEAP_BEGIN)
+    // compile the program to instructions
+    evaluators[node.type](node, context)
+    const agenda = context.runtime.agenda
+    const stash = context.runtime.stash
+    while (agenda.length()) {
+      const command = agenda.pop() as Node
+      console.log(command)
+      evaluators[command.type](command, context)
     }
-    return value
+
+    // By right C programs don't return anything, this should be undefined.
+
+    if (isNumber(stash.peek())) {
+      const [type, value] = memory.mem_read(stash.peek())
+      if (TAG_TO_TYPE[type] == 'float') {
+        return { status: 'finished', value: value.toFixed(6), context: context }
+      }
+      return { status: 'finished', value: value, context: context }
+    }
+    return { status: 'finished', value: undefined, context: context }
+  } catch (e) {
+    return { status: 'error', error: e as SourceError }
   }
-  return undefined
 }

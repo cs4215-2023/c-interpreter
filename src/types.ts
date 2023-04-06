@@ -132,6 +132,7 @@ export interface Environment {
 
 export interface Error {
   status: 'error'
+  error: SourceError
 }
 
 export interface Finished {

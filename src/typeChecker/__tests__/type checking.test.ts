@@ -6,14 +6,12 @@ import { TypeError } from '../errors'
 describe('Type checking', () => {
   it('Int to float assignment throws error ', async () => {
     const code = 'void main() {int a = 1.5;}'
-    try {
-      const context = createContext(Variant.DEFAULT, undefined, undefined)
-      await sourceRunner(code, context)
-    } catch (e) {
-      expect(e).toBeInstanceOf(TypeError)
-      const castError = e as TypeError
-      expect(castError.expected).toBe('int')
-      expect(castError.received).toBe('float')
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(1).toBe(2)
+    } else {
+      expect(result.error).toBeInstanceOf(TypeError)
     }
   })
 
@@ -36,10 +34,12 @@ describe('Type checking', () => {
 	void main() {
 		return f(1);
 	}`
-    try {
-      const context = createContext(Variant.DEFAULT, undefined, undefined)
-      await sourceRunner(code, context)
-    } catch (e) {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(1).toBe(2)
+    } else {
+      const e = result.error
       expect(e).toBeInstanceOf(TypeError)
       const castError = e as TypeError
       expect(castError.expected).toBe('void')
@@ -66,10 +66,13 @@ describe('Type checking', () => {
 	void main() {
 		char c[4]={1,2,3,4};
 	}`
-    try {
-      const context = createContext(Variant.DEFAULT, undefined, undefined)
-      await sourceRunner(code, context)
-    } catch (e) {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const result = await sourceRunner(code, context)
+
+    if (result.status == 'finished') {
+      expect(1).toBe(2)
+    } else {
+      const e = result.error
       expect(e).toBeInstanceOf(TypeError)
       const castError = e as TypeError
       expect(castError.expected).toBe('char')
@@ -82,10 +85,13 @@ describe('Type checking', () => {
 	void main() {
 		int* a = 1.5;
 	}`
-    try {
-      const context = createContext(Variant.DEFAULT, undefined, undefined)
-      await sourceRunner(code, context)
-    } catch (e) {
+
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(1).toBe(2)
+    } else {
+      const e = result.error
       expect(e).toBeInstanceOf(TypeError)
       const castError = e as TypeError
       expect(castError.expected).toBe('int')

@@ -22,15 +22,17 @@ describe('Builtin functions test', () => {
 
   it('Printf test with string', async () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
-    try {
-      const code = `
+
+    const code = `
 	void main() {
 		printf("h%dllo w%drl%c", 0, 'd', "C");
 	}
 	`
-      await sourceRunner(code, context)
-    } catch (e) {
-      expect(e).toBeInstanceOf(PrintfError)
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(1).toBe(2)
+    } else {
+      expect(result.error).toBeInstanceOf(PrintfError)
     }
   })
 
