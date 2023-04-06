@@ -50,6 +50,6 @@ describe('stack tests', () => {
     expect(heap.get_free_heap()).toBe(19)
     heap.free_up_memory(address)
     expect(heap.get_free_heap()).toBe(20)
-
+    //test
   })
 })
