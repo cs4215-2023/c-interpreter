@@ -30,10 +30,9 @@ export default class MemoryBuffer {
     this.memoryView.getInt32(node * this.word_size)
 
   // get and set a word in heap at given address
-  public mem_get = (address: number) => this.memoryView.getFloat64(address * this.word_size)
+  public mem_get = (address: number) => this.memoryView.getFloat32(address)
 
-  public mem_set = (address: number, x: number) =>
-    this.memoryView.setFloat64(address * this.word_size, x)
+  public mem_set = (address: number, x: number) => this.memoryView.setFloat32(address, x)
 
   // child index starts at 0
   public mem_get_child = (address: number, child_index: number) =>

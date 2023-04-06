@@ -8,7 +8,9 @@ export enum TAGS {
   char_pointer_tag = 6,
   pointer_tag = 7,
   Unassigned_tag = 8,
-  base_pointer_tag = 9
+  base_pointer_tag = 9,
+  END_OF_MALLOC = 11,
+  END_OF_FREE = -1,
 }
 export const TYPE_TO_TAG = {
   void: TAGS.void_tag,

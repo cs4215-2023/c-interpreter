@@ -18,7 +18,7 @@ describe('Arrays and Pointer', () => {
     const code = 'int main() {int a = 4; return &a;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe(12)
+      expect(result.value).toBe(24)
     } else {
       expect(1).toBe(2)
     }
@@ -28,7 +28,7 @@ describe('Arrays and Pointer', () => {
     const code = 'int main() {int a = 4;int* b = &a; int* c = &a; int* d = c; return d;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe(12)
+      expect(result.value).toBe(24)
     } else {
       expect(1).toBe(2)
     }
@@ -38,7 +38,7 @@ describe('Arrays and Pointer', () => {
     const code = 'int main() {int a = 4;int b = 5; int* c = &a; int* d = &b + 1; return d;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe(24)
+      expect(result.value).toBe(48)
     } else {
       expect(1).toBe(2)
     }
@@ -48,7 +48,7 @@ describe('Arrays and Pointer', () => {
     const code = 'int main() {int a = 4;int b = 5; int* c = &a; int* d = c + 1; return d;}'
     const result = await sourceRunner(code, context)
     if (result.status == 'finished') {
-      expect(result.value).toBe(16)
+      expect(result.value).toBe(32)
     } else {
       expect(1).toBe(2)
     }
