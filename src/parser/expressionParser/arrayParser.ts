@@ -1,5 +1,3 @@
-import { forEach } from 'lodash'
-
 import {
   ArrayContentContext,
   ArrayIdentifierExpressionContext,

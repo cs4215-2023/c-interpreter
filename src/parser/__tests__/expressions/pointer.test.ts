@@ -2,7 +2,7 @@ import createContext from '../../../createContext'
 import { Variant } from '../../../types'
 import { parse } from '../../parser'
 import { Program } from '../../types'
-import { Identifier, PointerIdentifier } from '../../types'
+import { Identifier } from '../../types'
 
 const variant = Variant.DEFAULT
 const context = createContext(variant, undefined, undefined)

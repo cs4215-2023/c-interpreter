@@ -95,7 +95,7 @@ function addCustomErrorListeners(lexer: ClangLexer, parser: ClangParser): void {
   })
 }
 
-export function parse(source: string, context: Context): Program | undefined {
+export function parse(source: string, _context: Context): Program | undefined {
   const inputStream = CharStreams.fromString(source)
   const lexer = new ClangLexer(inputStream)
   const tokenStream = new CommonTokenStream(lexer)

@@ -1,4 +1,4 @@
-import { pointerTypeMappings, typeMappings } from '../constants'
+import { typeMappings } from '../constants'
 import * as errors from '../errors/errors'
 import { handleRuntimeError } from '../interpreter/errors'
 import { TypedIdentifier } from '../parser/types'

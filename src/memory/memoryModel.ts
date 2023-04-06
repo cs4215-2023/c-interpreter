@@ -1,5 +1,3 @@
-import { assert } from 'console'
-
 import Heap from './heap'
 import Stack from './stack'
 import { TAGS } from './tags'
@@ -34,9 +32,9 @@ export default class MemoryModel {
   public mem_write_to_address(address: number, tag: number, x: number) {
     const heap_addr_begin = this.heap_addr_range[0]
     const heap_addr_end = this.heap_addr_range[1]
-    const stack_addr_start = this.stack_addr_range[0]
+
     if (address < heap_addr_begin) {
-      assert(address >= stack_addr_start) //or maybe include a runtime error
+      // maybe include a runtime error
       return this.stack.stack_set_tag_and_value(address, tag, x)
     } else if (address >= heap_addr_begin && address < heap_addr_end) {
       return this.heap.set_tag_and_value(address, tag, x)
@@ -47,15 +45,13 @@ export default class MemoryModel {
   public mem_read(address: number): [number, number] {
     const heap_addr_begin = this.heap_addr_range[0]
     const heap_addr_end = this.heap_addr_range[1]
-    const stack_addr_start = this.stack.stack_addr_begin
+
     if (address < heap_addr_begin) {
-      assert(address >= stack_addr_start) //or maybe include a runtime error
       return this.stack.stack_get_tag_and_value(address)
     } else if (address >= heap_addr_begin && address < heap_addr_end) {
       return this.heap.get_tag_and_value(address)
     }
     throw Error('Memory only supports heap and stack')
-
   }
 
   public mem_heap_allocate_one(): number {
@@ -74,16 +70,16 @@ export default class MemoryModel {
     return tag === TAGS.int_tag
       ? this.stack.push_int(x as number)
       : tag === TAGS.float_tag
-        ? this.stack.push_float(x as number)
-        : tag === TAGS.char_tag
-          ? this.stack.push_char(x as string)
-          : tag === TAGS.int_pointer_tag ||
-            tag === TAGS.float_pointer_tag ||
-            tag === TAGS.char_pointer_tag
-            ? this.stack.push_pointer(tag, x as number)
-            : tag === TAGS.void_tag
-              ? this.stack.push(TAGS.void_tag, 0)
-              : null
+      ? this.stack.push_float(x as number)
+      : tag === TAGS.char_tag
+      ? this.stack.push_char(x as string)
+      : tag === TAGS.int_pointer_tag ||
+        tag === TAGS.float_pointer_tag ||
+        tag === TAGS.char_pointer_tag
+      ? this.stack.push_pointer(tag, x as number)
+      : tag === TAGS.void_tag
+      ? this.stack.push(TAGS.void_tag, 0)
+      : null
   }
 
   public mem_stack_allocate_one(): number {

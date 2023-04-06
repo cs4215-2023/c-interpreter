@@ -1,4 +1,4 @@
-import { CHAR_POINTER_TYPE, CHAR_TYPE, DECLARED_BUT_NOT_YET_ASSIGNED } from '../constants'
+import { CHAR_TYPE, DECLARED_BUT_NOT_YET_ASSIGNED } from '../constants'
 import * as errors from '../errors/errors'
 import MemoryModel from '../memory/memoryModel'
 import { TAG_TO_TYPE, TAGS } from '../memory/tags'

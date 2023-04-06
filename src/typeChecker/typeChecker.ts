@@ -1,4 +1,4 @@
-import { FLOAT_TYPE, INT_POINTER_TYPE, INT_TYPE, VOID_TYPE } from '../constants'
+import { FLOAT_TYPE, INT_TYPE, VOID_TYPE } from '../constants'
 import { InvalidTypeError } from '../errors/errors'
 import { arity, builtin_functions } from '../interpreter/defaults'
 import { handleRuntimeError, InterpreterError } from '../interpreter/errors'

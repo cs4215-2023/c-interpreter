@@ -1,5 +1,3 @@
-import { assert } from 'console'
-
 import { StackOverflowError } from '../errors/errors'
 import MemoryBuffer from './memoryBuffer'
 import { TAGS } from './tags'
@@ -77,7 +75,7 @@ export default class Stack extends MemoryBuffer {
 
   public push_char(x: string) {
     console.log('pushing ' + x + ' as char, convert to ascii is ' + x.charCodeAt(0))
-    assert(x.length == 1) //should be a char and not string
+    //should be a char and not string
     return this.push(TAGS.char_tag, x.charCodeAt(0))
   }
 
@@ -92,15 +90,15 @@ export default class Stack extends MemoryBuffer {
 
   public type_to_data = (tag: number, x: number | string) =>
     tag === TAGS.int_tag ||
-      tag === TAGS.int_pointer_tag ||
-      TAGS.char_pointer_tag ||
-      TAGS.float_pointer_tag
+    tag === TAGS.int_pointer_tag ||
+    TAGS.char_pointer_tag ||
+    TAGS.float_pointer_tag
       ? ~~x
       : tag === TAGS.char_tag
-        ? String.fromCharCode(x as number)
-        : tag === TAGS.float_tag
-          ? x
-          : Error('Tag is undefined')
+      ? String.fromCharCode(x as number)
+      : tag === TAGS.float_tag
+      ? x
+      : Error('Tag is undefined')
 
   //END DATA TYPES
 

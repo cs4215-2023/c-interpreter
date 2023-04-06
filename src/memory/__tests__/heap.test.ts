@@ -1,10 +1,7 @@
-import { size } from 'lodash'
-
 import Heap from '../heap'
 import { TAGS } from '../tags'
 
 const word_size = 8
-const heap_size = 7
 
 describe('stack tests', () => {
   it('set to memory and read', () => {
@@ -50,6 +47,5 @@ describe('stack tests', () => {
     expect(heap.get_free_heap()).toBe(19)
     heap.free_up_memory(address)
     expect(heap.get_free_heap()).toBe(20)
-
   })
 })

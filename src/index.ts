@@ -39,7 +39,6 @@ export async function runInContext(
   context: Context,
   options: Partial<IOptions> = {}
 ): Promise<Result> {
-  const defaultFilePath = '/default.js'
   return sourceRunner(code, context, options)
 }
 

@@ -14,7 +14,7 @@ export const printfFunction = (stringInput: string, ...args: any[]) => {
   }
 
   let index = 0
-  const replaceTokens = (match: string, ...others: any[]) => {
+  const replaceTokens = (match: string, ..._others: any[]) => {
     const currentArg = args[index]
     index++
     if (match == '%c') {

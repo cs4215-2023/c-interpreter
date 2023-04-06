@@ -1,5 +1,3 @@
-import { size } from 'lodash'
-
 import MemoryBuffer from './memoryBuffer'
 import { TAGS } from './tags'
 
@@ -92,8 +90,6 @@ export default class Heap extends MemoryBuffer {
     }
     this.set_tag_and_value(prev_addr, 0, 0)
     this.set_child(prev_addr, initial_free)
-
-
   }
 
   public get_child(address: number): number {
@@ -128,7 +124,7 @@ export default class Heap extends MemoryBuffer {
       free = this.get_child(free)
       count++
       if (count > this.heap_size) {
-        throw Error("counting is going wrong")
+        throw Error('counting is going wrong')
       }
     }
     return count
