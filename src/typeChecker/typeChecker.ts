@@ -4,9 +4,9 @@ import {
   FLOAT_TYPE,
   INT_POINTER_TYPE,
   INT_TYPE,
+  validPointerTypes,
   VOID_POINTER_TYPE,
-  VOID_TYPE,
-  validPointerTypes
+  VOID_TYPE
 } from '../constants'
 import { InvalidNumberOfArguments, InvalidTypeError } from '../errors/errors'
 import { arity, builtin_functions } from '../interpreter/defaults'
