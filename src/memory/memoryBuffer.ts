@@ -1,5 +1,3 @@
-import { TAGS } from './tags'
-//gives
 export default class MemoryBuffer {
   public node_size: number
   public size_offset: number

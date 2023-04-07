@@ -1,17 +1,8 @@
-import {
-  CHAR_POINTER_TYPE,
-  FLOAT_POINTER_TYPE,
-  FLOAT_TYPE,
-  INT_POINTER_TYPE,
-  INT_TYPE,
-  validPointerTypes,
-  VOID_POINTER_TYPE,
-  VOID_TYPE
-} from '../constants'
+import { FLOAT_TYPE, INT_TYPE, VOID_POINTER_TYPE, VOID_TYPE } from '../constants'
 import { InvalidNumberOfArguments, InvalidTypeError } from '../errors/errors'
 import { arity, builtin_functions } from '../interpreter/defaults'
 import { handleRuntimeError, InterpreterError } from '../interpreter/errors'
-import { CallExpression, Identifier, Node } from '../parser/types'
+import { Identifier, Node } from '../parser/types'
 import { Command, Context } from '../types'
 import { TypeError } from './errors'
 import { checkLeftRightNotVoid } from './expressionChecks/checkBinaryOps'
@@ -181,11 +172,13 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     if (node.type != 'UnaryExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    if (node.operator == '&' || node.operator == '*') {
-      return typeCheck(node.argument, context)
-    }
 
     const argumentType = typeCheck(node.argument, context)
+
+    // if (node.operator == '&') {
+    //   return pointerTypeMappings[argumentType]
+    // }
+
     checkVoid(node, argumentType, context)
     return argumentType == FLOAT_TYPE ? FLOAT_TYPE : INT_TYPE
   },
@@ -269,7 +262,9 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
     const left = typeCheck(node.left, context)
     const right = typeCheck(node.right, context)
-    if (right == VOID_POINTER_TYPE && validPointerTypes.has(left)) {
+
+    //TODO: allow by pass checking if left is a pter as well
+    if (right == VOID_POINTER_TYPE) {
       return
     }
     if (left != right) {

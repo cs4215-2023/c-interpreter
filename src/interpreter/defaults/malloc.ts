@@ -1,4 +1,3 @@
-import Heap from '../../memory/heap'
 import MemoryModel from '../../memory/memoryModel'
 
 export const mallocFunction = (x: number, memory: MemoryModel): number => {

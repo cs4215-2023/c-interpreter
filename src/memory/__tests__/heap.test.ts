@@ -59,7 +59,7 @@ describe('stack tests', () => {
       addresses.push(heap.allocate_one())
     }
     expect(heap.get_free_heap()).toBe(0)
-    addresses.forEach((addr, i) => {
+    addresses.forEach((addr, _i) => {
       heap.free_up_memory(addr)
     })
     expect(heap.get_free_heap()).toBe(20)
@@ -75,7 +75,7 @@ describe('stack tests', () => {
       addresses.push(heap.allocate_one())
     }
     expect(heap.get_free_heap()).toBe(0)
-    addresses.reverse().forEach((addr, i) => {
+    addresses.reverse().forEach((addr, _i) => {
       heap.free_up_memory(addr)
     })
     expect(heap.get_free_heap()).toBe(20)
