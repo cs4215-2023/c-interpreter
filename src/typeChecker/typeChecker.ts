@@ -143,6 +143,9 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
       )
     }
 
+    const functionCallEnv = createBlockTypeEnvironment(context, 'functionCallEnv')
+    pushTypeEnvironment(context, functionCallEnv)
+
     for (let i = 0; i < args.length; i++) {
       typeCheck(
         {
@@ -158,6 +161,8 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
         context
       )
     }
+
+    popTypeEnvironment(context)
 
     return closure.returnType.valueType
   },
