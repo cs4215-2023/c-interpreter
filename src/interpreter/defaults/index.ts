@@ -1,4 +1,4 @@
-import { INT_POINTER_TYPE, VOID_TYPE } from '../../constants'
+import { INT_POINTER_TYPE, VOID_POINTER_TYPE, VOID_TYPE } from '../../constants'
 import MemoryModel from '../../memory/memoryModel'
 import { freeFunction } from './free'
 import { mallocFunction } from './malloc'
@@ -20,7 +20,7 @@ export const builtin_functions = {
   },
   malloc: {
     type: 'Builtin',
-    returnType: VOID_TYPE,
+    returnType: VOID_POINTER_TYPE,
     apply: (memory: MemoryModel, x: number): number => mallocFunction(x, memory),
     apply_mem: (x: number, memory: MemoryModel): number => {
       return mallocFunction(x, memory)

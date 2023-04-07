@@ -21,14 +21,8 @@ export default class MemoryModel {
     this.word_size = 8
     this.heap = new Heap(this.word_size, heap_size)
     this.heap.init()
-    this.stack_addr_range = [
-      stack_addr_begin,
-      (stack_size + stack_addr_begin)
-    ]
-    this.heap_addr_range = [
-      heap_addr_begin,
-      (heap_addr_begin + heap_size)
-    ]
+    this.stack_addr_range = [stack_addr_begin, stack_size + stack_addr_begin]
+    this.heap_addr_range = [heap_addr_begin, heap_addr_begin + heap_size]
     this.heap_addr_begin = heap_addr_begin
     //heap goes here
   }
@@ -42,7 +36,7 @@ export default class MemoryModel {
       // maybe include a runtime error
       return this.stack.stack_set_tag_and_value(address, tag, x)
     } else if (address >= heap_addr_begin && address < heap_addr_end) {
-      console.log("heap writing to addr " + address)
+      console.log('heap writing to addr ' + address)
       return this.heap.set_tag_and_value(address - heap_addr_begin, tag, x)
     }
     return Error('should have added to memory at this point')
@@ -76,16 +70,16 @@ export default class MemoryModel {
     return tag === TAGS.int_tag
       ? this.stack.push_int(x as number)
       : tag === TAGS.float_tag
-        ? this.stack.push_float(x as number)
-        : tag === TAGS.char_tag
-          ? this.stack.push_char(x as string)
-          : tag === TAGS.int_pointer_tag ||
-            tag === TAGS.float_pointer_tag ||
-            tag === TAGS.char_pointer_tag
-            ? this.stack.push_pointer(tag, x as number)
-            : tag === TAGS.void_tag
-              ? this.stack.push(TAGS.void_tag, 0)
-              : null
+      ? this.stack.push_float(x as number)
+      : tag === TAGS.char_tag
+      ? this.stack.push_char(x as string)
+      : tag === TAGS.int_pointer_tag ||
+        tag === TAGS.float_pointer_tag ||
+        tag === TAGS.char_pointer_tag
+      ? this.stack.push_pointer(tag, x as number)
+      : tag === TAGS.void_tag
+      ? this.stack.push(TAGS.void_tag, 0)
+      : null
   }
 
   public mem_stack_allocate_one(): number {

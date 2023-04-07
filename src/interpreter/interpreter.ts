@@ -1,6 +1,7 @@
 /* tslint:disable:max-classes-per-file */
 
 import { start } from 'repl'
+
 import { InvalidTypeError } from '../errors/errors'
 import MemoryModel from '../memory/memoryModel'
 import { TAG_TO_TYPE, TAGS, TYPE_TO_TAG } from '../memory/tags'
@@ -55,14 +56,14 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       const address = memory.mem_stack_push(TYPE_TO_TAG[node.valueType], node.value)
       console.log(
         'storing literal ' +
-        node.value +
-        ' with address ' +
-        address +
-        ' as ' +
-        node.valueType +
-        '(' +
-        TYPE_TO_TAG[node.valueType] +
-        ')'
+          node.value +
+          ' with address ' +
+          address +
+          ' as ' +
+          node.valueType +
+          '(' +
+          TYPE_TO_TAG[node.valueType] +
+          ')'
       )
       context.runtime.stash.push(address)
     }
@@ -499,8 +500,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (start_addr >= HEAP_BEGIN) {
       const [type, index] = memory.mem_read(index_addr)
       context.runtime.stash.push(index * memory.stack.word_size + start_addr)
-    }
-    else {
+    } else {
       const [type, index] = memory.mem_read(index_addr)
       const [typeVal, val] = memory.mem_read(index * memory.stack.word_size + array_addr)
       context.runtime.stash.push(val)
@@ -665,11 +665,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
         memory.mem_write_to_address(var_addr, valueType, actualAddr) //don't write new val here, but write addr
         console.log(
           'setting address' +
-          actualAddr +
-          ' to pointer ' +
-          identifier!.name +
-          ' at addr ' +
-          var_addr
+            actualAddr +
+            ' to pointer ' +
+            identifier!.name +
+            ' at addr ' +
+            var_addr
         )
         setValueToIdentifier(command, context, identifier!.name, var_addr)
       } else {

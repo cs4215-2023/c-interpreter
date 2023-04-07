@@ -1,4 +1,13 @@
-import { FLOAT_TYPE, INT_TYPE, VOID_TYPE } from '../constants'
+import {
+  CHAR_POINTER_TYPE,
+  FLOAT_POINTER_TYPE,
+  FLOAT_TYPE,
+  INT_POINTER_TYPE,
+  INT_TYPE,
+  VOID_POINTER_TYPE,
+  VOID_TYPE,
+  validPointerTypes
+} from '../constants'
 import { InvalidNumberOfArguments, InvalidTypeError } from '../errors/errors'
 import { arity, builtin_functions } from '../interpreter/defaults'
 import { handleRuntimeError, InterpreterError } from '../interpreter/errors'
@@ -126,7 +135,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     const closure = getVariableType(context, (node.callee as Identifier).name)
     console.log(closure)
     if (closure.type == 'Builtin') {
-      return closure.name
+      return closure.returnType
     }
 
     const args = []
@@ -260,7 +269,7 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
     const left = typeCheck(node.left, context)
     const right = typeCheck(node.right, context)
-    if (right === 'malloc') {
+    if (right == VOID_POINTER_TYPE && validPointerTypes.has(left)) {
       return
     }
     if (left != right) {
