@@ -260,6 +260,9 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
     const left = typeCheck(node.left, context)
     const right = typeCheck(node.right, context)
+    if (right === 'malloc') {
+      return
+    }
     if (left != right) {
       throw handleRuntimeError(context, new TypeError(node, left, right))
     }

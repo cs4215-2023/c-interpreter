@@ -7,18 +7,18 @@ const heap_start = 100
 describe('stack tests', () => {
   it('set to memory and read', () => {
     const heap_size = 20
-    const heap = new Heap(word_size, heap_size, heap_start)
+    const heap = new Heap(word_size, heap_size)
     heap.init()
-    heap.set_tag_and_value(0, TAGS.int_tag, 1)
-    const [type, val] = heap.get_tag_and_value(0)
+    heap.set_tag_and_value(heap_start, TAGS.int_tag, 1)
+    const [type, val] = heap.get_tag_and_value(heap_start)
     expect(type).toBe(TAGS.int_tag)
     expect(val).toBe(1)
   })
 
   it('set many to memory and read one', () => {
     const heap_size = 20
-    const heap = new Heap(word_size, heap_size, heap_start)
-    let address = 0
+    const heap = new Heap(word_size, heap_size)
+    let address = heap_start
     heap.init()
     for (let i = 0; i < 15; i++) {
       heap.set_tag_and_value(address, TAGS.int_tag, 1)
@@ -31,7 +31,7 @@ describe('stack tests', () => {
 
   it('allocate one and write to one', () => {
     const heap_size = 20
-    const heap = new Heap(word_size, heap_size, heap_start)
+    const heap = new Heap(word_size, heap_size)
     heap.init()
     const address = heap.allocate_one()
     heap.set_tag_and_value(address, TAGS.int_tag, 1)
@@ -41,7 +41,7 @@ describe('stack tests', () => {
   })
   it('allocate one and free one', () => {
     const heap_size = 20
-    const heap = new Heap(word_size, heap_size, heap_start)
+    const heap = new Heap(word_size, heap_size)
     heap.init()
     expect(heap.get_free_heap()).toBe(20)
     const address = heap.allocate_one()
@@ -52,7 +52,7 @@ describe('stack tests', () => {
   })
   it('allocate many and free all', () => {
     const heap_size = 20
-    const heap = new Heap(word_size, heap_size, heap_start)
+    const heap = new Heap(word_size, heap_size)
     const addresses = []
     heap.init()
     for (let i = 0; i < heap_size; i++) {
@@ -68,7 +68,7 @@ describe('stack tests', () => {
   })
   it('allocate many and free all in reverse', () => {
     const heap_size = 20
-    const heap = new Heap(word_size, heap_size, heap_start)
+    const heap = new Heap(word_size, heap_size)
     const addresses = []
     heap.init()
     for (let i = 0; i < heap_size; i++) {

@@ -1,5 +1,6 @@
 /* tslint:disable:max-classes-per-file */
 
+import { start } from 'repl'
 import { InvalidTypeError } from '../errors/errors'
 import MemoryModel from '../memory/memoryModel'
 import { TAG_TO_TYPE, TAGS, TYPE_TO_TAG } from '../memory/tags'
@@ -54,14 +55,14 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       const address = memory.mem_stack_push(TYPE_TO_TAG[node.valueType], node.value)
       console.log(
         'storing literal ' +
-          node.value +
-          ' with address ' +
-          address +
-          ' as ' +
-          node.valueType +
-          '(' +
-          TYPE_TO_TAG[node.valueType] +
-          ')'
+        node.value +
+        ' with address ' +
+        address +
+        ' as ' +
+        node.valueType +
+        '(' +
+        TYPE_TO_TAG[node.valueType] +
+        ')'
       )
       context.runtime.stash.push(address)
     }
@@ -494,9 +495,16 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
     const index_addr = context.runtime.stash.pop()
     const array_addr = context.runtime.stash.pop()
-    const [type, index] = memory.mem_read(index_addr)
-    const [typeVal, val] = memory.mem_read(index * memory.stack.word_size + array_addr)
-    context.runtime.stash.push(val)
+    const [_, start_addr] = memory.mem_read(array_addr)
+    if (start_addr >= HEAP_BEGIN) {
+      const [type, index] = memory.mem_read(index_addr)
+      context.runtime.stash.push(index * memory.stack.word_size + start_addr)
+    }
+    else {
+      const [type, index] = memory.mem_read(index_addr)
+      const [typeVal, val] = memory.mem_read(index * memory.stack.word_size + array_addr)
+      context.runtime.stash.push(val)
+    }
   },
 
   BinaryExpression_i: function (command: Command, context: Context) {
@@ -657,11 +665,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
         memory.mem_write_to_address(var_addr, valueType, actualAddr) //don't write new val here, but write addr
         console.log(
           'setting address' +
-            actualAddr +
-            ' to pointer ' +
-            identifier!.name +
-            ' at addr ' +
-            var_addr
+          actualAddr +
+          ' to pointer ' +
+          identifier!.name +
+          ' at addr ' +
+          var_addr
         )
         setValueToIdentifier(command, context, identifier!.name, var_addr)
       } else {
@@ -754,15 +762,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const args = []
     for (let i = arity - 1; i >= 0; i--) args[i] = memory.mem_read(stash.pop())
     const lambda = stash.pop()
-    console.log(lambda)
-    console.log(lambda.type === 'Builtin')
     checkNumberOfArguments(context, command, lambda)
 
     const agendaTop = agenda.peek() as Command
 
     if (lambda.type == 'Builtin') {
       const result = apply_builtin(lambda.name, args, memory)
-      console.log(result)
+      console.log('result is ' + result)
       if (lambda.name === 'malloc') {
         agenda.push({ type: 'Literal', value: result, valueType: 'int' })
       }
