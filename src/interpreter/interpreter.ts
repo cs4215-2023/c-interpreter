@@ -628,6 +628,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       identifier = stash.pop()
     }
     let addr = stash.peek()
+
     if (identifier!.type === 'ArrayIdentifier') {
       const index_addr = stash.pop()
       addr = stash.peek()
@@ -636,13 +637,16 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       const [valueType, newVal] = memory.mem_read(addr)
       const [type, write_addr] = memory.mem_read(var_addr)
       const [itype, index] = memory.mem_read(index_addr)
+      memory.mem_stack_deallocate_n(2)
       memory.mem_write_to_address(write_addr + index * memory.stack.word_size, valueType, newVal)
+
     } else if (addr.type != 'Closure_i') {
       const [valueType, newVal] = memory.mem_read(addr)
       const var_addr = getVariable(context, identifier!.name) //get addr
+
       if (identifier?.isPointer) {
-        const actualAddr = newVal //just to make it clear this is an address
-        memory.mem_write_to_address(var_addr, valueType, actualAddr) //don't write new val here, but write addr
+        const actualAddr = newVal
+        memory.mem_write_to_address(var_addr, valueType, actualAddr)
         setValueToIdentifier(command, context, identifier!.name, var_addr)
       } else {
         memory.mem_write_to_address(var_addr, valueType, newVal)

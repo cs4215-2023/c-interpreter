@@ -54,10 +54,10 @@ export default class MemoryModel {
   }
 
   public from_stack(address: number): boolean {
-    return (address < this.stack_addr_range[1]) && (address >= this.stack_addr_range[0])
+    return address < this.stack_addr_range[1] && address >= this.stack_addr_range[0]
   }
   public from_heap(address: number): boolean {
-    return (address < this.heap_addr_range[1]) && (address >= this.heap_addr_range[0])
+    return address < this.heap_addr_range[1] && address >= this.heap_addr_range[0]
   }
 
   //HEAP STUFF
@@ -96,6 +96,12 @@ export default class MemoryModel {
 
   public mem_stack_deallocate_one() {
     this.stack.deallocate_one()
+  }
+
+  public mem_stack_deallocate_n(n: number) {
+    for (let i = 0; i < n; i++) {
+      this.stack.deallocate_one()
+    }
   }
 
   public mem_stack_allocate_n(n: number): number {

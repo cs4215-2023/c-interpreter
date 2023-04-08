@@ -118,8 +118,7 @@ describe('Arrays and Pointer', () => {
   })
   it('Loop arrays and sum', async () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
-    const code =
-      `int main() {
+    const code = `int main() {
         int c[]={1,2,3,4}; 
         int b[]={2,3,4,5};
         int a[4];
