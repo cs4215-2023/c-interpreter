@@ -16,7 +16,6 @@ export const parserPointerExpression = <T extends Constructable>(
   const DerivedClass = class extends BaseClass {
     typeParser = new TypeParser()
     visitPointer(ctx: PointerContext): Identifier {
-      console.log('pointercontext')
       return {
         type: 'Identifier',
         name: ctx.IDENTIFIER().text,
@@ -37,7 +36,6 @@ export const parserPointerExpression = <T extends Constructable>(
     }
 
     visitPointerDerefernce(ctx: PointerDerefernceContext): UnaryExpression {
-      console.log('pointerdereferencecontext')
       const identifier = {
         type: 'Identifier',
         name: ctx.IDENTIFIER().text,
@@ -53,7 +51,6 @@ export const parserPointerExpression = <T extends Constructable>(
       return this.visit(ctx.pointerReference())
     }
     visitPointerReference(ctx: PointerReferenceContext): UnaryExpression {
-      console.log('pointerreferencecontext')
       const identifier = {
         type: 'Identifier',
         name: ctx.IDENTIFIER().text,

@@ -36,7 +36,6 @@ export default class MemoryModel {
       // maybe include a runtime error
       return this.stack.stack_set_tag_and_value(address, tag, x)
     } else if (address >= heap_addr_begin && address < heap_addr_end) {
-      console.log('heap writing to addr ' + address)
       return this.heap.set_tag_and_value(address - heap_addr_begin, tag, x)
     }
     return Error('should have added to memory at this point')

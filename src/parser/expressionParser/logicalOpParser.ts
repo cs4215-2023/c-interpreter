@@ -7,7 +7,6 @@ export const parserLogicalOpExpression = <T extends Constructable>(
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
     visitAnd(ctx: AndContext): Expression {
-      console.log('visitAnd for ' + ctx._left.text + ' and ' + ctx._right.text)
       return {
         type: 'LogicalExpression',
         operator: '&&',
@@ -18,7 +17,6 @@ export const parserLogicalOpExpression = <T extends Constructable>(
     }
 
     visitOr(ctx: OrContext): Expression {
-      console.log('visitOr for ' + ctx._left.text + ' and ' + ctx._right.text)
       return {
         type: 'LogicalExpression',
         operator: '||',
@@ -30,7 +28,6 @@ export const parserLogicalOpExpression = <T extends Constructable>(
 
     // use a binary expression here because ^ is not listed as a logical operator
     visitXor(ctx: XorContext): Expression {
-      console.log('visitXor for ' + ctx._left.text + ' and ' + ctx._right.text)
       return {
         type: 'BinaryExpression',
         operator: '^',

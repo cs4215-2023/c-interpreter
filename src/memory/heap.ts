@@ -120,7 +120,6 @@ export default class Heap extends MemoryBuffer {
 
   public get_free_heap(): number {
     let free = this.free
-    console.log(this.free)
     let count = 0
     while (free !== TAGS.END_OF_FREE) {
       free = this.get_child(free)

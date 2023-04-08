@@ -3,6 +3,16 @@ import { sourceRunner } from '../../runner'
 import { Variant } from '../../types'
 
 describe('Arithmetic', () => {
+  it('negative number ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const code = 'int main() {int a = -1; return a;}'
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(-1)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
   it('Simple addition ', async () => {
     const context = createContext(Variant.DEFAULT, undefined, undefined)
     const code = 'void main() {1+2;}'

@@ -11,7 +11,6 @@ export const parserPrimitiveExpression = <T extends Constructable>(
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
     visitNumberExpression(ctx: NumberExpressionContext): Expression {
-      console.log('literal')
       return {
         type: 'Literal',
         valueType: 'int',
@@ -20,7 +19,6 @@ export const parserPrimitiveExpression = <T extends Constructable>(
       }
     }
     visitFloatExpression(ctx: FloatExpressionContext): Expression {
-      console.log('float')
       return {
         type: 'Literal',
         valueType: 'float',
@@ -29,7 +27,6 @@ export const parserPrimitiveExpression = <T extends Constructable>(
       }
     }
     visitCharExpression(ctx: CharExpressionContext): Expression {
-      console.log('char')
       return {
         type: 'Literal',
         valueType: 'char',

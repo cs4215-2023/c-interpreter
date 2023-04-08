@@ -44,14 +44,11 @@ export default class Stack extends MemoryBuffer {
 
   public allocate_n(n: number) {
     const address = this.stack_pointer
-    console.log('before allocation: ' + this.stack_pointer)
     this.stack_pointer += n * this.word_size
-    console.log('after allocation: ' + this.stack_pointer)
     return address
   }
   public push(tag: number, x: number) {
     if ((this.stack_pointer - this.stack_addr_begin) / this.word_size >= this.stack_size) {
-      console.log('stack overflow,replacing top of stack')
       throw StackOverflowError
     }
     const address = this.stack_pointer
@@ -80,13 +77,11 @@ export default class Stack extends MemoryBuffer {
   }
 
   public push_char(x: string) {
-    console.log('pushing ' + x + ' as char, convert to ascii is ' + x.charCodeAt(0))
     //should be a char and not string
     return this.push(TAGS.char_tag, x.charCodeAt(0))
   }
 
   public push_float(x: number) {
-    console.log('pushing ' + x + ' as float')
     return this.push(TAGS.float_tag, x)
   }
 
@@ -138,12 +133,9 @@ export default class Stack extends MemoryBuffer {
   }
 
   public print() {
-    console.log('/////STACK START//////')
     for (let i = 0; i < this.stack_pointer; i += this.word_size) {
       const [type, val] = this.stack_get_tag_and_value(i)
-      console.log('type: ' + type + ' value: ' + val)
     }
-    console.log('/////STACK END//////')
   }
   //ENDPROPERTIES
 }

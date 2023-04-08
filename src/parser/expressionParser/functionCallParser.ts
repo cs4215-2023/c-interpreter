@@ -7,7 +7,6 @@ export const parserFunctionCallExpression = <T extends Constructable>(
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
     visitFunctionCall(ctx: FunctionCallContext): Expression {
-      console.log('visitFunctioncall')
       return {
         type: 'CallExpression',
         callee: tokenToIdentifierWrapper(ctx._func),
@@ -16,7 +15,6 @@ export const parserFunctionCallExpression = <T extends Constructable>(
     }
 
     visitFunctionCallParameters(ctx: FunctionCallParametersContext): Expression[] {
-      console.log('visitfunctionarguments')
       if (ctx.expressionList() == undefined) {
         return []
       }
