@@ -1,16 +1,6 @@
-import { Options } from 'acorn'
-import * as es from 'estree'
+import { SourceLocation } from './parser/types'
 
-import { Chapter, Language, Variant } from './types'
-
-export const CUT = 'cut' // cut operator for Source 4.3
-export const TRY_AGAIN = 'retry' // command for Source 4.3
-export const GLOBAL = typeof window === 'undefined' ? global : window
-export const NATIVE_STORAGE_ID = 'nativeStorage'
-export const MODULE_PARAMS_ID = 'moduleParams'
-export const MODULE_CONTEXTS_ID = 'moduleContexts'
-export const MAX_LIST_DISPLAY_LENGTH = 100
-export const UNKNOWN_LOCATION: es.SourceLocation = {
+export const UNKNOWN_LOCATION: SourceLocation = {
   start: {
     line: -1,
     column: -1
@@ -20,11 +10,44 @@ export const UNKNOWN_LOCATION: es.SourceLocation = {
     column: -1
   }
 }
-export const JSSLANG_PROPERTIES = {
-  maxExecTime: 1000,
-  factorToIncreaseBy: 10
+
+export const FLOAT_PRECISION: number = 6
+
+export const DECLARED_BUT_NOT_YET_ASSIGNED = Symbol('Used to implement hoisting')
+
+export const VOID_TYPE = 'void'
+
+export const INT_TYPE = 'int'
+
+export const FLOAT_TYPE = 'float'
+
+export const CHAR_TYPE = 'char'
+
+export const INT_POINTER_TYPE = 'int*'
+
+export const FLOAT_POINTER_TYPE = 'float*'
+
+export const VOID_POINTER_TYPE = 'void*'
+
+export const CHAR_POINTER_TYPE = 'char*'
+
+export const typeMappings = {
+  void: VOID_TYPE,
+  int: INT_TYPE,
+  float: FLOAT_TYPE,
+  char: CHAR_TYPE
 }
 
-export const sourceLanguages: Language[] = [{ chapter: Chapter.CLANG, variant: Variant.DEFAULT }]
+export const pointerTypeMappings = {
+  void: VOID_POINTER_TYPE,
+  int: INT_POINTER_TYPE,
+  float: FLOAT_POINTER_TYPE,
+  char: CHAR_POINTER_TYPE
+}
 
-export const ACORN_PARSE_OPTIONS: Options = { ecmaVersion: 2015 }
+export const validPointerTypes: Set<string> = new Set<string>([
+  VOID_POINTER_TYPE,
+  INT_POINTER_TYPE,
+  FLOAT_POINTER_TYPE,
+  CHAR_POINTER_TYPE
+])

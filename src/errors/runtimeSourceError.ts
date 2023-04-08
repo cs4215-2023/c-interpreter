@@ -1,15 +1,14 @@
-import * as es from 'estree'
-
 import { UNKNOWN_LOCATION } from '../constants'
-import { ErrorSeverity, ErrorType, SourceError } from '../types'
+import { SourceLocation } from '../parser/types'
+import { Command, ErrorSeverity, ErrorType, SourceError } from '../types'
 
 export class RuntimeSourceError implements SourceError {
   public type = ErrorType.RUNTIME
   public severity = ErrorSeverity.ERROR
-  public location: es.SourceLocation
+  public location: SourceLocation
 
-  constructor(node?: es.Node) {
-    this.location = node ? node.loc! : UNKNOWN_LOCATION
+  constructor(command?: Command) {
+    this.location = command?.loc ?? UNKNOWN_LOCATION
   }
 
   public explain() {

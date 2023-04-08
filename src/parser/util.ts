@@ -1,10 +1,9 @@
 import { Token } from 'antlr4ts/Token'
-import * as es from 'estree'
 
 import { ExpressionContext } from '../lang/ClangParser'
-import { Identifier } from './types'
+import { Identifier, SourceLocation } from './types'
 
-export function contextToLocation(ctx: ExpressionContext): es.SourceLocation {
+export function contextToLocation(ctx: ExpressionContext): SourceLocation {
   return {
     start: {
       line: ctx.start.line,
@@ -18,15 +17,10 @@ export function contextToLocation(ctx: ExpressionContext): es.SourceLocation {
 }
 
 export function tokenToIdentifierWrapper(token: Token): Identifier {
-  if (token.text) {
-    return {
-      type: 'Identifier',
-      name: token.text
-    }
-  }
   return {
     type: 'Identifier',
-    name: ''
+    name: token.text!,
+    isPointer: false
   }
 }
 

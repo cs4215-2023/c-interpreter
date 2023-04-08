@@ -1,6 +1,5 @@
 import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
-import * as es from 'estree'
 
 import { FunctionContext, FunctionDeclarationContext } from '../lang/ClangParser'
 import { ClangVisitor } from '../lang/ClangVisitor'
@@ -8,17 +7,18 @@ import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
 import { StatementParser } from './statementParser'
 import { TypeParser } from './typeParser'
+import { Statement, TypedIdentifier } from './types'
 import { tokenToIdentifierWrapper } from './util'
 
 export class FunctionParser
-  extends AbstractParseTreeVisitor<es.Statement>
-  implements ClangVisitor<es.Statement>
+  extends AbstractParseTreeVisitor<Statement>
+  implements ClangVisitor<Statement>
 {
-  protected defaultResult(): es.Statement {
+  protected defaultResult(): Statement {
     return { type: 'EmptyStatement' }
   }
 
-  bodyWrapper(ctx: FunctionContext): es.Statement[] {
+  bodyWrapper(ctx: FunctionContext): Statement[] {
     console.log('body wapper')
     const body = ctx._body
 
@@ -28,6 +28,8 @@ export class FunctionParser
 
     const statements = new StatementParser().visit(body)
 
+    console.log(statements)
+
     if (statements.type == 'BlockStatement') {
       return statements.body
     } else {
@@ -35,11 +37,14 @@ export class FunctionParser
     }
   }
 
-  paramsWrapper(ctx: FunctionContext): es.Pattern[] {
+  paramsWrapper(ctx: FunctionContext): TypedIdentifier[] {
+    if (ctx._params == undefined) {
+      return []
+    }
     console.log(ctx._params.text)
     const params = ctx._params
     const expressionParser = new ExpressionParser()
-    const patterns: es.Pattern[] = []
+    const patterns: TypedIdentifier[] = []
 
     for (let i = 0; i < params.childCount; i++) {
       const child = params.getChild(i)
@@ -48,11 +53,11 @@ export class FunctionParser
         patterns.push(expressionParser.visit(child))
       }
     }
-    console.log(patterns)
+    console.log('parameters are: ', patterns)
     return patterns
   }
 
-  visitErrorNode(node: ErrorNode): es.Statement {
+  visitErrorNode(node: ErrorNode): Statement {
     throw new FatalSyntaxError(
       {
         start: {
@@ -68,19 +73,21 @@ export class FunctionParser
     )
   }
 
-  visitFunctionDeclaration(ctx: FunctionDeclarationContext): es.Statement {
+  visitFunctionDeclaration(ctx: FunctionDeclarationContext): Statement {
     return this.visitFunctionProperties(ctx.function())
   }
 
-  visitFunctionProperties(ctx: FunctionContext): es.Statement {
+  visitFunctionProperties(ctx: FunctionContext): Statement {
     console.log('visit function declaration')
-    const type = new TypeParser().visit(ctx._funcType)
-    console.log('func type is: ', type)
+    const id = tokenToIdentifierWrapper(ctx._id)
+    const type = new TypeParser().visit(ctx._idType)
+    console.log(id, type)
     return {
       type: 'FunctionDeclaration',
-      id: tokenToIdentifierWrapper(ctx._funcName),
+      id: id,
       body: { type: 'BlockStatement', body: this.bodyWrapper(ctx) },
-      params: this.paramsWrapper(ctx)
+      params: this.paramsWrapper(ctx),
+      typeDeclaration: type
     }
   }
 }

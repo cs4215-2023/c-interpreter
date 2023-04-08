@@ -33,13 +33,7 @@ SIGNEDTYPE: 'signed' | 'unsigned';
 
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
-FORMATSPECIFIERS:
-	'"' '%d' '"'
-	| '"' '%i' '"'
-	| '"' '%c' '"'
-	| '"' '%f' '"'
-	| '"' '%s' '"'
-	| '"' '%p' '"';
+FORMATSPECIFIERS: '%d' | '%i' | '%c' | '%f' | '%s' | '%p';
 
 NUMBER: [0-9_]+;
 CHAR: '\'' ~[\])] '\'';
@@ -50,9 +44,11 @@ MINUSMINUS: '--';
 
 start: (statement)*;
 
-stringLiteral: '"' IDENTIFIER? '"';
+identifiersAndSpecifiers: IDENTIFIER | FORMATSPECIFIERS;
 
-stringLiteralList: stringLiteral (',' stringLiteral)*;
+string: StringLiteral+;
+
+stringLiteralList: string (',' string)*;
 
 identifierWithType: idType = type id = IDENTIFIER;
 
@@ -64,7 +60,13 @@ identifierWithTypeList:
 
 identifierList: IDENTIFIER (',' IDENTIFIER)*;
 
+expressionList: expression (',' expression)*;
+
 numberList: NUMBER (',' NUMBER)*;
+
+charList: CHAR (',' CHAR)*;
+
+floatList: FLOAT (',' FLOAT)*;
 
 pointerList: pointer (',' pointer)*;
 statement:
@@ -75,20 +77,20 @@ statement:
 	| functionDeclaration;
 
 expression:
-	identifierWithType														# TypedIdentifierExpression
+	identifierWithType														# VariableDeclarationExpression
 	| NUMBER																# NumberExpression
 	| CHAR																	# CharExpression
 	| FLOAT																	# FloatExpression
-	| stringLiteral															# StringLiteralExpression
+	| string																# StringExpression
 	| IDENTIFIER															# IdentifierExpression
 	| postFix																# PostFixNotationExpression
 	| arrayInitialisation													# ArrayInitialisationExpression
+	| arrayIdentifier														# ArrayIdentifierExpression
 	| '(' inner = expression ')'											# ParenthesisExpression
-	| pointer																# PointerExpression
+	| pointer																# PointerDeclarationExpression
 	| pointerDerefernce														# PointerDereferenceExpression
 	| pointerReference														# PointerReferenceExpression
 	| functionCall															# FunctionCallExpression
-	| printf																# PrintfExpression
 	| left = expression operator = MUL right = expression					# Multiplication
 	| left = expression operator = DIV right = expression					# Division
 	| left = expression operator = MOD right = expression					# ModulusDivision
@@ -112,7 +114,10 @@ expression:
 	| left = expression operator = PLUSEQUAL right = expression				# AssignAndAddOne
 	| operators = SUB argument = expression									# Negative
 	| operators = ADD argument = expression									# Positive
-	| operators = NOT argument = expression									# Not;
+	| operators = NOT argument = parenthesesExpression						# Not
+	| test = expression (
+		'?' consequent = expression ':' alternate = expression
+	)+ # ConditionalExpression;
 
 statementBlock: (statement)*;
 
@@ -120,10 +125,7 @@ parenthesesExpression: '(' inner = expression ')';
 
 postFix: argument = IDENTIFIER (PLUSPLUS | MINUSMINUS);
 
-conditionalExpression:
-	test = expression '?' consequent = expression ':' alternate = expression;
-
-returnStatement: 'return' expressionStatement;
+returnStatement: 'return' argument = expression? ';';
 
 expressionStatement: expression ';';
 
@@ -152,16 +154,22 @@ forCondition:
 arrayIdentifierWithType:
 	idType = type id = IDENTIFIER '[' size = NUMBER? ']';
 
+arrayIdentifier: id = IDENTIFIER '[' size = expression? ']';
+
 arrayContent:
-	'{' (pointerList | numberList | identifierList) '}';
+	'{' (
+		pointerList
+		| numberList
+		| identifierList
+		| floatList
+		| charList
+	) '}'
+	| string;
 
 arrayInitialisation:
-	arrayIdentifierWithType (
-		operator = '=' array = arrayContent
-		| stringLiteral
-	)?;
+	arrayIdentifierWithType (operator = '=' array = arrayContent)?;
 
-pointer: PRIMITIVETYPE '*' IDENTIFIER;
+pointer: idType = type '*' id = IDENTIFIER;
 
 pointerDerefernce: operator = MUL argument = IDENTIFIER;
 
@@ -170,21 +178,14 @@ pointerReference: operator = BITWISEAND argument = IDENTIFIER;
 functionDeclaration: function;
 
 function:
-	funcType = type (funcName = IDENTIFIER) (
-		'(' params = identifierWithTypeList ')'
+	idType = type id = IDENTIFIER (
+		'(' params = identifierWithTypeList? ')'
 	) '{' body = statementBlock '}';
 
 functionCall:
 	func = IDENTIFIER '(' args = functionCallParameters ')';
 
-functionCallParameters: (
-		stringLiteralList
-		| numberList
-		| identifierList
-	) (',' stringLiteralList | numberList | identifierList)*;
-
-printf:
-	'printf(' (stringLiteral | FORMATSPECIFIERS)* ',' identifierList ')';
+functionCallParameters: expressionList?;
 
 // primaryExpression: Identifier | Constant | StringLiteral+ | '(' inner = expression ')';
 
@@ -413,10 +414,24 @@ printf:
 
 // fragment SimpleEscapeSequence: '\\' ['"?abfnrtv\\];
 
-// StringLiteral: EncodingPrefix? '"' SCharSequence? '"';
-
-// fragment EncodingPrefix: 'u8' | 'u' | 'U' | 'L';
+// // fragment EncodingPrefix: 'u8' | 'u' | 'U' | 'L';
 
 // fragment SCharSequence: SChar+;
 
 // fragment SChar: ~["\\\r\n] | EscapeSequence | '\\\n' // Added line | '\\\r\n'; // Added line
+
+StringLiteral: '"' SCharSequence? '"';
+
+fragment CChar: ~['\\\r\n] | EscapeSequence;
+
+fragment EscapeSequence: SimpleEscapeSequence;
+
+fragment SimpleEscapeSequence: '\\' ['"?abfnrtv\\];
+
+fragment SCharSequence: SChar+;
+
+fragment SChar:
+	~["\\\r\n]
+	| EscapeSequence
+	| '\\\n' // Added line
+	| '\\\r\n';

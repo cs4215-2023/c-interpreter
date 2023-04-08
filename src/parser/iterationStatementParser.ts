@@ -1,6 +1,5 @@
 import { AbstractParseTreeVisitor } from 'antlr4ts/tree/AbstractParseTreeVisitor'
 import { ErrorNode } from 'antlr4ts/tree/ErrorNode'
-import * as es from 'estree'
 
 import {
   DoWhileLoopContext,
@@ -12,20 +11,38 @@ import { ClangVisitor } from '../lang/ClangVisitor'
 import { FatalSyntaxError } from './errors'
 import ExpressionParser from './expressionParser'
 import { StatementParser } from './statementParser'
+import { Statement } from './types'
 
 export class IterationStatementParser
-  extends AbstractParseTreeVisitor<es.Statement>
-  implements ClangVisitor<es.Statement>
+  extends AbstractParseTreeVisitor<Statement>
+  implements ClangVisitor<Statement>
 {
   private expressionParser = new ExpressionParser()
 
-  protected defaultResult(): es.Statement {
+  bodyWrapper(ctx: ForLoopContext | WhileLoopContext | DoWhileLoopContext): Statement[] {
+    console.log('body wapper')
+    const body = ctx._body
+
+    if (body == undefined) {
+      return [this.defaultResult()]
+    }
+
+    const statements = new StatementParser().visit(body)
+
+    if (statements.type == 'BlockStatement') {
+      return statements.body
+    } else {
+      return [statements]
+    }
+  }
+
+  protected defaultResult(): Statement {
     return {
       type: 'EmptyStatement'
     }
   }
 
-  visitErrorNode(node: ErrorNode): es.Statement {
+  visitErrorNode(node: ErrorNode): Statement {
     throw new FatalSyntaxError(
       {
         start: {
@@ -41,7 +58,7 @@ export class IterationStatementParser
     )
   }
 
-  visitIterationStatement(ctx: IterationStatementContext): es.Statement {
+  visitIterationStatement(ctx: IterationStatementContext): Statement {
     const forLoop = ctx.forLoop()
     const doWhileLoop = ctx.doWhileLoop()
     const whileLoop = ctx.whileLoop()
@@ -55,30 +72,30 @@ export class IterationStatementParser
     return this.defaultResult()
   }
 
-  visitForStatement(ctx: ForLoopContext): es.Statement {
+  visitForStatement(ctx: ForLoopContext): Statement {
     const forCondition = ctx._innerForCondition
     return {
       type: 'ForStatement',
       init: this.expressionParser.visit(forCondition._initialise),
       test: this.expressionParser.visit(forCondition._test),
       update: this.expressionParser.visit(forCondition._update),
-      body: new StatementParser().visit(ctx._body)
+      body: { type: 'BlockStatement', body: this.bodyWrapper(ctx) }
     }
   }
 
-  visitWhileStatement(ctx: WhileLoopContext): es.Statement {
+  visitWhileStatement(ctx: WhileLoopContext): Statement {
     return {
       type: 'WhileStatement',
       test: this.expressionParser.visit(ctx._condition),
-      body: new StatementParser().visit(ctx._body)
+      body: { type: 'BlockStatement', body: this.bodyWrapper(ctx) }
     }
   }
 
-  visitDoWhileStatement(ctx: DoWhileLoopContext): es.Statement {
+  visitDoWhileStatement(ctx: DoWhileLoopContext): Statement {
     return {
       type: 'DoWhileStatement',
       test: this.expressionParser.visit(ctx._condition),
-      body: new StatementParser().visit(ctx._body)
+      body: { type: 'BlockStatement', body: this.bodyWrapper(ctx) }
     }
   }
 }

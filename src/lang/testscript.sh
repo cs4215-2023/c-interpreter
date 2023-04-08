@@ -1,1 +1,1 @@
-antlr4-parse Clang.g4 start < tests/test.in
+antlr4-parse Clang.g4 start < tests/simpletest.in

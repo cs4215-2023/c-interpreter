@@ -2,20 +2,20 @@
 
 import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor'
 
-import { TypedIdentifierExpressionContext } from './ClangParser'
+import { VariableDeclarationExpressionContext } from './ClangParser'
 import { NumberExpressionContext } from './ClangParser'
 import { CharExpressionContext } from './ClangParser'
 import { FloatExpressionContext } from './ClangParser'
-import { StringLiteralExpressionContext } from './ClangParser'
+import { StringExpressionContext } from './ClangParser'
 import { IdentifierExpressionContext } from './ClangParser'
 import { PostFixNotationExpressionContext } from './ClangParser'
 import { ArrayInitialisationExpressionContext } from './ClangParser'
+import { ArrayIdentifierExpressionContext } from './ClangParser'
 import { ParenthesisExpressionContext } from './ClangParser'
-import { PointerExpressionContext } from './ClangParser'
+import { PointerDeclarationExpressionContext } from './ClangParser'
 import { PointerDereferenceExpressionContext } from './ClangParser'
 import { PointerReferenceExpressionContext } from './ClangParser'
 import { FunctionCallExpressionContext } from './ClangParser'
-import { PrintfExpressionContext } from './ClangParser'
 import { MultiplicationContext } from './ClangParser'
 import { DivisionContext } from './ClangParser'
 import { ModulusDivisionContext } from './ClangParser'
@@ -40,21 +40,25 @@ import { AssignAndAddOneContext } from './ClangParser'
 import { NegativeContext } from './ClangParser'
 import { PositiveContext } from './ClangParser'
 import { NotContext } from './ClangParser'
+import { ConditionalExpressionContext } from './ClangParser'
 import { StartContext } from './ClangParser'
-import { StringLiteralContext } from './ClangParser'
+import { IdentifiersAndSpecifiersContext } from './ClangParser'
+import { StringContext } from './ClangParser'
 import { StringLiteralListContext } from './ClangParser'
 import { IdentifierWithTypeContext } from './ClangParser'
 import { TypeContext } from './ClangParser'
 import { IdentifierWithTypeListContext } from './ClangParser'
 import { IdentifierListContext } from './ClangParser'
+import { ExpressionListContext } from './ClangParser'
 import { NumberListContext } from './ClangParser'
+import { CharListContext } from './ClangParser'
+import { FloatListContext } from './ClangParser'
 import { PointerListContext } from './ClangParser'
 import { StatementContext } from './ClangParser'
 import { ExpressionContext } from './ClangParser'
 import { StatementBlockContext } from './ClangParser'
 import { ParenthesesExpressionContext } from './ClangParser'
 import { PostFixContext } from './ClangParser'
-import { ConditionalExpressionContext } from './ClangParser'
 import { ReturnStatementContext } from './ClangParser'
 import { ExpressionStatementContext } from './ClangParser'
 import { ConditionalStatementContext } from './ClangParser'
@@ -64,6 +68,7 @@ import { DoWhileLoopContext } from './ClangParser'
 import { ForLoopContext } from './ClangParser'
 import { ForConditionContext } from './ClangParser'
 import { ArrayIdentifierWithTypeContext } from './ClangParser'
+import { ArrayIdentifierContext } from './ClangParser'
 import { ArrayContentContext } from './ClangParser'
 import { ArrayInitialisationContext } from './ClangParser'
 import { PointerContext } from './ClangParser'
@@ -73,7 +78,6 @@ import { FunctionDeclarationContext } from './ClangParser'
 import { FunctionContext } from './ClangParser'
 import { FunctionCallContext } from './ClangParser'
 import { FunctionCallParametersContext } from './ClangParser'
-import { PrintfContext } from './ClangParser'
 
 /**
  * This interface defines a complete generic visitor for a parse tree produced
@@ -84,12 +88,12 @@ import { PrintfContext } from './ClangParser'
  */
 export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
   /**
-   * Visit a parse tree produced by the `TypedIdentifierExpression`
+   * Visit a parse tree produced by the `VariableDeclarationExpression`
    * labeled alternative in `ClangParser.expression`.
    * @param ctx the parse tree
    * @return the visitor result
    */
-  visitTypedIdentifierExpression?: (ctx: TypedIdentifierExpressionContext) => Result
+  visitVariableDeclarationExpression?: (ctx: VariableDeclarationExpressionContext) => Result
 
   /**
    * Visit a parse tree produced by the `NumberExpression`
@@ -116,12 +120,12 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
   visitFloatExpression?: (ctx: FloatExpressionContext) => Result
 
   /**
-   * Visit a parse tree produced by the `StringLiteralExpression`
+   * Visit a parse tree produced by the `StringExpression`
    * labeled alternative in `ClangParser.expression`.
    * @param ctx the parse tree
    * @return the visitor result
    */
-  visitStringLiteralExpression?: (ctx: StringLiteralExpressionContext) => Result
+  visitStringExpression?: (ctx: StringExpressionContext) => Result
 
   /**
    * Visit a parse tree produced by the `IdentifierExpression`
@@ -148,6 +152,14 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
   visitArrayInitialisationExpression?: (ctx: ArrayInitialisationExpressionContext) => Result
 
   /**
+   * Visit a parse tree produced by the `ArrayIdentifierExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitArrayIdentifierExpression?: (ctx: ArrayIdentifierExpressionContext) => Result
+
+  /**
    * Visit a parse tree produced by the `ParenthesisExpression`
    * labeled alternative in `ClangParser.expression`.
    * @param ctx the parse tree
@@ -156,12 +168,12 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
   visitParenthesisExpression?: (ctx: ParenthesisExpressionContext) => Result
 
   /**
-   * Visit a parse tree produced by the `PointerExpression`
+   * Visit a parse tree produced by the `PointerDeclarationExpression`
    * labeled alternative in `ClangParser.expression`.
    * @param ctx the parse tree
    * @return the visitor result
    */
-  visitPointerExpression?: (ctx: PointerExpressionContext) => Result
+  visitPointerDeclarationExpression?: (ctx: PointerDeclarationExpressionContext) => Result
 
   /**
    * Visit a parse tree produced by the `PointerDereferenceExpression`
@@ -186,14 +198,6 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
    * @return the visitor result
    */
   visitFunctionCallExpression?: (ctx: FunctionCallExpressionContext) => Result
-
-  /**
-   * Visit a parse tree produced by the `PrintfExpression`
-   * labeled alternative in `ClangParser.expression`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitPrintfExpression?: (ctx: PrintfExpressionContext) => Result
 
   /**
    * Visit a parse tree produced by the `Multiplication`
@@ -388,6 +392,14 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
   visitNot?: (ctx: NotContext) => Result
 
   /**
+   * Visit a parse tree produced by the `ConditionalExpression`
+   * labeled alternative in `ClangParser.expression`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitConditionalExpression?: (ctx: ConditionalExpressionContext) => Result
+
+  /**
    * Visit a parse tree produced by `ClangParser.start`.
    * @param ctx the parse tree
    * @return the visitor result
@@ -395,11 +407,18 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
   visitStart?: (ctx: StartContext) => Result
 
   /**
-   * Visit a parse tree produced by `ClangParser.stringLiteral`.
+   * Visit a parse tree produced by `ClangParser.identifiersAndSpecifiers`.
    * @param ctx the parse tree
    * @return the visitor result
    */
-  visitStringLiteral?: (ctx: StringLiteralContext) => Result
+  visitIdentifiersAndSpecifiers?: (ctx: IdentifiersAndSpecifiersContext) => Result
+
+  /**
+   * Visit a parse tree produced by `ClangParser.string`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitString?: (ctx: StringContext) => Result
 
   /**
    * Visit a parse tree produced by `ClangParser.stringLiteralList`.
@@ -437,11 +456,32 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
   visitIdentifierList?: (ctx: IdentifierListContext) => Result
 
   /**
+   * Visit a parse tree produced by `ClangParser.expressionList`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitExpressionList?: (ctx: ExpressionListContext) => Result
+
+  /**
    * Visit a parse tree produced by `ClangParser.numberList`.
    * @param ctx the parse tree
    * @return the visitor result
    */
   visitNumberList?: (ctx: NumberListContext) => Result
+
+  /**
+   * Visit a parse tree produced by `ClangParser.charList`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitCharList?: (ctx: CharListContext) => Result
+
+  /**
+   * Visit a parse tree produced by `ClangParser.floatList`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitFloatList?: (ctx: FloatListContext) => Result
 
   /**
    * Visit a parse tree produced by `ClangParser.pointerList`.
@@ -484,13 +524,6 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
    * @return the visitor result
    */
   visitPostFix?: (ctx: PostFixContext) => Result
-
-  /**
-   * Visit a parse tree produced by `ClangParser.conditionalExpression`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitConditionalExpression?: (ctx: ConditionalExpressionContext) => Result
 
   /**
    * Visit a parse tree produced by `ClangParser.returnStatement`.
@@ -556,6 +589,13 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
   visitArrayIdentifierWithType?: (ctx: ArrayIdentifierWithTypeContext) => Result
 
   /**
+   * Visit a parse tree produced by `ClangParser.arrayIdentifier`.
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  visitArrayIdentifier?: (ctx: ArrayIdentifierContext) => Result
+
+  /**
    * Visit a parse tree produced by `ClangParser.arrayContent`.
    * @param ctx the parse tree
    * @return the visitor result
@@ -617,11 +657,4 @@ export interface ClangVisitor<Result> extends ParseTreeVisitor<Result> {
    * @return the visitor result
    */
   visitFunctionCallParameters?: (ctx: FunctionCallParametersContext) => Result
-
-  /**
-   * Visit a parse tree produced by `ClangParser.printf`.
-   * @param ctx the parse tree
-   * @return the visitor result
-   */
-  visitPrintf?: (ctx: PrintfContext) => Result
 }

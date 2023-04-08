@@ -1,38 +1,42 @@
-import * as es from 'estree'
-
 import {
   IdentifierExpressionContext,
   IdentifierWithTypeContext,
-  TypedIdentifierExpressionContext
+  VariableDeclarationExpressionContext
 } from '../../lang/ClangParser'
 import { TypeParser } from '../typeParser'
+import { Expression, Identifier, TypedIdentifier } from '../types'
 import { Constructable } from '../util'
 
 export const parserIdentifierExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    visitTypedIdentifierExpression(ctx: TypedIdentifierExpressionContext): es.Expression {
+    visitVariableDeclarationExpression(ctx: VariableDeclarationExpressionContext): Expression {
       console.log('visitTypedIdentifierExpression')
-      return this.visitIdentifierWithType(ctx.identifierWithType())
-    }
-
-    // Returns an Identifier with the name in the format <name>#<type>
-    visitIdentifierWithType(ctx: IdentifierWithTypeContext): es.Expression {
-      console.log('visitIdentifierWithType')
-      const type = new TypeParser().visit(ctx._idType)
-      console.log(ctx.IDENTIFIER().text)
-      console.log('type is ' + type.valueType)
+      const idWithType = this.visitIdentifierWithType(ctx.identifierWithType())
       return {
-        type: 'Identifier',
-        name: ctx.IDENTIFIER().text + '#' + type.valueType
+        identifier: { type: 'Identifier', name: idWithType.name, isPointer: false },
+        identifierType: idWithType.typeDeclaration,
+        type: 'VariableDeclarationExpression'
       }
     }
 
-    visitIdentifier(ctx: IdentifierExpressionContext): es.Expression {
+    visitIdentifierWithType(ctx: IdentifierWithTypeContext): TypedIdentifier {
+      console.log('visitIdentifierWithType')
+      const type = new TypeParser().visit(ctx._idType)
+      return {
+        type: 'TypedIdentifier',
+        name: ctx.IDENTIFIER().text,
+        typeDeclaration: type
+      }
+    }
+
+    visitIdentifierExpression(ctx: IdentifierExpressionContext): Identifier {
+      console.log('visit identifier')
       return {
         type: 'Identifier',
-        name: ctx.IDENTIFIER().text
+        name: ctx.IDENTIFIER().text,
+        isPointer: false
       }
     }
   }

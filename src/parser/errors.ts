@@ -1,55 +1,11 @@
-import * as es from 'estree'
+import { RuntimeSourceError } from '../errors/runtimeSourceError'
+import { ErrorSeverity, ErrorType } from '../types'
+import { SourceLocation } from './types'
 
-import { ErrorSeverity, ErrorType, SourceError } from '../types'
-import { stripIndent } from '../utils/formatters'
-
-export class DisallowedConstructError implements SourceError {
+export class FatalSyntaxError implements RuntimeSourceError {
   public type = ErrorType.SYNTAX
   public severity = ErrorSeverity.ERROR
-  public nodeType: string
-
-  constructor(public node: es.Node) {
-    this.nodeType = this.formatNodeType(this.node.type)
-  }
-
-  get location() {
-    return this.node.loc!
-  }
-
-  public explain() {
-    return `${this.nodeType} are not allowed`
-  }
-
-  public elaborate() {
-    return stripIndent`
-		You are trying to use ${this.nodeType}, which is not allowed (yet).
-	  `
-  }
-
-  /**
-   * Converts estree node.type into english
-   * e.g. ThisExpression -> 'this' expressions
-   *      Property -> Properties
-   *      EmptyStatement -> Empty Statements
-   */
-  private formatNodeType(nodeType: string) {
-    switch (nodeType) {
-      case 'ThisExpression':
-        return "'this' expressions"
-      case 'Property':
-        return 'Properties'
-      default: {
-        const words = nodeType.split(/(?=[A-Z])/)
-        return words.map((word, i) => (i === 0 ? word : word.toLowerCase())).join(' ') + 's'
-      }
-    }
-  }
-}
-
-export class FatalSyntaxError implements SourceError {
-  public type = ErrorType.SYNTAX
-  public severity = ErrorSeverity.ERROR
-  public constructor(public location: es.SourceLocation, public message: string) {}
+  public constructor(public location: SourceLocation, public message: string) {}
 
   public explain() {
     return this.message
@@ -57,33 +13,5 @@ export class FatalSyntaxError implements SourceError {
 
   public elaborate() {
     return 'There is a syntax error in your program'
-  }
-}
-
-export class MissingSemicolonError implements SourceError {
-  public type = ErrorType.SYNTAX
-  public severity = ErrorSeverity.ERROR
-  public constructor(public location: es.SourceLocation) {}
-
-  public explain() {
-    return 'Missing semicolon at the end of statement'
-  }
-
-  public elaborate() {
-    return 'Every statement must be terminated by a semicolon.'
-  }
-}
-
-export class TrailingCommaError implements SourceError {
-  public type: ErrorType.SYNTAX
-  public severity: ErrorSeverity.WARNING
-  public constructor(public location: es.SourceLocation) {}
-
-  public explain() {
-    return 'Trailing comma'
-  }
-
-  public elaborate() {
-    return 'Please remove the trailing comma'
   }
 }

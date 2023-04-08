@@ -1,5 +1,3 @@
-import { BaseDeclaration, BlockStatement } from 'estree'
-
 export interface Position {
   /** >= 1 */
   line: number
@@ -15,7 +13,7 @@ export interface SourceLocation {
 
 interface BaseNode {
   type: string
-  loc?: SourceLocation
+  loc?: SourceLocation | null
 }
 
 export interface Program extends BaseNode {
@@ -24,11 +22,32 @@ export interface Program extends BaseNode {
 }
 
 interface BaseFunction extends BaseNode {
-  params: Array<Pattern>
+  params: Array<TypedIdentifier>
   body: BlockStatement
 }
 
+export type Node = Program | Statement | Expression
+
 type BaseStatement = BaseNode
+
+export type Statement =
+  | Declaration
+  | ExpressionStatement
+  | EmptyStatement
+  | ReturnStatement
+  | BlockStatement
+  | IfStatement
+  | DoWhileStatement
+  | WhileStatement
+  | ForStatement
+  | Function
+  | ConditionalExpressionStatement
+
+export interface BlockStatement extends BaseStatement {
+  type: 'BlockStatement'
+  body: Array<Statement>
+  innerComments?: Array<Comment> | undefined
+}
 
 export interface ExpressionStatement extends BaseStatement {
   type: 'ExpressionStatement'
@@ -39,11 +58,46 @@ export interface EmptyStatement extends BaseStatement {
   type: 'EmptyStatement'
 }
 
+export interface ReturnStatement extends BaseStatement {
+  type: 'ReturnStatement'
+  argument?: Expression | null | undefined
+}
+
+export interface IfStatement extends BaseStatement {
+  type: 'IfStatement'
+  test: Expression
+  alternate: Statement
+  consequent: Statement
+}
+
+export interface DoWhileStatement extends BaseStatement {
+  type: 'DoWhileStatement'
+  test: Expression
+  body: BlockStatement
+}
+
+export interface WhileStatement extends BaseStatement {
+  type: 'WhileStatement'
+  test: Expression
+  body: BlockStatement
+}
+
+export interface ForStatement extends BaseStatement {
+  type: 'ForStatement'
+  init: Expression
+  test: Expression
+  update: Expression
+  body: BlockStatement
+}
+
+export interface ConditionalExpressionStatement extends BaseStatement {
+  type: 'ConditionalExpressionStatement'
+  conditionalExpression: ConditionalExpression
+}
+
 export type Function = FunctionDeclaration
 
-export type Statement = Declaration | ExpressionStatement | EmptyStatement
-
-export type Declaration = FunctionDeclaration | VariableDeclaration
+export type Declaration = FunctionDeclaration
 
 export interface FunctionDeclaration extends BaseFunction, BaseExpression {
   type: 'FunctionDeclaration'
@@ -52,21 +106,12 @@ export interface FunctionDeclaration extends BaseFunction, BaseExpression {
   typeDeclaration: Type
 }
 
-export interface VariableDeclaration extends BaseDeclaration {
-  type: 'VariableDeclaration'
-  declarations: VariableDeclarator
-  typeDeclaration: Type
-}
-
-export interface VariableDeclarator extends BaseNode {
-  type: 'VariableDeclarator'
-  id: Pattern
-  init?: Expression | null | undefined
-}
-
 export type Expression =
-  | IdentifierWithTypeExpression
+  | VariableDeclarationExpression
+  | PointerDeclarationExpression
+  | ArrayDeclarationExpression
   | ArrayExpression
+  | ArrayIdentifier
   | Literal
   | Identifier
   | UnaryExpression
@@ -75,13 +120,41 @@ export type Expression =
   | ConditionalExpression
   | UpdateExpression
   | EmptyExpression
+  | SequenceExpression
+  | CallExpression
+  | AssignmentExpression
+  | TypedIdentifier
+  | StringLiteral
 
 export type BaseExpression = BaseNode
 
-export interface IdentifierWithTypeExpression extends BaseExpression {
-  type: 'IdentifierWithTypeExpression'
+interface BaseCallExpression extends BaseExpression {
+  callee: Expression
+  arguments: Array<Expression>
+}
+
+export interface CallExpression extends BaseCallExpression {
+  type: 'CallExpression'
+}
+
+export interface ArrayDeclarationExpression extends BaseExpression {
+  type: 'ArrayDeclarationExpression'
+  array?: ArrayExpression
+  arrayType: Type
+  size?: number
   identifier: Identifier
-  identifierType?: Type
+}
+
+export interface VariableDeclarationExpression extends BaseExpression {
+  type: 'VariableDeclarationExpression'
+  identifier: Identifier | TypedIdentifier
+  identifierType: Type
+}
+
+export interface PointerDeclarationExpression extends BaseExpression {
+  type: 'PointerDeclarationExpression'
+  pointer: Identifier
+  pointerType: Type
 }
 
 export interface ArrayExpression extends BaseExpression {
@@ -109,7 +182,7 @@ export interface BinaryExpression extends BaseExpression {
 export interface AssignmentExpression extends BaseExpression {
   type: 'AssignmentExpression'
   operator: AssignmentOperator
-  left: Pattern
+  left: Pattern | VariableDeclarationExpression | PointerDeclarationExpression
   right: Expression
 }
 
@@ -133,11 +206,45 @@ export interface ConditionalExpression extends BaseExpression {
   consequent: Expression
 }
 
-export type Pattern = Identifier
+export interface SequenceExpression extends BaseExpression {
+  type: 'SequenceExpression'
+  expressions: Array<Expression>
+}
+
+export interface StringLiteral extends BaseExpression {
+  type: 'StringLiteral'
+  string: string
+}
+
+export type Pattern = Identifier | ArrayIdentifier
 
 export interface Identifier extends BaseExpression {
   type: 'Identifier'
   name: string
+  isPointer?: boolean
+}
+
+export interface ArrayIdentifier extends BaseExpression {
+  type: 'ArrayIdentifier'
+  name: string
+  index: Expression
+  isPointer: true
+}
+
+export interface TypedIdentifier extends BaseExpression {
+  type: 'TypedIdentifier'
+  name: string
+  typeDeclaration: Type
+}
+
+// Have to be the same type as Identifier otherwise an error is thrown by acorn
+export interface PointerIdentifier extends BaseExpression {
+  type: 'Identifier'
+  name: string
+  pointingAddress: undefined | number
+  pointerAddress: undefined | number
+  isReferenced: boolean
+  isDereferenced: boolean
 }
 
 /**
@@ -166,7 +273,9 @@ export interface Float extends BaseLiteral {
 
 export interface Void extends BaseLiteral {
   valueType: 'void'
+  value: null
 }
+
 export type Literal = Integer | Float | Character | Void
 
 export type UnaryOperator = '-' | '+' | '!' | '&' | '*'
@@ -191,7 +300,7 @@ export type BinaryOperator =
 
 export type LogicalOperator = '||' | '&&'
 
-export type AssignmentOperator = '=' | '+=' | '-='
+export type AssignmentOperator = '='
 
 export type UpdateOperator = '++' | '--'
 

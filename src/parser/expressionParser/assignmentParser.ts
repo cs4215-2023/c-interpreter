@@ -1,14 +1,12 @@
-import * as es from 'estree'
-
 import { AssignmentContext } from '../../lang/ClangParser'
+import { Expression } from '../types'
 import { Constructable, contextToLocation } from '../util'
 
 export const parserAssignmentExpression = <T extends Constructable>(
   BaseClass: T
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
-    visitAssignment(ctx: AssignmentContext): es.Expression {
-      console.log('assignmentexpression')
+    visitAssignment(ctx: AssignmentContext): Expression {
       return {
         type: 'AssignmentExpression',
         operator: '=',
