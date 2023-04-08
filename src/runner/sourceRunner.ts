@@ -1,5 +1,4 @@
 import { IOptions, Result } from '..'
-import { handleRuntimeError } from '../interpreter/errors'
 import { evaluate } from '../interpreter/interpreter'
 import { parse } from '../parser/parser'
 import { Program } from '../parser/types'

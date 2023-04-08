@@ -639,7 +639,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       const [itype, index] = memory.mem_read(index_addr)
       memory.mem_stack_deallocate_n(2)
       memory.mem_write_to_address(write_addr + index * memory.stack.word_size, valueType, newVal)
-
     } else if (addr.type != 'Closure_i') {
       const [valueType, newVal] = memory.mem_read(addr)
       const var_addr = getVariable(context, identifier!.name) //get addr
