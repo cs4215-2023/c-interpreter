@@ -122,7 +122,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     } else {
       size = node.size
     }
-    const address = memory.mem_stack_allocate_n(1 + size) //allocate memory for both address and content
+    const address = memory.mem_stack_allocate_n(2 * size) //allocate memory for both address and content
     const type = node.arrayType.valueType
     declareIdentifier(context, node.identifier.name, node, address)
     //write pointers to memory
@@ -651,7 +651,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     } else {
       setValueToIdentifier(command, context, identifier!.name, addr)
     }
-    memory.stack.print()
   },
 
   EnvironmentRestoration_i: function (command: Command, context: Context) {

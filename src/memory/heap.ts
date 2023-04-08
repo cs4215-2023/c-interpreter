@@ -74,7 +74,6 @@ export default class Heap extends MemoryBuffer {
   public free_up_memory(address: number) {
     //reset memory
     const initial_free = this.free
-    this.print()
     //set free to be start of memory that is freed up
     this.free = address
 
@@ -85,7 +84,6 @@ export default class Heap extends MemoryBuffer {
       prev_addr = child_addr
       this.set_tag_and_value(child_addr, 0, 0)
       child_addr = this.get_child(child_addr)
-      this.print()
       if (child_addr === TAGS.END_OF_MALLOC) {
         break
       }

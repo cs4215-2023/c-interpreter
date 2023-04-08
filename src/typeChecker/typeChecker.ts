@@ -124,7 +124,6 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
 
     const closure = getVariableType(context, (node.callee as Identifier).name)
-    console.log(closure)
     if (closure.type == 'Builtin') {
       return closure.returnType
     }

@@ -53,6 +53,15 @@ export default class MemoryModel {
     throw Error('Memory only supports heap and stack')
   }
 
+  public from_stack(address: number): boolean {
+    return (address < this.stack_addr_range[1]) && (address >= this.stack_addr_range[0])
+  }
+  public from_heap(address: number): boolean {
+    return (address < this.heap_addr_range[1]) && (address >= this.heap_addr_range[0])
+  }
+
+  //HEAP STUFF
+
   public mem_heap_allocate_one(): number {
     return this.heap.allocate_one() + this.heap_addr_begin
   }
@@ -69,16 +78,16 @@ export default class MemoryModel {
     return tag === TAGS.int_tag
       ? this.stack.push_int(x as number)
       : tag === TAGS.float_tag
-      ? this.stack.push_float(x as number)
-      : tag === TAGS.char_tag
-      ? this.stack.push_char(x as string)
-      : tag === TAGS.int_pointer_tag ||
-        tag === TAGS.float_pointer_tag ||
-        tag === TAGS.char_pointer_tag
-      ? this.stack.push_pointer(tag, x as number)
-      : tag === TAGS.void_tag
-      ? this.stack.push(TAGS.void_tag, 0)
-      : null
+        ? this.stack.push_float(x as number)
+        : tag === TAGS.char_tag
+          ? this.stack.push_char(x as string)
+          : tag === TAGS.int_pointer_tag ||
+            tag === TAGS.float_pointer_tag ||
+            tag === TAGS.char_pointer_tag
+            ? this.stack.push_pointer(tag, x as number)
+            : tag === TAGS.void_tag
+              ? this.stack.push(TAGS.void_tag, 0)
+              : null
   }
 
   public mem_stack_allocate_one(): number {
