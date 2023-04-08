@@ -126,10 +126,13 @@ export const apply_builtin = (builtin_symbol: string, args: any[], memory: Memor
     resolvedArgs = [...parameters, stringInput]
   }
   resolvedArgs.reverse()
+<<<<<<< HEAD
   //   if (builtin_symbol === 'malloc' || builtin_symbol === 'free') {
   //     const value = resolvedArgs[0]
   //     return builtin_functions[builtin_symbol].apply(value, memory)
   //   }
+=======
+>>>>>>> 272705e (remove some console logs)
 
   return builtin_functions[builtin_symbol].apply(memory, ...resolvedArgs)
 }

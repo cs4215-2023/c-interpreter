@@ -108,6 +108,7 @@ export const parserArrayExpression = <T extends Constructable>(
       if (ctx === undefined) {
         return []
       }
+
       const tokens = ctx.CHAR()
       const numbers: Expression[] | Literal[] = []
       tokens.forEach(token => {
@@ -123,6 +124,7 @@ export const parserArrayExpression = <T extends Constructable>(
     visitStringContext(ctx: StringContext): Expression[] {
       const chars = [...ctx.StringLiteral().toString()]
       const ret: Literal[] = []
+
       chars.forEach((c, i) => {
         if (i !== 0 && i !== chars.length - 1) {
           ret.push({ type: 'Literal', value: c, valueType: 'char' })

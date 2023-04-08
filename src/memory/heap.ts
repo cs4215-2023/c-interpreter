@@ -74,6 +74,7 @@ export default class Heap extends MemoryBuffer {
   public free_up_memory(address: number) {
     //reset memory
     const initial_free = this.free
+
     //set free to be start of memory that is freed up
     this.free = address
 
@@ -84,6 +85,7 @@ export default class Heap extends MemoryBuffer {
       prev_addr = child_addr
       this.set_tag_and_value(child_addr, 0, 0)
       child_addr = this.get_child(child_addr)
+
       if (child_addr === TAGS.END_OF_MALLOC) {
         break
       }
@@ -111,13 +113,9 @@ export default class Heap extends MemoryBuffer {
     this.mem_set(address + this.word_size / 2, x)
   }
 
-  //UTILS
-  public print() {
-    console.log(this.memoryView)
-  }
-
   public get_free_heap(): number {
     let free = this.free
+
     let count = 0
     while (free !== TAGS.END_OF_FREE) {
       free = this.get_child(free)
@@ -129,14 +127,3 @@ export default class Heap extends MemoryBuffer {
     return count
   }
 }
-
-// const heap_size = 20
-// const heap = new Heap(8, heap_size)
-// heap.init()
-// heap.print()
-// console.log(heap.get_free_heap())
-// const address = heap.allocate_one(TAGS.int_tag)
-// console.log(heap.get_free_heap())
-// heap.free_up_memory(address)
-// heap.print()
-// console.log(heap.get_free_heap())

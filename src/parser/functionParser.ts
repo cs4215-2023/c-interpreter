@@ -38,6 +38,7 @@ export class FunctionParser
     if (ctx._params == undefined) {
       return []
     }
+
     const params = ctx._params
     const expressionParser = new ExpressionParser()
     const patterns: TypedIdentifier[] = []
@@ -49,6 +50,7 @@ export class FunctionParser
         patterns.push(expressionParser.visit(child))
       }
     }
+
     return patterns
   }
 
@@ -75,6 +77,7 @@ export class FunctionParser
   visitFunctionProperties(ctx: FunctionContext): Statement {
     const id = tokenToIdentifierWrapper(ctx._id)
     const type = new TypeParser().visit(ctx._idType)
+
     return {
       type: 'FunctionDeclaration',
       id: id,
