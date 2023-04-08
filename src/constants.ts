@@ -44,3 +44,10 @@ export const pointerTypeMappings = {
   float: FLOAT_POINTER_TYPE,
   char: CHAR_POINTER_TYPE
 }
+
+export const validPointerTypes: Set<string> = new Set<string>([
+  VOID_POINTER_TYPE,
+  INT_POINTER_TYPE,
+  FLOAT_POINTER_TYPE,
+  CHAR_POINTER_TYPE
+])

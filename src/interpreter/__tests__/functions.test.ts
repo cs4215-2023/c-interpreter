@@ -117,4 +117,22 @@ describe('Functions', () => {
       expect(1).toBe(2)
     }
   })
+
+  it('Function param same name as assignment ', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const code = `
+	int foo(int a) {
+		return a;
+	}
+	int main() {
+		int a = foo(2);
+		return a;
+	}`
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(2)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
 })

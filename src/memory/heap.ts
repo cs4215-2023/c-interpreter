@@ -15,12 +15,12 @@ export default class Heap extends MemoryBuffer {
   public heap_size: number
   public heap_bottom: number
   public heap_end
-  constructor(word_size: number, heap_size: number, heap_start_addr: number) {
+  constructor(word_size: number, heap_size: number) {
     super(2, 1, word_size, heap_size)
-    this.free = heap_start_addr
+    this.free = 0
     this.heap_size = heap_size * word_size
-    this.heap_end = this.heap_size + heap_start_addr
-    this.heap_bottom = heap_start_addr
+    this.heap_end = this.heap_size
+    this.heap_bottom = 0
   }
   //probably no need for most of these since we only need it for malloc
   //probably move this to heap
