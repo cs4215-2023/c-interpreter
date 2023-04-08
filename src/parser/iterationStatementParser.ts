@@ -20,7 +20,6 @@ export class IterationStatementParser
   private expressionParser = new ExpressionParser()
 
   bodyWrapper(ctx: ForLoopContext | WhileLoopContext | DoWhileLoopContext): Statement[] {
-    console.log('body wapper')
     const body = ctx._body
 
     if (body == undefined) {
