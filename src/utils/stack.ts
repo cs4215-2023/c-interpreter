@@ -24,11 +24,4 @@ export class Stack<T> {
   isEmpty(): boolean {
     return this.items.length === 0
   }
-
-  debug(): void {
-    console.log(this.items)
-    for (const item of this.items) {
-      console.log(item)
-    }
-  }
 }
