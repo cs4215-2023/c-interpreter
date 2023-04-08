@@ -36,6 +36,12 @@ export default class Stack extends MemoryBuffer {
     return address
   }
 
+  public deallocate_one() {
+    //allocate one slot of data
+    this.stack_set_tag_and_value(this.stack_pointer, 0, 0)
+    this.stack_pointer -= this.word_size
+  }
+
   public allocate_n(n: number) {
     const address = this.stack_pointer
     console.log('before allocation: ' + this.stack_pointer)
@@ -90,15 +96,15 @@ export default class Stack extends MemoryBuffer {
 
   public type_to_data = (tag: number, x: number | string) =>
     tag === TAGS.int_tag ||
-    tag === TAGS.int_pointer_tag ||
-    TAGS.char_pointer_tag ||
-    TAGS.float_pointer_tag
+      tag === TAGS.int_pointer_tag ||
+      TAGS.char_pointer_tag ||
+      TAGS.float_pointer_tag
       ? ~~x
       : tag === TAGS.char_tag
-      ? String.fromCharCode(x as number)
-      : tag === TAGS.float_tag
-      ? x
-      : Error('Tag is undefined')
+        ? String.fromCharCode(x as number)
+        : tag === TAGS.float_tag
+          ? x
+          : Error('Tag is undefined')
 
   //END DATA TYPES
 

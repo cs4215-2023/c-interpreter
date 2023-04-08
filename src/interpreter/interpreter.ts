@@ -54,17 +54,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       context.runtime.stash.push(node)
     } else {
       const address = memory.mem_stack_push(TYPE_TO_TAG[node.valueType], node.value)
-      console.log(
-        'storing literal ' +
-          node.value +
-          ' with address ' +
-          address +
-          ' as ' +
-          node.valueType +
-          '(' +
-          TYPE_TO_TAG[node.valueType] +
-          ')'
-      )
       context.runtime.stash.push(address)
     }
   },
@@ -119,7 +108,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const address = memory.mem_stack_allocate_one()
     declareIdentifier(context, identifier.name, node, address)
-    console.log('allocated address ' + address + ' to pointer ' + identifier.name)
     context.runtime.stash.push(identifier)
   },
 
@@ -134,7 +122,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     } else {
       size = node.size
     }
-    const address = memory.mem_stack_allocate_n(2 * size) //allocate memory for both address and content
+    const address = memory.mem_stack_allocate_n(1 + size) //allocate memory for both address and content
     const type = node.arrayType.valueType
     declareIdentifier(context, node.identifier.name, node, address)
     //write pointers to memory
@@ -146,8 +134,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.array === undefined) {
       context.runtime.stash.push(node.identifier)
     } else {
-      console.log('start')
-      console.log(node.array.elements.length)
       for (let i = node.array.elements.length - 1; i >= 0; i--) {
         const expression = {
           type: 'Literal',
@@ -187,7 +173,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
 
     const identifier = getVariable(context, node.name)
-    console.log('load identifier ' + node.name + ' at addr ' + identifier)
     if (typeof identifier === 'number') {
       memory.mem_read(identifier)
     }
@@ -517,8 +502,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     let [type_left, left] = memory.mem_read(left_addr)
     let [type_right, right] = memory.mem_read(right_addr)
     const operator = command.operator
-    console.log(right, operator, left)
-
     //pointer arithmetic
     if (type_left > type_right) {
       //the assumption is that one of these will be a pointer
@@ -545,8 +528,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     // Get address here.
     const [type, value] = memory.mem_read(address)
     if (operator == '&') {
-      console.log('since pointer referencing, pushing address ' + address)
-      //maybe write the address to stack, then push that address instead and read the addr from the address
       const push_addr = memory.mem_stack_push(type + 3, address as number) //pointer type is offset by 3
       stash.push(push_addr)
     } else if (operator == '*') {
@@ -647,7 +628,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       identifier = stash.pop()
     }
     let addr = stash.peek()
-    console.log('AssignmentExpression_i')
     if (identifier!.type === 'ArrayIdentifier') {
       const index_addr = stash.pop()
       addr = stash.peek()
@@ -663,20 +643,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       if (identifier?.isPointer) {
         const actualAddr = newVal //just to make it clear this is an address
         memory.mem_write_to_address(var_addr, valueType, actualAddr) //don't write new val here, but write addr
-        console.log(
-          'setting address' +
-            actualAddr +
-            ' to pointer ' +
-            identifier!.name +
-            ' at addr ' +
-            var_addr
-        )
         setValueToIdentifier(command, context, identifier!.name, var_addr)
       } else {
         memory.mem_write_to_address(var_addr, valueType, newVal)
-        console.log(
-          'setting ' + newVal + ' to identifier ' + identifier!.name + ' at addr ' + var_addr
-        )
         setValueToIdentifier(command, context, identifier!.name, var_addr)
       }
     } else {
@@ -768,7 +737,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     if (lambda.type == 'Builtin') {
       const result = apply_builtin(lambda.name, args, memory)
-      console.log('result is ' + result)
       if (lambda.name === 'malloc') {
         agenda.push({ type: 'Literal', value: result, valueType: 'int' })
       }
@@ -819,7 +787,6 @@ export function evaluate(node: Node, context: Context) {
     const stash = context.runtime.stash
     while (agenda.length()) {
       const command = agenda.pop() as Node
-      console.log(command)
       evaluators[command.type](command, context)
     }
 
