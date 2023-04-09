@@ -24,6 +24,8 @@ import {
   getVariable,
   setValueToIdentifier
 } from './utils'
+import { currentTypeEnvironment } from '../typeChecker/typeEnvironment'
+import { getVariableType } from '../typeChecker/utils'
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => Value
 
@@ -91,7 +93,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const identifier = node.identifier as Identifier
     const address = memory.mem_stack_allocate_one()
     declareIdentifier(context, identifier.name, node, address)
-
     context.runtime.stash.push(identifier)
   },
 
@@ -499,12 +500,9 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const stash = context.runtime.stash
     const left_addr = stash.pop()
     const right_addr = stash.pop()
-    console.log(left_addr, right_addr)
-    memory.stack.print()
     let [type_left, left] = memory.mem_read(left_addr)
     let [type_right, right] = memory.mem_read(right_addr)
     const operator = command.operator
-    console.log(right, operator, left)
     //pointer arithmetic
     if (type_left >= TAGS.int_pointer_tag) {
       //the assumption is that one of these will be a pointer
@@ -625,7 +623,6 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     }
     const stash = context.runtime.stash
     let identifier = command.symbol
-
     // We are assigning to a variable.
     if (command.symbol == undefined) {
       identifier = stash.pop()
@@ -639,7 +636,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       const var_addr = getVariable(context, id.name) //get addr
       const [valueType, newVal] = memory.mem_read(addr)
       const [type, write_addr] = memory.mem_read(var_addr)
-      const [itype, index] = memory.mem_read(index_addr)
+      const [_, index] = memory.mem_read(index_addr)
       memory.mem_stack_deallocate_n(2)
       memory.mem_write_to_address(write_addr + index * memory.stack.word_size, valueType, newVal)
     } else if (addr.type != 'Closure_i') {
@@ -648,11 +645,13 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
       if (identifier?.isPointer) {
         const actualAddr = newVal
+        setValueToIdentifier(command, context, identifier!.name, var_addr)
+        console.log(getVariableType(context, identifier!.name))
         memory.mem_write_to_address(var_addr, valueType, actualAddr)
-        setValueToIdentifier(command, context, identifier!.name, var_addr)
       } else {
-        memory.mem_write_to_address(var_addr, valueType, newVal)
         setValueToIdentifier(command, context, identifier!.name, var_addr)
+        console.log(currentTypeEnvironment(context))
+        memory.mem_write_to_address(var_addr, valueType, newVal)
       }
     } else {
       setValueToIdentifier(command, context, identifier!.name, addr)
@@ -792,6 +791,7 @@ export function evaluate(node: Node, context: Context) {
     const stash = context.runtime.stash
     while (agenda.length()) {
       const command = agenda.pop() as Node
+      console.log(command)
       evaluators[command.type](command, context)
     }
 

@@ -23,7 +23,13 @@ export default class Stack extends MemoryBuffer {
     const val = this.mem_get(address + this.word_size / 2)
     return ~~type !== TAGS.float_tag ? [~~type, ~~val] : [~~type, val]
   }
-
+  public stack_set_tag(address: number, tag: number) {
+    this.mem_set(address, tag)
+  }
+  public stack_get_tag(address: number): number {
+    const type = this.mem_get(address)
+    return ~~type
+  }
   public stack_set_tag_and_value(address: number, tag: number, x: number) {
     this.mem_set(address, tag)
     this.mem_set(address + this.word_size / 2, x)
@@ -78,9 +84,12 @@ export default class Stack extends MemoryBuffer {
     return this.push(TAGS.int_tag, x)
   }
 
-  public push_char(x: string) {
+  public push_char(x: string | number) {
     //should be a char and not string
-    return this.push(TAGS.char_tag, x.charCodeAt(0))
+    if (typeof x === 'string') {
+      x = x.charCodeAt(0)
+    }
+    return this.push(TAGS.char_tag, x)
   }
 
   public push_float(x: number) {
