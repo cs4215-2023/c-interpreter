@@ -1,7 +1,7 @@
 import MemoryBuffer from './memoryBuffer'
 import { TAGS } from './tags'
 
-//FOR THE HEAP: (FOR MY FUTURE SELF)
+//FOR THE HEAP:
 //ON INITIALIZATION, EACH ADDRESS IS LINKED TO THE NEXT ADDRESS IN FRONT OF IT
 //DURING USE, THE HEAP WON'T CHANGE SIZE, SO WHEN REASSIGNING STUFF LIKE VALUES
 //WE JUST NEED TO POINT TO THE NEXT ADDRESS
@@ -40,9 +40,6 @@ export default class Heap extends MemoryBuffer {
     const address = this.free
     this.free = this.get_child(this.free)
     this.set_child(address, TAGS.END_OF_MALLOC) //let heap know that this memory is at the end
-    // this.memoryView.setInt8(address, tag)
-
-    // this.memoryView.setFloat32(address + this.word_size / 2, val) //set 32bits = 4 bytes of data
     return address
   }
 

@@ -103,9 +103,10 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
 
     const identifier = node.pointer as Identifier
 
+    // Pointer assertion
     if (identifier.isPointer !== true) {
       throw InvalidTypeError
-    } //pointer assertion
+    }
 
     const address = memory.mem_stack_allocate_one()
     declareIdentifier(context, identifier.name, node, address)
@@ -116,17 +117,22 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     if (node.type != 'ArrayDeclarationExpression') {
       throw handleRuntimeError(context, new InterpreterError(node))
     }
-    //if elements are already declared
+
     let size
+
+    // Elements are already declared
     if (node.size === undefined) {
       size = node.array!.elements.length
     } else {
       size = node.size
     }
-    const address = memory.mem_stack_allocate_n(2 * size) //allocate memory for both address and content
+
+    // Allocate memory for both address and content
+    const address = memory.mem_stack_allocate_n(2 * size)
     const type = node.arrayType.valueType
     declareIdentifier(context, node.identifier.name, node, address)
-    //write pointers to memory
+
+    // Write pointers to memory
     for (let i = 0; i < size; i++) {
       const pointer_addr = i * memory.word_size + address
       const value_addr = i * memory.word_size + size * memory.word_size + address
@@ -202,7 +208,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       if (expression.type != 'EmptyExpression') {
         callArguments.push(expression)
         if (expression.type == 'StringLiteral') {
-          // less 2 aprostrophes at the end
+          // Less null byte at the end
           actualArgLength += expression.string.length - 1
         } else {
           actualArgLength += 1
@@ -503,9 +509,10 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     let [type_left, left] = memory.mem_read(left_addr)
     let [type_right, right] = memory.mem_read(right_addr)
     const operator = command.operator
-    //pointer arithmetic
+
+    // Pointer arithmetic
     if (type_left >= TAGS.int_pointer_tag) {
-      //the assumption is that one of these will be a pointer
+      // The assumption is that one of these will be a pointer
       right *= memory.stack.word_size
       type_right = type_left
     } else if (type_right >= TAGS.int_pointer_tag) {
@@ -529,7 +536,8 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     // Get address here.
     const [type, value] = memory.mem_read(address)
     if (operator == '&') {
-      const push_addr = memory.mem_stack_push(type + 3, address as number) //pointer type is offset by 3
+      // Pointer type is offset by 3
+      const push_addr = memory.mem_stack_push(type + 3, address as number)
       stash.push(push_addr)
     } else if (operator == '*') {
       if (
@@ -543,7 +551,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       }
     } else {
       const result = evaluateUnaryExpression(operator, value)
-      //get new address
+      // Get new address
       const push_addr = memory.mem_stack_push(type, result as number)
       stash.push(push_addr)
     }
@@ -624,7 +632,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const stash = context.runtime.stash
     let identifier = command.symbol
 
-    // We are assigning to a variable.
+    // Variable assignment
     if (command.symbol == undefined) {
       identifier = stash.pop()
     }
@@ -634,15 +642,15 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       const index_addr = stash.pop()
       addr = stash.peek()
       const id = identifier as ArrayIdentifier
-      const var_addr = getVariable(context, id.name) //get addr of pointer
-      const [valueType, newVal] = memory.mem_read(addr) //get the value and type to be written to variable
-      const [type, write_addr] = memory.mem_read(var_addr) //get the address that the pointer is pointing to
-      const [itype, index] = memory.mem_read(index_addr) //get the index to write to
+      const var_addr = getVariable(context, id.name) // Get addr of pointer
+      const [valueType, newVal] = memory.mem_read(addr) // Get the value and type to be written to variable
+      const [type, write_addr] = memory.mem_read(var_addr) // Get the address that the pointer is pointing to
+      const [itype, index] = memory.mem_read(index_addr) // Get the index to write to
       memory.mem_stack_deallocate_n(2)
       memory.mem_write_to_address(write_addr + index * memory.stack.word_size, varType, newVal)
     } else if (addr.type != 'Closure_i') {
       const [valueType, newVal] = memory.mem_read(addr)
-      const var_addr = getVariable(context, identifier!.name) //get addr
+      const var_addr = getVariable(context, identifier!.name) // Get addr
 
       if (identifier?.isPointer) {
         const actualAddr = newVal
@@ -784,7 +792,7 @@ export function evaluate(node: Node, context: Context) {
   try {
     typeCheck(node, context)
     memory = new MemoryModel(STACK_SIZE, STACK_BEGIN, HEAP_SIZE, HEAP_BEGIN)
-    // compile the program to instructions
+    // Compile the program to instructions
     evaluators[node.type](node, context)
     const agenda = context.runtime.agenda
     const stash = context.runtime.stash
@@ -792,8 +800,6 @@ export function evaluate(node: Node, context: Context) {
       const command = agenda.pop() as Node
       evaluators[command.type](command, context)
     }
-
-    // By right C programs don't return anything, this should be undefined.
 
     if (isNumber(stash.peek())) {
       const [type, value] = memory.mem_read(stash.peek())

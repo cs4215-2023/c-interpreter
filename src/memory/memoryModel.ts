@@ -33,7 +33,7 @@ export default class MemoryModel {
     const heap_addr_end = this.heap_addr_range[1]
 
     if (address < heap_addr_begin) {
-      // maybe include a runtime error
+      // TODO: include a runtime error
       return this.stack.stack_set_tag_and_value(address, tag, x)
     } else if (address >= heap_addr_begin && address < heap_addr_end) {
       return this.heap.set_tag_and_value(address - heap_addr_begin, tag, x)
@@ -60,7 +60,7 @@ export default class MemoryModel {
     return address < this.heap_addr_range[1] && address >= this.heap_addr_range[0]
   }
 
-  //HEAP STUFF
+  //HEAP METHODS
 
   public mem_heap_allocate_one(): number {
     return this.heap.allocate_one() + this.heap_addr_begin
@@ -73,7 +73,7 @@ export default class MemoryModel {
     this.heap.free_up_memory(address - this.heap_addr_begin)
   }
 
-  //STACK STUFF
+  //STACK METHODS
   public mem_stack_push(tag: number, x: number | string | null) {
     return tag === TAGS.int_tag
       ? this.stack.push_int(x as number)

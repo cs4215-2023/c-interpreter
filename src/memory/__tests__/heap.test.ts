@@ -48,7 +48,6 @@ describe('stack tests', () => {
     expect(heap.get_free_heap()).toBe(19)
     heap.free_up_memory(address)
     expect(heap.get_free_heap()).toBe(20)
-    //test
   })
   it('allocate many and free all', () => {
     const heap_size = 20
@@ -63,8 +62,6 @@ describe('stack tests', () => {
       heap.free_up_memory(addr)
     })
     expect(heap.get_free_heap()).toBe(20)
-
-    //test
   })
   it('allocate many and free all in reverse', () => {
     const heap_size = 20
@@ -79,7 +76,5 @@ describe('stack tests', () => {
       heap.free_up_memory(addr)
     })
     expect(heap.get_free_heap()).toBe(20)
-
-    //test
   })
 })

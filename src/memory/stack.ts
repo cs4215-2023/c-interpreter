@@ -7,7 +7,6 @@ export default class Stack extends MemoryBuffer {
   public stack_pointer: number
   public base_pointer: number
   public stack_addr_begin: number
-  //check what is happening here
   constructor(stack_size: number, stack_addr_begin: number) {
     super(1, 1, 8, stack_size)
     this.stack_pointer = stack_addr_begin
@@ -77,9 +76,9 @@ export default class Stack extends MemoryBuffer {
     this.stack_pointer -= this.word_size //move stack pointer backwards
     return [~~type, val]
   }
-  //END BASIC FUNCTIONALITY
 
   //DATA TYPES
+
   public push_int(x: number) {
     return this.push(TAGS.int_tag, x)
   }
@@ -112,9 +111,8 @@ export default class Stack extends MemoryBuffer {
       ? x
       : Error('Tag is undefined')
 
-  //END DATA TYPES
-
   //SCOPE
+
   public enter_scope() {
     this.push(TAGS.base_pointer_tag, this.base_pointer) // save old pointer from previous stack frame
     this.base_pointer = this.stack_pointer
@@ -136,13 +134,14 @@ export default class Stack extends MemoryBuffer {
     this.exit_scope()
     return this.push(type, val)
   }
-  //END SCOPE
 
   //PROPERTIES
+
   public size() {
     return (this.stack_pointer - this.stack_addr_begin) / this.word_size
   }
 
+  // for debugging purposes
   public print() {
     console.log('/////STACK START/////')
     for (let i = 0; i < this.stack_pointer; i += this.word_size) {
@@ -151,6 +150,4 @@ export default class Stack extends MemoryBuffer {
     }
     console.log('/////STACK END/////')
   }
-
-  //ENDPROPERTIES
 }

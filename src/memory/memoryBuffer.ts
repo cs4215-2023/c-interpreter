@@ -27,6 +27,6 @@ export default class MemoryBuffer {
   public mem_set = (address: number, x: number) => this.memoryView.setFloat32(address, x)
 
   public address_to_JS_value = (x: number) => {
-    return this.mem_get(x) //this is fine for now
+    return this.mem_get(x)
   }
 }
