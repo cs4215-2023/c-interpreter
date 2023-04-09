@@ -1,4 +1,4 @@
-import { FLOAT_TYPE, INT_TYPE, VOID_POINTER_TYPE, VOID_TYPE } from '../constants'
+import { CHAR_TYPE, FLOAT_TYPE, INT_TYPE, VOID_POINTER_TYPE, VOID_TYPE } from '../constants'
 import { InvalidNumberOfArguments, InvalidTypeError } from '../errors/errors'
 import { arity, builtin_functions } from '../interpreter/defaults'
 import { handleRuntimeError, InterpreterError } from '../interpreter/errors'
@@ -197,7 +197,11 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     checkLeftRightNotVoid(node, left, right, context)
 
-    return left == FLOAT_TYPE || right == FLOAT_TYPE ? FLOAT_TYPE : INT_TYPE
+    return left == FLOAT_TYPE || right == FLOAT_TYPE
+      ? FLOAT_TYPE
+      : left == CHAR_TYPE || right == CHAR_TYPE
+      ? CHAR_TYPE
+      : INT_TYPE
   },
 
   ConditionalExpression: function (node: Node, context: Context) {
@@ -237,7 +241,11 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     checkLeftRightNotVoid(node, left, right, context)
 
-    return left == FLOAT_TYPE || right == FLOAT_TYPE ? FLOAT_TYPE : INT_TYPE
+    return left == FLOAT_TYPE || right == FLOAT_TYPE
+      ? FLOAT_TYPE
+      : left == CHAR_TYPE || right == CHAR_TYPE
+      ? CHAR_TYPE
+      : INT_TYPE
   },
 
   StringLiteral: function (node: Node, context: Context) {
