@@ -132,4 +132,15 @@ describe('Arithmetic', () => {
       expect(1).toBe(2)
     }
   })
+
+  it('Char int operations', async () => {
+    const context = createContext(Variant.DEFAULT, undefined, undefined)
+    const code = `int main() {return 'a' + 1;}`
+    const result = await sourceRunner(code, context)
+    if (result.status == 'finished') {
+      expect(result.value).toBe(98)
+    } else {
+      expect(1).toBe(2)
+    }
+  })
 })
