@@ -86,12 +86,10 @@ export class StatementParser
   }
 
   visitExpression(ctx: ExpressionStatementContext): Statement {
-    console.log('visiting expr')
     return this.wrapAsExpressionStatement(new ExpressionParser().visit(ctx))
   }
 
   visitIterative(ctx: IterationStatementContext): Statement {
-    console.log('visiting iter')
     return new IterationStatementParser().visit(ctx)
   }
 
@@ -100,8 +98,6 @@ export class StatementParser
   }
 
   visitConditionalStatement(ctx: ConditionalStatementContext): Statement {
-    console.log('if statement')
-
     let alternate = undefined
     const alternateStatementBlock = ctx._alternateStatementBlock
     const elseIfStatement = ctx._elseIfStatement
@@ -121,7 +117,6 @@ export class StatementParser
   }
 
   visitReturnStatement(ctx: ReturnStatementContext): Statement {
-    console.log('return statement')
     let argument = undefined
     if (ctx._argument != undefined) {
       argument = new ExpressionParser().visit(ctx._argument)

@@ -19,7 +19,6 @@ export class FunctionParser
   }
 
   bodyWrapper(ctx: FunctionContext): Statement[] {
-    console.log('body wapper')
     const body = ctx._body
 
     if (body == undefined) {
@@ -27,8 +26,6 @@ export class FunctionParser
     }
 
     const statements = new StatementParser().visit(body)
-
-    console.log(statements)
 
     if (statements.type == 'BlockStatement') {
       return statements.body
@@ -41,7 +38,7 @@ export class FunctionParser
     if (ctx._params == undefined) {
       return []
     }
-    console.log(ctx._params.text)
+
     const params = ctx._params
     const expressionParser = new ExpressionParser()
     const patterns: TypedIdentifier[] = []
@@ -53,7 +50,7 @@ export class FunctionParser
         patterns.push(expressionParser.visit(child))
       }
     }
-    console.log('parameters are: ', patterns)
+
     return patterns
   }
 
@@ -78,10 +75,9 @@ export class FunctionParser
   }
 
   visitFunctionProperties(ctx: FunctionContext): Statement {
-    console.log('visit function declaration')
     const id = tokenToIdentifierWrapper(ctx._id)
     const type = new TypeParser().visit(ctx._idType)
-    console.log(id, type)
+
     return {
       type: 'FunctionDeclaration',
       id: id,

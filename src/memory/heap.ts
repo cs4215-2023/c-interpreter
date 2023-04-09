@@ -1,7 +1,7 @@
 import MemoryBuffer from './memoryBuffer'
 import { TAGS } from './tags'
 
-//FOR THE HEAP: (FOR MY FUTURE SELF)
+//FOR THE HEAP:
 //ON INITIALIZATION, EACH ADDRESS IS LINKED TO THE NEXT ADDRESS IN FRONT OF IT
 //DURING USE, THE HEAP WON'T CHANGE SIZE, SO WHEN REASSIGNING STUFF LIKE VALUES
 //WE JUST NEED TO POINT TO THE NEXT ADDRESS
@@ -40,9 +40,6 @@ export default class Heap extends MemoryBuffer {
     const address = this.free
     this.free = this.get_child(this.free)
     this.set_child(address, TAGS.END_OF_MALLOC) //let heap know that this memory is at the end
-    // this.memoryView.setInt8(address, tag)
-
-    // this.memoryView.setFloat32(address + this.word_size / 2, val) //set 32bits = 4 bytes of data
     return address
   }
 
@@ -74,7 +71,7 @@ export default class Heap extends MemoryBuffer {
   public free_up_memory(address: number) {
     //reset memory
     const initial_free = this.free
-    this.print()
+
     //set free to be start of memory that is freed up
     this.free = address
 
@@ -85,7 +82,7 @@ export default class Heap extends MemoryBuffer {
       prev_addr = child_addr
       this.set_tag_and_value(child_addr, 0, 0)
       child_addr = this.get_child(child_addr)
-      this.print()
+
       if (child_addr === TAGS.END_OF_MALLOC) {
         break
       }
@@ -113,14 +110,9 @@ export default class Heap extends MemoryBuffer {
     this.mem_set(address + this.word_size / 2, x)
   }
 
-  //UTILS
-  public print() {
-    console.log(this.memoryView)
-  }
-
   public get_free_heap(): number {
     let free = this.free
-    console.log(this.free)
+
     let count = 0
     while (free !== TAGS.END_OF_FREE) {
       free = this.get_child(free)
@@ -132,14 +124,3 @@ export default class Heap extends MemoryBuffer {
     return count
   }
 }
-
-// const heap_size = 20
-// const heap = new Heap(8, heap_size)
-// heap.init()
-// heap.print()
-// console.log(heap.get_free_heap())
-// const address = heap.allocate_one(TAGS.int_tag)
-// console.log(heap.get_free_heap())
-// heap.free_up_memory(address)
-// heap.print()
-// console.log(heap.get_free_heap())

@@ -124,7 +124,6 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
 
     const closure = getVariableType(context, (node.callee as Identifier).name)
-    console.log(closure)
     if (closure.type == 'Builtin') {
       return closure.returnType
     }
@@ -179,10 +178,6 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
     }
 
     const argumentType = typeCheck(node.argument, context)
-
-    // if (node.operator == '&') {
-    //   return pointerTypeMappings[argumentType]
-    // }
 
     checkVoid(node, argumentType, context)
     return argumentType == FLOAT_TYPE ? FLOAT_TYPE : INT_TYPE
@@ -317,14 +312,14 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
 
     const returnType: [] = typeCheck(node.body, context)
 
-    // loop through since there may be multiple return values.
-
     if (returnType.length == 0 && functionClosure.returnType.valueType != VOID_TYPE) {
       throw handleRuntimeError(
         context,
         new TypeError(node, functionClosure.returnType.valueType, VOID_TYPE)
       )
     }
+
+    // loop through since there may be multiple return values.
     for (const type of returnType) {
       if (type != undefined && type != functionClosure.returnType.valueType) {
         throw handleRuntimeError(
@@ -408,7 +403,6 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
         }
       }
     }
-    popTypeEnvironment(context)
 
     return result
   },

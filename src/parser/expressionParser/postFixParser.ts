@@ -11,7 +11,6 @@ export const parserPostFixExpression = <T extends Constructable>(
     }
     visitPostFix(ctx: PostFixContext): Expression {
       const updateOp = ctx.PLUSPLUS() ? '++' : '--'
-      console.log('visitPostFix with postfix ' + updateOp)
       return {
         type: 'UpdateExpression',
         operator: updateOp,

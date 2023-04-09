@@ -28,7 +28,6 @@ export const parserArrayExpression = <T extends Constructable>(
       return this.visitArrayInitialisation(ctx.arrayInitialisation())
     }
     visitArrayInitialisation(ctx: ArrayInitialisationContext): Expression {
-      console.log('visitArrayInitialisation')
       const arrayInitialisor = this.visitArrayIdentifierWithType(
         ctx.arrayIdentifierWithType()
       ) as ArrayDeclarationExpression
@@ -39,7 +38,6 @@ export const parserArrayExpression = <T extends Constructable>(
       return arrayInitialisor
     }
     visitArrayContent(ctx: ArrayContentContext): Expression[] {
-      console.log('visit array content')
       if (ctx === undefined) {
         return []
       }
@@ -66,14 +64,12 @@ export const parserArrayExpression = <T extends Constructable>(
     }
 
     visitIdentifierList(ctx: IdentifierListContext): Expression[] {
-      console.log('visit identifierlist')
       if (ctx === undefined) {
         return []
       }
       const tokens = ctx.IDENTIFIER()
       const identifier: Expression[] | Identifier[] = []
       tokens.forEach(token => {
-        console.log(token.text)
         identifier.push({
           type: 'Identifier',
           name: token.text,
@@ -99,7 +95,6 @@ export const parserArrayExpression = <T extends Constructable>(
       const tokens = ctx.NUMBER()
       const numbers: Expression[] | Literal[] = []
       tokens.forEach(token => {
-        console.log(token.text)
         numbers.push({
           type: 'Literal',
           value: parseInt(token.text),
@@ -113,11 +108,10 @@ export const parserArrayExpression = <T extends Constructable>(
       if (ctx === undefined) {
         return []
       }
-      console.log('visitCharList')
+
       const tokens = ctx.CHAR()
       const numbers: Expression[] | Literal[] = []
       tokens.forEach(token => {
-        console.log(token.text)
         numbers.push({
           type: 'Literal',
           value: token.text[1],
@@ -130,7 +124,7 @@ export const parserArrayExpression = <T extends Constructable>(
     visitStringContext(ctx: StringContext): Expression[] {
       const chars = [...ctx.StringLiteral().toString()]
       const ret: Literal[] = []
-      console.log(chars)
+
       chars.forEach((c, i) => {
         if (i !== 0 && i !== chars.length - 1) {
           ret.push({ type: 'Literal', value: c, valueType: 'char' })
@@ -146,7 +140,6 @@ export const parserArrayExpression = <T extends Constructable>(
       const tokens = ctx.FLOAT()
       const numbers: Expression[] | Literal[] = []
       tokens.forEach(token => {
-        console.log(token.text)
         numbers.push({
           type: 'Literal',
           value: parseFloat(token.text),
@@ -163,7 +156,6 @@ export const parserArrayExpression = <T extends Constructable>(
      */
 
     visitArrayIdentifierWithType(ctx: ArrayIdentifierWithTypeContext): Expression {
-      console.log('visitarrayidentifierwithtypecontext')
       const identifier = tokenToIdentifierWrapper(ctx._id)
       identifier.isPointer = true
       const type = new TypeParser().visit(ctx._idType)

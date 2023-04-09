@@ -17,7 +17,6 @@ export function checkNumberOfArguments(
   command: CallInstruction,
   lambda: Command | Builtin
 ) {
-  console.log(lambda)
   if (lambda.type == 'Closure_i') {
     if (lambda.parameters == undefined) {
       return handleRuntimeError(context, new errors.CallingNonFunctionValue(undefined, command))
@@ -30,7 +29,6 @@ export function checkNumberOfArguments(
     }
     return undefined
   } else if (lambda.type == 'Builtin') {
-    console.log(command)
     if (lambda.hasVarArgs && command.arity - lambda.arity >= 0) {
       return undefined
     } else if (command.arity != lambda.arity) {
@@ -128,11 +126,6 @@ export const apply_builtin = (builtin_symbol: string, args: any[], memory: Memor
     resolvedArgs = [...parameters, stringInput]
   }
   resolvedArgs.reverse()
-  //   console.log(resolvedArgs)
-  //   if (builtin_symbol === 'malloc' || builtin_symbol === 'free') {
-  //     const value = resolvedArgs[0]
-  //     return builtin_functions[builtin_symbol].apply(value, memory)
-  //   }
 
   return builtin_functions[builtin_symbol].apply(memory, ...resolvedArgs)
 }

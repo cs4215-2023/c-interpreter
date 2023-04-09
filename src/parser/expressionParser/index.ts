@@ -35,7 +35,6 @@ class BaseParser extends AbstractParseTreeVisitor<Expression> implements ClangVi
 
   visitChildren(node: RuleNode): Expression {
     const expressions: Expression[] = []
-    console.log('visit children')
     for (let i = 0; i < node.childCount; i++) {
       expressions.push(node.getChild(i).accept(this))
     }

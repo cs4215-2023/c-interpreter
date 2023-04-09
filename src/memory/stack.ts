@@ -7,7 +7,6 @@ export default class Stack extends MemoryBuffer {
   public stack_pointer: number
   public base_pointer: number
   public stack_addr_begin: number
-  //check what is happening here
   constructor(stack_size: number, stack_addr_begin: number) {
     super(1, 1, 8, stack_size)
     this.stack_pointer = stack_addr_begin
@@ -23,7 +22,13 @@ export default class Stack extends MemoryBuffer {
     const val = this.mem_get(address + this.word_size / 2)
     return ~~type !== TAGS.float_tag ? [~~type, ~~val] : [~~type, val]
   }
-
+  public stack_set_tag(address: number, tag: number) {
+    this.mem_set(address, tag)
+  }
+  public stack_get_tag(address: number): number {
+    const type = this.mem_get(address)
+    return ~~type
+  }
   public stack_set_tag_and_value(address: number, tag: number, x: number) {
     this.mem_set(address, tag)
     this.mem_set(address + this.word_size / 2, x)
@@ -36,16 +41,21 @@ export default class Stack extends MemoryBuffer {
     return address
   }
 
+  public deallocate_one() {
+    //allocate one slot of data
+    this.stack_set_tag_and_value(this.stack_pointer, 0, 0)
+    this.stack_pointer -= this.word_size
+  }
+
   public allocate_n(n: number) {
     const address = this.stack_pointer
-    console.log('before allocation: ' + this.stack_pointer)
+
     this.stack_pointer += n * this.word_size
-    console.log('after allocation: ' + this.stack_pointer)
+
     return address
   }
   public push(tag: number, x: number) {
     if ((this.stack_pointer - this.stack_addr_begin) / this.word_size >= this.stack_size) {
-      console.log('stack overflow,replacing top of stack')
       throw StackOverflowError
     }
     const address = this.stack_pointer
@@ -66,21 +76,22 @@ export default class Stack extends MemoryBuffer {
     this.stack_pointer -= this.word_size //move stack pointer backwards
     return [~~type, val]
   }
-  //END BASIC FUNCTIONALITY
 
   //DATA TYPES
+
   public push_int(x: number) {
     return this.push(TAGS.int_tag, x)
   }
 
-  public push_char(x: string) {
-    console.log('pushing ' + x + ' as char, convert to ascii is ' + x.charCodeAt(0))
+  public push_char(x: string | number) {
     //should be a char and not string
-    return this.push(TAGS.char_tag, x.charCodeAt(0))
+    if (typeof x === 'string') {
+      x = x.charCodeAt(0)
+    }
+    return this.push(TAGS.char_tag, x)
   }
 
   public push_float(x: number) {
-    console.log('pushing ' + x + ' as float')
     return this.push(TAGS.float_tag, x)
   }
 
@@ -100,9 +111,8 @@ export default class Stack extends MemoryBuffer {
       ? x
       : Error('Tag is undefined')
 
-  //END DATA TYPES
-
   //SCOPE
+
   public enter_scope() {
     this.push(TAGS.base_pointer_tag, this.base_pointer) // save old pointer from previous stack frame
     this.base_pointer = this.stack_pointer
@@ -124,20 +134,20 @@ export default class Stack extends MemoryBuffer {
     this.exit_scope()
     return this.push(type, val)
   }
-  //END SCOPE
 
   //PROPERTIES
+
   public size() {
     return (this.stack_pointer - this.stack_addr_begin) / this.word_size
   }
 
+  // for debugging purposes
   public print() {
-    console.log('/////STACK START//////')
+    console.log('/////STACK START/////')
     for (let i = 0; i < this.stack_pointer; i += this.word_size) {
       const [type, val] = this.stack_get_tag_and_value(i)
-      console.log('type: ' + type + ' value: ' + val)
+      console.log(type + ' ' + val)
     }
-    console.log('/////STACK END//////')
+    console.log('/////STACK END/////')
   }
-  //ENDPROPERTIES
 }

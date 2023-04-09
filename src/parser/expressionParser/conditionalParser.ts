@@ -7,7 +7,6 @@ export const parserConditionalExpression = <T extends Constructable>(
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
     visitConditionalExpression(ctx: ConditionalExpressionContext): Expression {
-      console.log('in conditional expr')
       return {
         type: 'ConditionalExpression',
         test: this.visit(ctx._test),

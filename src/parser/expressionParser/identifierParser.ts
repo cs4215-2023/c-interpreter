@@ -12,7 +12,6 @@ export const parserIdentifierExpression = <T extends Constructable>(
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
     visitVariableDeclarationExpression(ctx: VariableDeclarationExpressionContext): Expression {
-      console.log('visitTypedIdentifierExpression')
       const idWithType = this.visitIdentifierWithType(ctx.identifierWithType())
       return {
         identifier: { type: 'Identifier', name: idWithType.name, isPointer: false },
@@ -22,7 +21,6 @@ export const parserIdentifierExpression = <T extends Constructable>(
     }
 
     visitIdentifierWithType(ctx: IdentifierWithTypeContext): TypedIdentifier {
-      console.log('visitIdentifierWithType')
       const type = new TypeParser().visit(ctx._idType)
       return {
         type: 'TypedIdentifier',
@@ -32,7 +30,6 @@ export const parserIdentifierExpression = <T extends Constructable>(
     }
 
     visitIdentifierExpression(ctx: IdentifierExpressionContext): Identifier {
-      console.log('visit identifier')
       return {
         type: 'Identifier',
         name: ctx.IDENTIFIER().text,

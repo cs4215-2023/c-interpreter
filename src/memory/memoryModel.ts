@@ -33,10 +33,9 @@ export default class MemoryModel {
     const heap_addr_end = this.heap_addr_range[1]
 
     if (address < heap_addr_begin) {
-      // maybe include a runtime error
+      // TODO: include a runtime error
       return this.stack.stack_set_tag_and_value(address, tag, x)
     } else if (address >= heap_addr_begin && address < heap_addr_end) {
-      console.log('heap writing to addr ' + address)
       return this.heap.set_tag_and_value(address - heap_addr_begin, tag, x)
     }
     return Error('should have added to memory at this point')
@@ -54,6 +53,15 @@ export default class MemoryModel {
     throw Error('Memory only supports heap and stack')
   }
 
+  public from_stack(address: number): boolean {
+    return address < this.stack_addr_range[1] && address >= this.stack_addr_range[0]
+  }
+  public from_heap(address: number): boolean {
+    return address < this.heap_addr_range[1] && address >= this.heap_addr_range[0]
+  }
+
+  //HEAP METHODS
+
   public mem_heap_allocate_one(): number {
     return this.heap.allocate_one() + this.heap_addr_begin
   }
@@ -65,14 +73,14 @@ export default class MemoryModel {
     this.heap.free_up_memory(address - this.heap_addr_begin)
   }
 
-  //STACK STUFF
+  //STACK METHODS
   public mem_stack_push(tag: number, x: number | string | null) {
     return tag === TAGS.int_tag
       ? this.stack.push_int(x as number)
       : tag === TAGS.float_tag
       ? this.stack.push_float(x as number)
       : tag === TAGS.char_tag
-      ? this.stack.push_char(x as string)
+      ? this.stack.push_char(x as number | string)
       : tag === TAGS.int_pointer_tag ||
         tag === TAGS.float_pointer_tag ||
         tag === TAGS.char_pointer_tag
@@ -84,6 +92,16 @@ export default class MemoryModel {
 
   public mem_stack_allocate_one(): number {
     return this.stack.allocate_one()
+  }
+
+  public mem_stack_deallocate_one() {
+    this.stack.deallocate_one()
+  }
+
+  public mem_stack_deallocate_n(n: number) {
+    for (let i = 0; i < n; i++) {
+      this.stack.deallocate_one()
+    }
   }
 
   public mem_stack_allocate_n(n: number): number {

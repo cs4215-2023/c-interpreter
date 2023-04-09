@@ -17,7 +17,6 @@ export class TypeParser
   }
 
   visitType(ctx: TypeContext): PrimitiveType {
-    console.log('prim type')
     return {
       type: 'PrimitiveType',
       signed: undefined,
