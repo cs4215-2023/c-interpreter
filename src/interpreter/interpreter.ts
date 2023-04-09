@@ -7,7 +7,9 @@ import MemoryModel from '../memory/memoryModel'
 import { TAG_TO_TYPE, TAGS, TYPE_TO_TAG } from '../memory/tags'
 import { ArrayIdentifier, ExpressionStatement, Identifier, Literal, Node } from '../parser/types'
 import { typeCheck } from '../typeChecker/typeChecker'
+import { currentTypeEnvironment } from '../typeChecker/typeEnvironment'
 import { Builtin } from '../typeChecker/types'
+import { getVariableType } from '../typeChecker/utils'
 import { Command, Context, Result, SourceError, Value, WhileStatementInstruction } from '../types'
 import { arity, builtin_functions } from './defaults'
 import { createBlockEnvironment, popEnvironment, pushEnvironment } from './environment'
@@ -24,8 +26,6 @@ import {
   getVariable,
   setValueToIdentifier
 } from './utils'
-import { currentTypeEnvironment } from '../typeChecker/typeEnvironment'
-import { getVariableType } from '../typeChecker/utils'
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => Value
 
