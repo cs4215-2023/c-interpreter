@@ -93,15 +93,15 @@ export default class Stack extends MemoryBuffer {
 
   public type_to_data = (tag: number, x: number | string) =>
     tag === TAGS.int_tag ||
-    tag === TAGS.int_pointer_tag ||
-    TAGS.char_pointer_tag ||
-    TAGS.float_pointer_tag
+      tag === TAGS.int_pointer_tag ||
+      TAGS.char_pointer_tag ||
+      TAGS.float_pointer_tag
       ? ~~x
       : tag === TAGS.char_tag
-      ? String.fromCharCode(x as number)
-      : tag === TAGS.float_tag
-      ? x
-      : Error('Tag is undefined')
+        ? String.fromCharCode(x as number)
+        : tag === TAGS.float_tag
+          ? x
+          : Error('Tag is undefined')
 
   //END DATA TYPES
 
@@ -132,6 +132,15 @@ export default class Stack extends MemoryBuffer {
   //PROPERTIES
   public size() {
     return (this.stack_pointer - this.stack_addr_begin) / this.word_size
+  }
+
+  public print() {
+    console.log("/////STACK START/////")
+    for (let i = 0; i < this.stack_pointer; i += this.word_size) {
+      const [type, val] = this.stack_get_tag_and_value(i)
+      console.log(type + " " + val)
+    }
+    console.log("/////STACK END/////")
   }
 
   //ENDPROPERTIES

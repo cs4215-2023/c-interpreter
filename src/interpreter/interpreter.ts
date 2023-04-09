@@ -499,15 +499,18 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const stash = context.runtime.stash
     const left_addr = stash.pop()
     const right_addr = stash.pop()
+    console.log(left_addr, right_addr)
+    memory.stack.print()
     let [type_left, left] = memory.mem_read(left_addr)
     let [type_right, right] = memory.mem_read(right_addr)
     const operator = command.operator
+    console.log(right, operator, left)
     //pointer arithmetic
-    if (type_left > type_right) {
+    if (type_left >= TAGS.int_pointer_tag) {
       //the assumption is that one of these will be a pointer
       right *= memory.stack.word_size
       type_right = type_left
-    } else if (type_left < type_right) {
+    } else if (type_right >= TAGS.int_pointer_tag) {
       left *= memory.stack.word_size
       type_left = type_right
     }
