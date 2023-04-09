@@ -158,7 +158,7 @@ T-diagrams of all major language processing steps that the project utilizes
 % Description of how the system can be built using the repository (or repositories) Description of test cases and how to run them: Make sure you include at least 10 test cases that cover the main features of the system. Clear specification of the envisioned deliverable (informal or formal)
 % Description to what extent the objectives are met
 
-This section will list the various features that were implemented and certain design choices that we made. The system can be built and tested by following the instructions of the language processor repository, followed by the frontend repository accordingly. Alternatively, one can use the dedicated code editor at \url{https://cs4215-2023.github.io/CS4215-frontend/}
+This section will list the various features that were implemented and certain design choices that we made. The system can be built and tested by following the instructions of the language processor repository, followed by the frontend repository accordingly. Alternatively, one can use the dedicated code editor at \url{https://cs4215-2023.github.io/CS4215-frontend/}. Note that if there is no output on right panel, the return value should be taken as \texttt{NaN}.
 \\
 
 The main entry point of each program is a \texttt{main} function \textbf{without any arguments}. This is implicitly called by the interpreter itself. Also note that comments are currently \textbf{not supported}, but for the clarity of code examples, they will be use just like how it is implemented in C. Not that these examples are \textbf{not valid programs} in RECEC because of the comments present.  
@@ -264,9 +264,66 @@ Arrays in RECEC have 2 main requirements. Firstly, the type declarations cannot 
 	int* d[]; // invalid array; array of pointers
 \end{verbatim}
 
+\subsection{Pointers}
+
+Like C, arrays are pointers as well. Simple pointer arithmetic is supported such as \texttt{++}. However, more complex operations such as \texttt{*(c + 1)} is currently not supported. The dereferencing of pointers works similarly to the C language. \\
+
+The address that a pointer points to is taken to be an \texttt{int} type. This value will be represented in base 10 instead instead of the usual hexadecimal representation. 
+
+\begin{verbatim}
+	int a = 1;
+	int* a_pter = &a;
+	*a_pter; // value of 1
+	a_pter++;
+	*a_pter; // value of 2
+\end{verbatim}
+
+\subsection{Builtins}
+
+RECEC supports 3 primary builtin functions, namely, \texttt{printf}, \texttt{malloc} and \texttt{free}.\\
+
+\subsubsection{\texttt{printf}}
+
+\texttt{printf} prints to the console instead of the UI display. To view the result of printf, one is required to look at the console itself to see the value printed. Format specifiers supported by \texttt{printf} are \texttt{"\%c"},\texttt{"\%d"} and \texttt{"\%f"}. Type casting is done here as well, based on the format specifier provided in the input string. Note that the input \textbf{must be a string}. \\
+
+Here are some sample \texttt{printf} in RECEC:
+\begin{verbatim}
+	printf("hello world");
+	printf("hello worl%d", 3); // prints hello worl3
+	printf("%d", 1.0); // prints  1
+\end{verbatim}
+
+\subsubsection{\texttt{malloc}}
+
+TODO
+
+\subsubsection{\texttt{free}}
+
+TODO 
+
+
 \subsection{Type Checking}
 
-In RECEC, type checking is done before evaluation takes place. This means that the typechecker parses the entire program and check \textbf{every line} for its type. If there is a mismatch in types, the type checker throws a type error. Unlike C where warnings are thrown when a type mismatched is detected, RECEC will terminate the program instead. 
+In RECEC, type checking is done before evaluation takes place. This means that the typechecker parses the entire program and check \textbf{every line} for its type. If there is a mismatch in types, the type checker throws a type error. Unlike C where warnings are thrown when a type mismatched is detected, RECEC will terminate the program instead. \\
 
+The following are some implicit type casting examples that works in RECEC:
+
+\begin{verbatim}
+	2.0/ 4; // evaluates to a float type
+	int a = 4 + 'a' // evaluates to an int
+	char b = 4 + 'b' // evaluates to a char
+\end{verbatim}
+
+\subsection{Memory}
+
+TODO
+
+\subsubsection{Stack}
+
+TODO
+
+\subsubsection{Heap}
+
+TODO
 
 \end{document}
