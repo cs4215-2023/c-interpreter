@@ -8,7 +8,7 @@ export const parserUnaryOpExpression = <T extends Constructable>(
 ): typeof DerivedClass => {
   const DerivedClass = class extends BaseClass {
     visitNegative(ctx: NegativeContext): es.Expression {
-      console.log("visitNegative for "+ctx._argument.text)
+      console.log('visitNegative for ' + ctx._argument.text)
       return {
         type: 'UnaryExpression',
         operator: '-',
@@ -18,7 +18,7 @@ export const parserUnaryOpExpression = <T extends Constructable>(
     }
 
     visitPositive(ctx: PositiveContext): es.Expression {
-      console.log("visitPositive for "+ctx._argument.text)
+      console.log('visitPositive for ' + ctx._argument.text)
       return {
         type: 'UnaryExpression',
         operator: '+',
@@ -28,7 +28,7 @@ export const parserUnaryOpExpression = <T extends Constructable>(
     }
 
     visitNot(ctx: NotContext): es.Expression {
-      console.log("visitNot for "+ctx._argument.text)
+      console.log('visitNot for ' + ctx._argument.text)
       return {
         type: 'UnaryExpression',
         operator: '!',

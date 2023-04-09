@@ -32,7 +32,7 @@ export const parserBinaryExpression = <T extends Constructable>(
       }
     }
     visitAddition(ctx: AdditionContext): es.Expression {
-      console.log("visitAddition for "+ctx._left.text+" and "+ctx._right.text)
+      console.log('visitAddition for ' + ctx._left.text + ' and ' + ctx._right.text)
       return {
         type: 'BinaryExpression',
         operator: '+',
