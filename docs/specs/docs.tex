@@ -164,7 +164,16 @@ This section will list the various features that were implemented and certain de
 Comments are currently \textbf{not supported}, but for the clarity of code examples, they will be use just like how it is implemented in C. Not that these examples are \textbf{not valid programs} in RECEC because of the comments present.  
 
 \subsection{Primitive Type}
-RECEC supports the basic types present in C, primarily, \texttt{int}, \texttt{void}, \texttt{float}, \texttt{char} and their respective pointer and array types.
+\label{types}
+RECEC supports the basic types present in C, primarily, \texttt{int}, \texttt{void}, \texttt{float}, \texttt{char}. These types can be defined with their respective pointer and array types. \\
+
+An example of types in RECEC:
+
+\begin{verbatim}
+	int a;
+	float a[];
+	char* a_pter;
+\end{verbatim}
 
 \subsection{Basic Operators}
 RECEC supports various basic operators.
@@ -190,7 +199,20 @@ This is an example of how basic operators are used in RECEC:
 
 As we are not supporting \texttt{\_bool\_} type of C, logical operators and unary \texttt{!} will give an integer value of \texttt{1} if \texttt{true} and \texttt{0} otherwise. 
 
-For equality checking, \texttt{==} and \texttt{!=}, we check if the values are the same, regardless of whether they have the same address or not. 
+For equality checking, \texttt{==} and \texttt{!=}, we check if the values are the same, regardless of whether they have the same address or not.
+
+\subsection{Variable and Function Declarations}
+Each variable declaration must come with a type. The valid types are present in \ref{types} section. This flexibility, however, is not the same for function declarations. For function declarations, only the basic types are allowed. \\
+
+Here is an example of some variable and function declarations used in RECEC: 
+
+\begin{verbatim}
+	int* a;
+	int a[4] = {1,2,3,4};
+	void foo() {
+		return;
+	}
+\end{verbatim}
 
 \subsection{Conditionals}
 
@@ -207,6 +229,37 @@ There are 2 types of conditionals in C, namely \texttt{if-else} statements and c
 
 	// conditional expressions
 	a == 0 ? 2 : 3;
+\end{verbatim}
+
+\subsection{Loops}
+
+Similar to C, this sublanguage also implements the 3 main loops found in C, namely the for-loop, while loop and the do-while loop. These loops do not return any values at the end if there are no \texttt{return} statements within the body of the loop itself. Furthermore, loops do implement intermediate control functionalities such as \texttt{continue} and \texttt{break}, however, \texttt{return} statements can be used in loops. \\
+
+In the case of for loops, \textbf{all initialization, condition and update components are required}. Here are examples of each of the loop:
+
+\begin{verbatim}
+	// for loop
+	for (int i = 0; i < 10; i++) {
+		// do something
+	}
+
+	while (i--) {
+		// do something
+	}
+
+	do {
+		// something
+	} while (i--);
+\end{verbatim}
+
+\subsection{Arrays}
+Arrays in RECEC have 2 main requirements. Firstly, the type declarations cannot contain pointer or another array type declaration. Secondly, if an array is initialised, all the values should be of the same type with no variables in it. This could be better explained with a sample program here:
+
+\begin{verbatim}
+	int a[] = {1, 2}; // valid array
+	int b = 2;
+	int c[] = {1, b}; // invalid array; presence of variable in array
+	int* d[]; // invalid array; array of pointers
 \end{verbatim}
 
 
