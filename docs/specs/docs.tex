@@ -161,7 +161,7 @@ T-diagrams of all major language processing steps that the project utilizes
 This section will list the various features that were implemented and certain design choices that we made. The system can be built and tested by following the instructions of the language processor repository, followed by the frontend repository accordingly. Alternatively, one can use the dedicated code editor at \url{https://cs4215-2023.github.io/CS4215-frontend/}
 \\
 
-Comments are currently \textbf{not supported}, but for the clarity of code examples, they will be use just like how it is implemented in C. Not that these examples are \textbf{not valid programs} in RECEC because of the comments present.  
+The main entry point of each program is a \texttt{main} function \textbf{without any arguments}. This is implicitly called by the interpreter itself. Also note that comments are currently \textbf{not supported}, but for the clarity of code examples, they will be use just like how it is implemented in C. Not that these examples are \textbf{not valid programs} in RECEC because of the comments present.  
 
 \subsection{Primitive Type}
 \label{types}
@@ -202,15 +202,17 @@ As we are not supporting \texttt{\_bool\_} type of C, logical operators and unar
 For equality checking, \texttt{==} and \texttt{!=}, we check if the values are the same, regardless of whether they have the same address or not.
 
 \subsection{Variable and Function Declarations}
-Each variable declaration must come with a type. The valid types are present in \ref{types} section. This flexibility, however, is not the same for function declarations. For function declarations, only the basic types are allowed. \\
+Each variable declaration must come with a type. The valid types are present in \ref{types} section. This flexibility, however, is not the same for function declarations. \\
+
+For function declarations, only the basic types are allowed. If the return type is \texttt{char}, return values of characters will be converted to their respective ascii value. \\
 
 Here is an example of some variable and function declarations used in RECEC: 
 
 \begin{verbatim}
 	int* a;
 	int a[4] = {1,2,3,4};
-	void foo() {
-		return;
+	char foo() {
+		return 'a'; // returns 97
 	}
 \end{verbatim}
 
@@ -261,6 +263,10 @@ Arrays in RECEC have 2 main requirements. Firstly, the type declarations cannot 
 	int c[] = {1, b}; // invalid array; presence of variable in array
 	int* d[]; // invalid array; array of pointers
 \end{verbatim}
+
+\subsection{Type Checking}
+
+In RECEC, type checking is done before evaluation takes place. This means that the typechecker parses the entire program and check \textbf{every line} for its type. If there is a mismatch in types, the type checker throws a type error. Unlike C where warnings are thrown when a type mismatched is detected, RECEC will terminate the program instead. 
 
 
 \end{document}
