@@ -629,17 +629,17 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       identifier = stash.pop()
     }
     let addr = stash.peek()
-
+    const varType = TYPE_TO_TAG[getVariableType(context, identifier!.name)]
     if (identifier!.type === 'ArrayIdentifier') {
       const index_addr = stash.pop()
       addr = stash.peek()
       const id = identifier as ArrayIdentifier
-      const var_addr = getVariable(context, id.name) //get addr
-      const [valueType, newVal] = memory.mem_read(addr)
-      const [type, write_addr] = memory.mem_read(var_addr)
-      const [itype, index] = memory.mem_read(index_addr)
+      const var_addr = getVariable(context, id.name) //get addr of pointer
+      const [valueType, newVal] = memory.mem_read(addr) //get the value and type to be written to variable
+      const [type, write_addr] = memory.mem_read(var_addr) //get the address that the pointer is pointing to
+      const [itype, index] = memory.mem_read(index_addr) //get the index to write to
       memory.mem_stack_deallocate_n(2)
-      memory.mem_write_to_address(write_addr + index * memory.stack.word_size, valueType, newVal)
+      memory.mem_write_to_address(write_addr + index * memory.stack.word_size, varType, newVal)
     } else if (addr.type != 'Closure_i') {
       const [valueType, newVal] = memory.mem_read(addr)
       const var_addr = getVariable(context, identifier!.name) //get addr
@@ -649,7 +649,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
         memory.mem_write_to_address(var_addr, valueType, actualAddr)
         setValueToIdentifier(command, context, identifier!.name, var_addr)
       } else {
-        memory.mem_write_to_address(var_addr, valueType, newVal)
+        memory.mem_write_to_address(var_addr, varType, newVal)
         setValueToIdentifier(command, context, identifier!.name, var_addr)
       }
     } else {
@@ -790,7 +790,6 @@ export function evaluate(node: Node, context: Context) {
     const stash = context.runtime.stash
     while (agenda.length()) {
       const command = agenda.pop() as Node
-      console.log(command)
       evaluators[command.type](command, context)
     }
 
