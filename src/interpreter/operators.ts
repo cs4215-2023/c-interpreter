@@ -10,7 +10,7 @@ export function evaluateUnaryExpression(operator: UnaryOperator, value: number) 
   } else if (operator === '+') {
     return +value
   }
-  throw new Error('Pointer not implemented yet')
+  return undefined
 }
 
 export function evaluateLogicalExpression(operator: LogicalOperator, left: number, right: number) {
