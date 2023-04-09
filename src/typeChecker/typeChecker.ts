@@ -415,7 +415,6 @@ export const typeCheckers: { [nodeType: string]: TypeChecker<Node> } = {
         }
       }
     }
-    popTypeEnvironment(context)
 
     return result
   },
