@@ -145,7 +145,7 @@
 \section{Introduction}
 
 % Outline of the scope and objectives of the project.
-C is a programming language that has memory models present such as stack and heap. Thus, we decided to implement a realistic explicit control evaluator for C (RECEC) to align closely with the memory models present. \\
+C is a programming language that has memory models present such as stack and heap. Thus, we decided to implement a realistic explicit control evaluator for C (RECEC) to align closely with the memory models present. 
 
 The first section, Section 2, will cover the features implemented. The second main section, Section 3, will include the technical specification of our RECEC.
 
@@ -160,13 +160,13 @@ T-diagrams of all major language processing steps that the project utilizes
 % Description to what extent the objectives are met
 
 This section will list the various features that were implemented and certain design choices that we made. The system can be built and tested by following the instructions of the language processor repository, followed by the frontend repository accordingly. Alternatively, one can use the dedicated code editor at \url{https://cs4215-2023.github.io/CS4215-frontend/}. Note that if there is no output on right panel, the return value should be taken as \texttt{NaN}.
-\\
+
 
 The main entry point of each program is a \texttt{main} function \textbf{without any arguments}. This is implicitly called by the interpreter itself. Also note that comments are currently \textbf{not supported}, but for the clarity of code examples, they will be use just like how it is implemented in C. Not that these examples are \textbf{not valid programs} in RECEC because of the comments present.  
 
 \subsection{Primitive Type}
 \label{types}
-RECEC supports the basic types present in C, primarily, \texttt{int}, \texttt{void}, \texttt{float}, \texttt{char}. These types can be defined with their respective pointer and array types. \\
+RECEC supports the basic types present in C, primarily, \texttt{int}, \texttt{void}, \texttt{float}, \texttt{char}. These types can be defined with their respective pointer and array types. 
 
 An example of types in RECEC:
 
@@ -203,9 +203,9 @@ As we are not supporting \texttt{\_bool\_} type of C, logical operators and unar
 For equality checking, \texttt{==} and \texttt{!=}, we check if the values are the same, regardless of whether they have the same address or not.
 
 \subsection{Variable and Function Declarations}
-Each variable declaration must come with a type. The valid types are present in \ref{types} section. This flexibility, however, is not the same for function declarations. \\
+Each variable declaration must come with a type. The valid types are present in \ref{types} section. This flexibility, however, is not the same for function declarations. 
 
-For function declarations, only the basic types are allowed. If the return type is \texttt{char}, return values of characters will be converted to their respective ascii value. \\
+For function declarations, only the basic types are allowed. If the return type is \texttt{char}, return values of characters will be converted to their respective ascii value. 
 
 Here is an example of some variable and function declarations used in RECEC: 
 
@@ -236,7 +236,7 @@ There are 2 types of conditionals in C, namely \texttt{if-else} statements and c
 
 \subsection{Loops}
 
-Similar to C, this sublanguage also implements the 3 main loops found in C, namely the for-loop, while loop and the do-while loop. These loops do not return any values at the end if there are no \texttt{return} statements within the body of the loop itself. Furthermore, loops do implement intermediate control functionalities such as \texttt{continue} and \texttt{break}, however, \texttt{return} statements can be used in loops. \\
+Similar to C, this sublanguage also implements the 3 main loops found in C, namely the for-loop, while loop and the do-while loop. These loops do not return any values at the end if there are no \texttt{return} statements within the body of the loop itself. Furthermore, loops do implement intermediate control functionalities such as \texttt{continue} and \texttt{break}, however, \texttt{return} statements can be used in loops. 
 
 In the case of for loops, \textbf{all initialization, condition and update components are required}. Here are examples of each of the loop:
 
@@ -267,7 +267,7 @@ Arrays in RECEC have 2 main requirements. Firstly, the type declarations cannot 
 
 \subsection{Pointers}
 
-Like C, arrays are pointers as well. Simple pointer arithmetic is supported such as \texttt{++}. However, more complex operations such as \texttt{*(c + 1)} is currently not supported. The dereferencing of pointers works similarly to the C language. \\
+Like C, arrays are pointers as well. Simple pointer arithmetic is supported such as \texttt{++}. However, more complex operations such as \texttt{*(c + 1)} is currently not supported. The dereferencing of pointers works similarly to the C language. 
 
 The address that a pointer points to is taken to be an \texttt{int} type. This value will be represented in base 10 instead instead of the usual hexadecimal representation. 
 
@@ -281,11 +281,11 @@ The address that a pointer points to is taken to be an \texttt{int} type. This v
 
 \subsection{Builtins}
 
-RECEC supports 3 primary builtin functions, namely, \texttt{printf}, \texttt{malloc} and \texttt{free}.\\
+RECEC supports 3 primary builtin functions, namely, \texttt{printf}, \texttt{malloc} and \texttt{free}.
 
 \subsubsection{\texttt{printf}}
 
-\texttt{printf} prints to the console instead of the UI display. To view the result of printf, one is required to look at the console itself to see the value printed. Format specifiers supported by \texttt{printf} are \texttt{"\%c"},\texttt{"\%d"} and \texttt{"\%f"}. Type casting is done here as well, based on the format specifier provided in the input string. Note that the input \textbf{must be a string}. \\
+\texttt{printf} prints to the console instead of the UI display. To view the result of printf, one is required to look at the console itself to see the value printed. Format specifiers supported by \texttt{printf} are \texttt{"\%c"},\texttt{"\%d"} and \texttt{"\%f"}. Type casting is done here as well, based on the format specifier provided in the input string. Note that the input \textbf{must be a string}. 
 
 Here are some sample \texttt{printf} in RECEC:
 \begin{verbatim}
@@ -305,7 +305,7 @@ TODO
 
 \subsection{Type Checking}
 
-In RECEC, type checking is done before evaluation takes place. This means that the typechecker parses the entire program and check \textbf{every line} for its type. If there is a mismatch in types, the type checker throws a type error. Unlike C where warnings are thrown when a type mismatched is detected, RECEC will terminate the program instead. \\
+In RECEC, type checking is done before evaluation takes place. This means that the typechecker parses the entire program and check \textbf{every line} for its type. If there is a mismatch in types, the type checker throws a type error. Unlike C where warnings are thrown when a type mismatched is detected, RECEC will terminate the program instead.
 
 The following are some implicit type casting examples that works in RECEC:
 
@@ -324,149 +324,34 @@ Once again, you can find the latest tagged release of RECEC at \url{}, and follo
 
 We first begin by defining the syntax of RECEC.
 We then bring in the type system and define it using static semantics.
-This is then synergised with how our interpreter behaves, described using the framework of denotational semantics.
+This is then synergised with how our interpreter behaves, described using the framework of structural operational semantics.
+Finally, we explain how the memory management is performed in RECEC.
 
 \subsection{Syntax}
 
+We divide the syntax of RECEC into three categories, \textit{expressions} and \textit{statements}.
+
 \addtolength{\jot}{-0.5mm}
 \begin{alignat*}{9}
-&& \textit{program}    &&\quad ::= &\quad && \textit{import-directive} ... \ \textit{statement} ...
-                                                            \\[1mm]
-&& \textit{import-directive}    &&\quad ::= &\quad && \textbf{\texttt{import}}\ \textbf{\texttt{\{}}\ \textit{import-names} \ \textbf{\texttt{\}}}\ \textbf{\texttt{from}}\  \textit{string} \ \textbf{\texttt{;}}
-                                                           && \textrm{import directive} \\[1mm]
-&& \textit{import-names}   && ::= &\quad &&  \epsilon\ | \  \textit{import-name} \ 
-                                                   (\ \textbf{\texttt{,}} \ \textit{import-name}\ ) ...
-                                                            && \textrm{import name list}   \\[1mm]
-&& \textit{import-name}   && ::= &\quad &&  \textit{name}\ | \  \textit{name} \ \textbf{\texttt{as}}\ \textit{name} 
-                                                            && \textrm{import name}   \\[1mm]
-&& \textit{statement}    &&\quad ::= &\quad && \textbf{\texttt{const}}\  \textit{name} \ 
-                                           \textbf{\texttt{=}}\  \textit{expression} \ \textbf{\texttt{;}}
-                                                            \\
-&&                       && |   &\quad && \textit{let} \ \textbf{\texttt{;}}
-                                                            \\
-&&                       && |   &\quad && \textbf{\texttt{function}}\  \textit{name} \ 
-                                   \textbf{\texttt{(}}\  \textit{rest-names} \ \textbf{\texttt{)}}\ \textit{block} \quad
-                                                           \\
-&&                       && |   &\quad && \textbf{\texttt{return}}\  \textit{expression} \ \textbf{\texttt{;}}
-                                                           \\
-&&                       && |   &\quad && \textit{if-statement} \quad
-                                                           \\
-&&                       && |   &\quad && \textbf{\texttt{while}}\  
-                                   \textbf{\texttt{(}}\  \textit{expression} \ \textbf{\texttt{)}} \
-                                   \textit{block}
-                                                           && \\
-&&                       && |   &\quad && \textbf{\texttt{for}}\ \textbf{\texttt{(}} \ 
-                                          (\ \textit{\href{https://sourceacademy.org/sicpjs/4.1.2\#ex_4.8}{expression}}_1 \ | \  \textit{\href{https://sourceacademy.org/sicpjs/4.1.2\#ex_4.9}{let}}\ ) \textbf{\texttt{;}} \\
-&&                       &&     &\quad && \ \ \ \ \ \ \ \ \ \ \textit{expression}_2 \ \textbf{\texttt{;}} \\
-&&                       &&     &\quad && \ \ \ \ \ \ \ \ \ \ \textit{expression}_3 \ \textbf{\texttt{)}} \ 
-                                            \textit{block}
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/4.1.2\#ex_4.8}{for loop}}\\
-&&                       && |   &\quad && \textbf{\texttt{break}}\ \textbf{\texttt{;}}
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/4.1.2\#ex_4.7}{break statement}}\\
-&&                       && |   &\quad && \textbf{\texttt{continue}}\ \textbf{\texttt{;}}
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/4.1.2\#ex_4.7}{continue statement}}\\
-&&                       && |   &\quad &&  \textit{block} 
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.8\#p14}{block statement}}\\
-&&                       && |   &\quad &&  \textit{expression} \ \textbf{\texttt{;}}
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.1\#p3}{expression statement}} \\
-&&                       && |   &\quad &&  \textbf{\texttt{debugger}} \ \textbf{\texttt{;}}
-                                                           && \textrm{breakpoint} \\[1mm]
-&& \textit{names}   && ::= &\quad &&  \epsilon\ | \  \textit{name} \ 
-                                                   (\ \textbf{\texttt{,}} \ \textit{name}\ ) ...
-                                                            && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.4\#p4}{name list}} \\[1mm]
-&& \textit{rest-names}   && ::= &\quad &&  \epsilon\ | \  \texttt{...} \textit{name} \ |  \ \textit{name} \ 
-                                           (\texttt{,}\ \textit{name}) ...\ [\texttt{, ...}\textit{name}]
-                                                            && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.4\#p4}{name list} (\href{https://sourceacademy.org/sicpjs/3.4.2\#p17}{rest})} \\[1mm]
-&& \textit{if-statement} && ::= &\quad &&  \textbf{\texttt{if}}\
-                                   \textbf{\texttt{(}}\ \textit{expression} \ \textbf{\texttt{)}}\ 
-                                   \textit{block} \\
-&&                       &&     &      && [ \ \textbf{\texttt{else}}\
-                                          (\ \textit{block}
-                                          \ | \
-                                          \textit{\href{https://sourceacademy.org/sicpjs/1.3.3\#footnote-1}{if-statement}} \ )\ ]
-                                                            && \textrm{\href{https://sourceacademy.org/sicpjs/1.3.2\#p12}{conditional statement}} \\[1mm]
-&& \textit{block}        && ::= &      && \textbf{\texttt{\{}}\  \textit{statement} ... \ \textbf{\texttt{\}}} \quad
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.8\#p14}{block statement}} \\[1mm]
-&& \textit{let}          && ::= &\quad &&  \textbf{\texttt{let}}\  \textit{name} \ 
-                                           \textbf{\texttt{=}}\  \textit{expression} 
-                                                            && \textrm{\href{https://sourceacademy.org/sicpjs/3.1.1\#p3}{variable declaration}} \\[1mm]
-&& \textit{assignment}   && ::= &\quad &&  \textit{name} \ 
-                                           \textbf{\texttt{=}}\  \textit{expression} 
-                                                            && \textrm{\href{https://sourceacademy.org/sicpjs/3.1.1\#p4}{variable assignment}} \\
-&&                       && |   &\quad && \textit{expression} \textbf{\texttt{[}}
-                                          \textit{expression} \textbf{\texttt{]}} \ 
-                                           \textbf{\texttt{=}}\  \textit{expression} 
-                                                           && \textrm{array assignment} \\[1mm]
-&& \textit{expression}   && ::= &\quad &&  \textit{number}   && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.1\#p3}{primitive number expression}}\\
-&&                       && |   &\quad && \textbf{\texttt{true}}\ |\ \textbf{\texttt{false}}
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.6\#p1}{primitive boolean expression}}\\
-&&                       && |   &\quad &&  \textit{string}   && \textrm{\href{https://sourceacademy.org/sicpjs/2.3.1}{primitive string expression}} \\
-&&                       && |   &\quad && \textbf{\texttt{null}}
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/2.2.1\#p1}{primitive list expression}} \\
-&&                       && |   &\quad &&  \textit{name}   && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.2}{name expression}} \\
-&&                       && |   &\quad &&  \textit{expression} \  \textit{binary-operator} \ 
-                                            \textit{expression} \qquad
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.1\#p5}{binary operator combination}} \\
-&&                       && |   &\quad &&   \textit{unary-operator} \ 
-                                            \textit{expression}
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.6\#p4}{unary operator combination}}\\
-&&                       && |   &\quad &&  \textit{expression} \  \textit{binary-logical} \ 
-                                            \textit{expression} \qquad
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.6\#p5}{logical composition}}\\
-&&                       && |   &\quad &&   \textit{expression} \ 
-                                            \textbf{\texttt{(}}\ \textit{spread-expressions}\
-                                            \textbf{\texttt{)}}
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.4\#p5}{function application}} \\
-&&                       && |   &\quad &&   (\ \textit{name}\ | \
-                                               \textbf{\texttt{(}}\ \textit{rest-names}\ \textbf{\texttt{)}}\
-                                            )\    
-                                            \texttt{\textbf{=>}}\ \textit{expression}
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/1.3.2}{lambda expression (expr. body)}} \\
-&&                       && |   &\quad &&   (\ \textit{name}\ | \
-                                               \textbf{\texttt{(}}\ \textit{rest-names}\ \textbf{\texttt{)}}\
-                                            )\    
-                                            \texttt{\textbf{=>}}\ \textit{block}
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/2.2.4\#footnote-3}{lambda expression (block body)}} \\
-&&                       && |   &\quad &&   \textit{expression} \ \textbf{\texttt{?}}\ 
-                                            \textit{expression}
-                                            \ \textbf{\texttt{:}}\
-                                            \textit{expression}\
-                                                           && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.6\#p1}{conditional expression}} \\
-&&                       && |   &\quad && \textit{assignment} 
-                                                           && \textrm{assignment} \\
-&&                       && |   &\quad && \textit{expression} \textbf{\texttt{[}}
-                                          \textit{expression} \textbf{\texttt{]}}
-                                                           && \textrm{array access} \\
-&&                       && |   &\quad &&   \textbf{\texttt{[}}\ 
-                                            \textit{expressions}\
-                                            \textbf{\texttt{]}}
-                                                           && \textrm{literal array expression}\\
-&&                       && |   &\quad &&  \textbf{\texttt{(}}\  \textit{expression} \ 
-                                            \textbf{\texttt{)}} && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.1\#p6}{parenthesised expression}}\\[1mm]
-&& \textit{binary-operator}    \ 
-                        && ::= &\quad && \textbf{\texttt{+}}\ |\ \textbf{\texttt{-}}\ |\ \textbf{\texttt{*}}\ |\ \textbf{\texttt{/}}\ |\ \textbf{\texttt{\%}}\ |\ 
-                                   \textbf{\texttt{===}}\ |\ \textbf{\texttt{!==}}\ \\
-&&                       && |  &\quad &&  \texttt{\textbf{>}}\ |\ \texttt{\textbf{<}}\ |\ \texttt{\textbf{>=}}\ |\ \texttt{\textbf{<=}}
-                                          && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.1\#p4}{binary operator}}\\[1mm]
-&& \textit{unary-operator}    
-                        && ::= &\quad && \textbf{\texttt{!}}\ |\ \textbf{\texttt{-}}
-                        && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.6\#p4}{unary operator}}\\[1mm]          
-&& \textit{binary-logical}   && ::=  &\quad &&  \textbf{\texttt{\&\&}}\ |\ \texttt{\textbf{||}}
-                                          && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.6\#p5}{logical composition symbol}}\\[1mm]
-&& \textit{expressions}  && ::= &\quad && \epsilon\ | \ \textit{expression}\ (
-                                                               \ \textbf{\texttt{,}} \
-                                                                 \textit{expression} \ 
-                                                                      ) ...
-                                                            && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.4\#p5}{element expressions}}\\[1mm]
-&& \textit{spread-expressions}  && ::= &\quad && \epsilon\ | \ \textit{spread-expression}\ (
-                                                               \ \textbf{\texttt{,}} \
-                                                                 \textit{spread-expression} \ 
-                                                                      ) ...\quad
-                                                            && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.4\#p5}{argument expressions}}\\[1mm]
-&& \textit{spread-expression}  && ::= &\quad && \textit{expression} \ |\ 
-                                               \texttt{...}\ \textit{expression}
-                                                            && \textrm{\href{https://sourceacademy.org/sicpjs/1.1.4\#p5}{argument expression} (\href{https://sourceacademy.org/sicpjs/3.4.2\#p17}{spread})}
+    && \textit{program}    &&\quad ::= &\quad && \textit{statement} ... && \textrm{program} \\[1mm]
+    && \textit{statement}  &&\quad ::= &\quad && \textit{expression} \ \textbf{\texttt{;}} && \textrm{expression statement} \\
+	&&                       && |   &\quad && \textbf{\texttt{return}}\  \textit{expression} \ \textbf{\texttt{;}} && \textrm{return statement}\\
+	&&                       && |   &\quad && \textit{if-statement} \quad && \textrm{conditional statement}\\
+	&&                       && |   &\quad && \textbf{\texttt{while}}\  \textbf{\texttt{(}}\  \textit{expression} \ \textbf{\texttt{)}} \ \textit{block} && \textrm{while loop}\\
+	&&						 && |	&\quad && \textbf{\texttt{do}} \ \textit{block} \ \textbf{\texttt{while}}\  \textbf{\texttt{(}}\  \textit{expression} \ \textbf{\texttt{)}} \ \textbf{\texttt{;}} && \textrm{do-while loop}\\
+	&&						 && | 	 &\quad && \textbf{\texttt{for}}\  \textbf{\texttt{(}}\  \textit{expression} \ \textbf{\texttt{;}} \ \textit{expression} \ \textbf{\texttt{;}} \ \textit{expression} \ \textbf{\texttt{)}} \ \textit{block} \ \ \  && \textrm{for loop}\\
+	&&						&& 	| &\quad && \textit{type}\  \textit{name} \ \textbf{\texttt{(}}\  \textit{parameters} \ \textbf{\texttt{)}}\ \textit{block} \quad
+							&& \textrm{function declaration}\\
 \end{alignat*}
+
+
+
+
+\subsubsection{Expressions} 
+
+
+
+
 
 
 \subsection{Memory}
