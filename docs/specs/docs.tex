@@ -331,6 +331,10 @@ Finally, we explain how the memory management is performed in RECEC.
 
 We divide the syntax of RECEC into three categories, \textit{expressions} and \textit{statements}.
 
+\subsubsection{Statement}
+
+Here is what the statement BNF looks like:
+
 \addtolength{\jot}{-0.5mm}
 \begin{alignat*}{9}
     && \textit{program}    &&\quad ::= &\quad && \textit{statement} ... && \textrm{program} \\[1mm]
@@ -340,16 +344,38 @@ We divide the syntax of RECEC into three categories, \textit{expressions} and \t
 	&&                       && |   &\quad && \textbf{\texttt{while}}\  \textbf{\texttt{(}}\  \textit{expression} \ \textbf{\texttt{)}} \ \textit{block} && \textrm{while loop}\\
 	&&						 && |	&\quad && \textbf{\texttt{do}} \ \textit{block} \ \textbf{\texttt{while}}\  \textbf{\texttt{(}}\  \textit{expression} \ \textbf{\texttt{)}} \ \textbf{\texttt{;}} && \textrm{do-while loop}\\
 	&&						 && | 	 &\quad && \textbf{\texttt{for}}\  \textbf{\texttt{(}}\  \textit{expression} \ \textbf{\texttt{;}} \ \textit{expression} \ \textbf{\texttt{;}} \ \textit{expression} \ \textbf{\texttt{)}} \ \textit{block} \ \ \  && \textrm{for loop}\\
-	&&						&& 	| &\quad && \textit{type}\  \textit{name} \ \textbf{\texttt{(}}\  \textit{parameters} \ \textbf{\texttt{)}}\ \textit{block} \quad
-							&& \textrm{function declaration}\\
+	&&						&& 	| &\quad && \textit{type}\  \textit{name} \ \textbf{\texttt{(}}\  \textit{parameters} \ \textbf{\texttt{)}}\ \textit{block} \quad && \textrm{function declaration}\\[1mm]
+	&& \textit{parameters}    &&\quad ::= &\quad && \textit{type}\  \textit{name} \textbf{\texttt{(}}\  \textbf{\texttt{,}}\ \textit{type}\  \textit{name} \ \textbf{\texttt{)}}\ ... && \textrm{parameters} \\[1mm]
+	&& \textit{block}         &&\quad ::= &\quad && \textbf{\texttt{\{}}\  \textit{statement} ... \ \textbf{\texttt{\}}} \quad && \textrm{block statement} \\[1mm]
+	&& \textit{if-statement} && ::= &\quad &&  \textbf{\texttt{if}}\
+                                   \textbf{\texttt{(}}\ \textit{expression} \ \textbf{\texttt{)}}\ 
+                                   \textit{block} \\
+&&                       &&     &      && [ \ \textbf{\texttt{else}}\
+                                          (\ \textit{block}
+                                          \ | \
+                                          \textit{if-statement} \ )\ ]
+                                                            && \textrm{conditional statement} \\[1mm]
 \end{alignat*}
 
+In for-loops, the expressions are referred to as \texttt{initialisation}, \texttt{test} and \texttt{update}. The for-loop is syntatic sugar for a while-loop. Firstly, \texttt{initialisation} is converted to an \texttt{expression statement}. Then, \texttt{test} is placed as the condition for the while loop. \texttt{update} is then appended to the end of the for-loop body. \texttt{body} refers to the original for-loop body. What this looks like in the underlying implementation is something like the following:
 
 
+\begin{verbatim}
+	initialisation;
+	while (test) {
+		body;
+		update;
+	}
+\end{verbatim}
 
-\subsubsection{Expressions} 
+Similarly, the implementation of do-while is also converted to a while-loop. The only difference is that the body is first executed first, before checking the condition. Hence, we execute the body independently, and then we follow it with a while-loop immediately after. \texttt{body} refers to the original do-while loop body and \texttt{test} refers to the condition in the while statement. Here is what the underlying implementation looks like:
 
-
+\begin{verbatim}
+	body;
+	while (test) {
+		body;
+	}
+\end{verbatim}
 
 
 
