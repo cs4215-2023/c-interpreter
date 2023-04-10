@@ -332,8 +332,8 @@ Finally, we explain how the memory management is performed in RECEC.
 We divide the syntax of RECEC into three categories, \textit{expressions} and \textit{statements}.
 
 \subsubsection{Statement}
-
-Here is what the statement BNF looks like:
+\label{statement}
+This is what the statement BNF looks like:
 
 \addtolength{\jot}{-0.5mm}
 \begin{alignat*}{9}
@@ -377,8 +377,74 @@ Similarly, the implementation of do-while is also converted to a while-loop. The
 	}
 \end{verbatim}
 
+\subsection{Expressions}
 
+Now, we will go into  details of what \texttt{expression} was referring to in \ref{statement}, but firstly, this is the BNF for expressions:
 
+\addtolength{\jot}{-0.5mm}
+\begin{alignat*}{9}
+	&& \textit{expression}   && ::= &\quad &&  \textit{integer}   && \textrm{primitive integer expression}\\
+	&&                       && |   &\quad &&  \textit{float}   && \textrm{primitive float expression} \\
+	&&                       && |   &\quad &&  \textit{char}   && \textrm{primitive char expression} \\
+	&&                       && |   &\quad &&  \textit{string}   && \textrm{primitive string expression} \\
+	&&                       && |   &\quad &&  \textit{name}   && \textrm{name expression} \\
+	&&                       && |   &\quad &&  \textit{expression} \  \textit{binary-operator} \ 
+												\textit{expression} \qquad
+															   && \textrm{binary operator combination} \\
+	&&                       && |   &\quad &&   \textit{unary-operator} \ 
+												\textit{expression}
+															   && \textrm{{unary operator combination}}\\
+	&&                       && |   &\quad &&  \textit{expression} \  \textit{binary-logical} \ 
+												\textit{expression} \qquad
+															   && \textrm{{logical composition}}\\
+	&&                       && |   &\quad &&   \textit{expression} \ 
+												\textbf{\texttt{(}}\ \textit{[expressions, ...]}\
+												\textbf{\texttt{)}}
+															   && \textrm{{function application}} \\
+	&&                       && |   &\quad &&   \textit{expression} \ \textbf{\texttt{?}}\ 
+												\textit{expression}
+												\ \textbf{\texttt{:}}\
+												\textit{expression}\
+															   && \textrm{{conditional expression}} \\
+	&&                       && |   &\quad && \textit{assignment} 
+															   && \textrm{assignment} \\
+	&&                       && |   &\quad && \textit{expression} \textbf{\texttt{[}}
+											  \textit{expression} \textbf{\texttt{]}}
+															   && \textrm{array access} \\
+	&&                       && |   &\quad &&   \textbf{\texttt{[}}\ 
+												\textit{expressions}\
+												\textbf{\texttt{]}}
+															   && \textrm{literal array expression}\\
+	&&                       && |   &\quad &&  \textbf{\texttt{(}}\  \textit{expression} \ 
+												\textbf{\texttt{)}} && \textrm{{parenthesised expression}}\\
+	&&                       && |   &\quad &&   \textit{type}  \textbf{\texttt{*}}  \ \textit{name}  && \textrm{{pointer expression}}\\
+	&&                       && |   &\quad &&  \textbf{\texttt{*}}  \textit{pointer}  && \textrm{{pointer dereference expression}}\\
+	&&                       && |   &\quad &&  \textbf{\texttt{\&}}  \textit{pointer}  && \textrm{{pointer reference expression}}\\
+	&&                       && |   &\quad &&  \textit{name} \textit{(postfix-operator)}  && \textrm{{postfix expression}}\\[1mm]
+	&& \textit{binary-operator}    \ 
+							&& ::= &\quad && \textbf{\texttt{+}}\ |\ \textbf{\texttt{-}}\ |\ \textbf{\texttt{*}}\ |\ \textbf{\texttt{/}}\ |\ \textbf{\texttt{\%}}\ |\ 
+									   \textbf{\texttt{==}}\ |\ \textbf{\texttt{!=}}\ \\
+	&&                       && |  &\quad &&  \texttt{\textbf{>}}\ |\ \texttt{\textbf{<}}\ |\ \texttt{\textbf{>=}}\ |\ \texttt{\textbf{<=}}
+											  && \textrm{{binary operator}}\\[1mm]
+	&& \textit{unary-operator}    
+							&& ::= &\quad && \textbf{\texttt{!}}\ |\ \textbf{\texttt{-}} |\ \textbf{\texttt{+}}
+							&& \textrm{{unary operator}}\\[1mm]          
+	&& \textit{binary-logical}   && ::=  &\quad &&  \textbf{\texttt{\&\&}}\ |\ \texttt{\textbf{||}} |\ \texttt{\textbf{\^}}
+											  && \textrm{{logical composition symbol}}\\[1mm]
+	&& \textit{bitwise-operator}   && ::=  &\quad &&  \textbf{\texttt{<<}}\ |\ \texttt{\textbf{>>}}  |\ \texttt{\textbf{\&}} |\ \texttt{\textbf{|}}
+											  && \textrm{{bitwise operator}}\\[1mm]
+\end{alignat*}
+
+\texttt{integer}, \texttt{float}, \texttt{char} refers to values that fall within the range of \texttt{int}, \texttt{float} and \texttt{char} represented in C respectively. To differentiate between \texttt{char} and \texttt{strings}, RECEC looks at the type of quotation marks that was parsed and process it accordingly. \texttt{strings} are stored as an array of \texttt{char} and is terminated by a null byte, \texttt{$\backslash$0}.
+
+In RECEC, there is a \textbf{restriction} imposed on values of arrays. For \textbf{all values} in the array, they \textbf{must} be the same kind. This means that an array can \textbf{only contain all} numbers or all floats, or all variable names. Here is an example program to better illustrate this point:
+
+\begin{verbatim}
+	int a[] = {1 , 2}; // ok
+	int a[] = {1, 1.5}; // not ok, syntax error is thrown here 
+	int b = 1;
+	int a[] = {1, b}; // not ok, mixture of variable and numbers
+\end{verbatim}
 
 \subsection{Memory}
 
