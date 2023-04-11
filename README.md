@@ -2,18 +2,6 @@
 
 C language modified from js-slang.
 
-# Table of Contents
-
-- [Requirements](#requirements)
-- [Usage](#usage)
-- [Documentation](#documentation)
-- [Requirements](#requirements-1)
-- [Testing](#testing)
-- [Error messages](#error-messages)
-- [Using your xx-slang in your local Source Academy](#using-your-xx-slang-in-your-local-source-academy)
-- [Talks and Presentations](#talks-and-presentations)
-- [License](#license)
-
 # Requirements
 
 - node: known working version: v16.14.0
