@@ -26,12 +26,13 @@ import {
   getVariable,
   setValueToIdentifier
 } from './utils'
+import { write } from 'fs'
 
 export type Evaluator<T extends Node> = (node: T, context: Context) => Value
 
 const STACK_SIZE = 500
 const STACK_BEGIN = 0
-const HEAP_SIZE = 200
+const HEAP_SIZE = 600
 const HEAP_BEGIN = 600
 let memory = new MemoryModel(STACK_SIZE, STACK_BEGIN, HEAP_SIZE, HEAP_BEGIN)
 
@@ -491,7 +492,11 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
     const [_, start_addr] = memory.mem_read(array_addr)
     if (start_addr >= HEAP_BEGIN) {
       const [type, index] = memory.mem_read(index_addr)
-      context.runtime.stash.push(index * memory.stack.word_size + start_addr)
+      let new_write_addr = start_addr
+      for (let i = 0; i < index; i++) {
+        new_write_addr = memory.mem_heap_get_child(new_write_addr)
+      }
+      context.runtime.stash.push(new_write_addr)
     } else {
       const [type, index] = memory.mem_read(index_addr)
       const [typeVal, val] = memory.mem_read(index * memory.stack.word_size + array_addr)
@@ -637,6 +642,7 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       identifier = stash.pop()
     }
     let addr = stash.peek()
+
     const varType = TYPE_TO_TAG[getVariableType(context, identifier!.name)]
     if (identifier!.type === 'ArrayIdentifier') {
       const index_addr = stash.pop()
@@ -646,8 +652,17 @@ export const evaluators: { [nodeType: string]: Evaluator<Node> } = {
       const [valueType, newVal] = memory.mem_read(addr) // Get the value and type to be written to variable
       const [type, write_addr] = memory.mem_read(var_addr) // Get the address that the pointer is pointing to
       const [itype, index] = memory.mem_read(index_addr) // Get the index to write to
-      memory.mem_stack_deallocate_n(2)
-      memory.mem_write_to_address(write_addr + index * memory.stack.word_size, varType, newVal)
+      if (write_addr >= HEAP_SIZE) {
+        let new_write_addr = write_addr
+        for (let i = 0; i < index; i++) {
+          new_write_addr = memory.mem_heap_get_child(new_write_addr)
+        }
+        memory.mem_stack_deallocate_n(2)
+        memory.mem_write_to_address(new_write_addr, varType, newVal)
+
+      } else {
+        memory.mem_write_to_address(write_addr + index * memory.stack.word_size, varType, newVal)
+      }
     } else if (addr.type != 'Closure_i') {
       const [valueType, newVal] = memory.mem_read(addr)
       const var_addr = getVariable(context, identifier!.name) // Get addr

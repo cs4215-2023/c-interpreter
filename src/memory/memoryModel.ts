@@ -66,11 +66,18 @@ export default class MemoryModel {
     return this.heap.allocate_one() + this.heap_addr_begin
   }
   public mem_heap_allocate_n(n: number): number {
-    return this.heap.allocate_n(n) + this.heap_addr_begin
+    const addr = this.heap.allocate_n(n) + this.heap_addr_begin
+    console.log("child is " + this.heap.get_child(addr - this.heap_addr_begin))
+    console.log(this.heap.print())
+    return addr
   }
 
   public mem_heap_free(address: number) {
     this.heap.free_up_memory(address - this.heap_addr_begin)
+  }
+
+  public mem_heap_get_child(address: number) {
+    return this.heap.get_child(address - this.heap_addr_begin) + this.heap_addr_begin
   }
 
   //STACK METHODS
@@ -78,16 +85,16 @@ export default class MemoryModel {
     return tag === TAGS.int_tag
       ? this.stack.push_int(x as number)
       : tag === TAGS.float_tag
-      ? this.stack.push_float(x as number)
-      : tag === TAGS.char_tag
-      ? this.stack.push_char(x as number | string)
-      : tag === TAGS.int_pointer_tag ||
-        tag === TAGS.float_pointer_tag ||
-        tag === TAGS.char_pointer_tag
-      ? this.stack.push_pointer(tag, x as number)
-      : tag === TAGS.void_tag
-      ? this.stack.push(TAGS.void_tag, 0)
-      : null
+        ? this.stack.push_float(x as number)
+        : tag === TAGS.char_tag
+          ? this.stack.push_char(x as number | string)
+          : tag === TAGS.int_pointer_tag ||
+            tag === TAGS.float_pointer_tag ||
+            tag === TAGS.char_pointer_tag
+            ? this.stack.push_pointer(tag, x as number)
+            : tag === TAGS.void_tag
+              ? this.stack.push(TAGS.void_tag, 0)
+              : null
   }
 
   public mem_stack_allocate_one(): number {
