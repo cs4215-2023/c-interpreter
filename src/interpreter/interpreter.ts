@@ -804,7 +804,7 @@ export function evaluate(node: Node, context: Context) {
     if (isNumber(stash.peek())) {
       const [type, value] = memory.mem_read(stash.peek())
       if (TAG_TO_TYPE[type] == 'float') {
-        return { status: 'finished', value: value.toFixed(6), context: context }
+        return { status: 'finished', value: parseFloat(value.toFixed(6)), context: context }
       }
       return { status: 'finished', value: value, context: context }
     }
