@@ -10,6 +10,7 @@
 \usepackage{xcolor}
 \usepackage{url}
 \usepackage{hyperref}
+
 \usepackage{multirow}
 
 % For code listing %
@@ -123,7 +124,7 @@
         \vspace{3cm}
 
         \Large
-        \textbf{Lester Leong (), \\Lui Wen-Jie, Benjamin (A0214362N)}\\
+        \textbf{Lester Leong (A0269245W), \\Lui Wen-Jie, Benjamin (A0214362N)}\\
         School of Computing\\
         National University of Singapore\\
         April 2022
@@ -296,12 +297,30 @@ Here are some sample \texttt{printf} in RECEC:
 
 \subsubsection{\texttt{malloc}}
 
-TODO
+\texttt{malloc} allocates a variable amount of heap memory based on the argument provided. The 
+argument is an expression which specifies \texttt{n} number of nodes in the heap to be allocated to the variable. 
+Here is a sample for \texttt{malloc} in RECEC:
+\begin{verbatim}
+	int* c = malloc(3); //length of c is 3
+    int a = 5;
+    c[0] = 5;
+    c[1] = 2;
+    c[2] = 3+a;
+    c[2]; //value of 8
+\end{verbatim}
 
 \subsubsection{\texttt{free}}
 
-TODO 
+\texttt{free} deallocates the specified heap memory based on the argument provided to it, which is a variable. The variable has to be initialized with \texttt{malloc} first before \texttt{free} can be used to free up memory used by that variable.
 
+Here is a sample for \texttt{free} in RECEC:
+\begin{verbatim}
+	int* c = malloc(3); //length of c is 3
+    c[0] = 5;
+    c[1] = 2;
+    c[2] = 4;
+    free(c);
+\end{verbatim}
 
 \subsection{Type Checking}
 
@@ -329,7 +348,7 @@ Finally, we explain how the memory management is performed in RECEC.
 
 \subsection{Syntax}
 
-We divide the syntax of RECEC into three categories, \textit{expressions} and \textit{statements}.
+We divide the syntax of RECEC into two categories, \textit{expressions} and \textit{statements}.
 
 \subsubsection{Statement}
 \label{statement}
@@ -357,7 +376,7 @@ This is what the statement BNF looks like:
                                                             && \textrm{conditional statement} \\[1mm]
 \end{alignat*}
 
-In for-loops, the expressions are referred to as \texttt{initialisation}, \texttt{test} and \texttt{update}. The for-loop is syntatic sugar for a while-loop. Firstly, \texttt{initialisation} is converted to an \texttt{expression statement}. Then, \texttt{test} is placed as the condition for the while loop. \texttt{update} is then appended to the end of the for-loop body. \texttt{body} refers to the original for-loop body. What this looks like in the underlying implementation is something like the following:
+In for-loops, the expressions are referred to as \texttt{initialisation}, \texttt{test} and \texttt{update}. The for-loop is syntactic sugar for a while-loop. Firstly, \texttt{initialisation} is converted to an \texttt{expression statement}. Then, \texttt{test} is placed as the condition for the while loop. \texttt{update} is then appended to the end of the for-loop body. \texttt{body} refers to the original for-loop body. What this looks like in the underlying implementation is something like the following:
 
 
 \begin{verbatim}
@@ -446,16 +465,357 @@ In RECEC, there is a \textbf{restriction} imposed on values of arrays. For \text
 	int a[] = {1, b}; // not ok, mixture of variable and numbers
 \end{verbatim}
 
+
+\subsection{Static Semantics of RECEC's Type System}
+
+Not all statements in RECEC make sense. For example,
+
+\begin{verbatim}
+    'a' + 1;
+\end{verbatim}
+
+does not make sense, because we expect both operands to be of integer type but \texttt{'a'} is a character type. 
+We thus say that this statement is \textit{ill-typed}, because a typing condition is not met.
+Statements that meet these conditions are what we call \textit{well-typed} in RECEC.
+
+An expression \verb|x + 3| within a statement may or may not be well-typed, depending on the type of \verb|x|.
+Thus we define a type environment, denoted by $\Gamma$.
+$\Gamma$ is a partial function from names to types, with which a name $x$ is associated with type $\Gamma(x)$.
+
+We  define a relation $\Gamma[x\leftarrow t]\Gamma'$, which constructs a new type environment where $\Gamma'(y)$ is $t$ if $y=x$ and $\Gamma(y)$ otherwise.
+The set of names, on which a type environment $\Gamma$ is defined is called the domain of $\Gamma$, denoted by $dom(\Gamma)$.
+We define the empty type environment $\Gamma=\emptyset$.
+
+\subsubsection{Free Names}
+
+We need to be able to find out what names that are bounded by enclosing function definitions and those that are not. For example, the name \texttt{foo} occurs free in
+
+\begin{verbatim}
+void bar(int x) {
+	return foo(x);
+}
+\end{verbatim}
+
+since it is not declared by any surrounding \texttt{function} expression but \texttt{x} is bounded by \texttt{int x} declared in the parameters. Formally, we are looking for a function $\text{FV: RECEC} \rightarrow 2^V$ that defines the set of free names of a given RECEC program/expression. the relation \textit{FV} on expression is defined by the following rules:
+
+$\Rule{}{FV(x) = {x}}$
+\hfill
+$\Rule{}{FV(n) = \emptyset}$
+\hfill
+$\Rule{FV(E) = X}{FV(p_1[E]) = X}$
+\hfill
+$\Rule{FV(E_1) = X_1 \ FV(E_2) = X_2}{FV(p_2[E_1,E_2]) = X_1 \cup X_2}$
+
+$p_1$ is defined as the set all unary operations, including those that exclusive to pointers. $p_2$ is defined as the set of all binary operations.
+
+\subsubsection{Expressions}
+The following rules denote the set of expressions in RECEC. Let $i$ be an integer, $f$ be a float and $c$ be a char.
+
+$\RuleWithName{}{\Gamma \vdash \texttt{i}\ :\ \Int}{IntegerT}$
+\hfill
+$\RuleWithName{}{\Gamma \vdash \texttt{f}\ :\ \Float}{FloatT}$
+\hfill
+$\RuleWithName{}{\Gamma \vdash \texttt{f}\ :\ \Char}{CharT}$
+
+As \texttt{char} in C tend to be implicitly converted to their ASCII representations when binary operations are executed on them, RECEC will do the same. Furthermore, the resulting type of a binary operation depends on the type of both arguments. The precedence follows as such, \texttt{float}, \texttt{int}, \texttt{char}. What this means is that if one of the arguments is a \texttt{float} and the other is an \texttt{int}, the resulting type would be a \texttt{float}. 
+
+Furthermore, addition of \texttt{char} results in an \texttt{int}. The reason for this is that \texttt{char} is implicitly converted to its ASCII value before operations are carried out.
+
+
+The table below shows the resulting type from 2 argument types. For simplicity, only the primitive binary operation of \textbf{+} is shown, but all the other primitive binary operations (logical included) follows the same rules.
+
+
+\begin{center}
+\begin{tabular}{c|c|c|c}
+operator & argument 1 & argument 2 & result\\ \hline
+\texttt{\textbf{+}} & integer   & integer     & integer\\
+\texttt{\textbf{+}} & char   & integer    & integer\\
+\texttt{\textbf{+}} & integer   & char    & integer\\
+\texttt{\textbf{+}} & integer   & float     & float\\
+\texttt{\textbf{+}} & float   & float    & float\\
+\texttt{\textbf{+}} & float   & integer     & float\\
+\texttt{\textbf{+}} & float   & char    & float\\
+\texttt{\textbf{+}} & char   & float    & float\\
+\texttt{\textbf{+}} & char   & char    & integer\\
+\texttt{\textbf{==}} & any  & any     & integer\\
+\texttt{\textbf{!=}} & any   & any     & integer\\
+\texttt{\textbf{!}}    & any &      & integer\\
+\texttt{\textbf{-}}    & any &    & any\\
+\texttt{\textbf{+}}    & any &    & any\\
+\texttt{\textbf{*}}    & any &    & any\\
+\texttt{\textbf{\&}}    & any &    & integer\\
+\end{tabular}
+\end{center}
+
+For conditional expressions, we also enforce that the consequent and alternative expressions have the same type:
+
+\begin{center}
+    $\RuleWithName{\Gamma \vdash E\ :\ \texttt{int} \qquad \Gamma\vdash E_1\ :\ t\ \qquad \Gamma \vdash E_2\ :\ t}{\Gamma \vdash  E\  \texttt{?}\ E_1\ \texttt{:}\ E_2\ : t}{ConditionalExpression}$
+\end{center}
+
+\subsubsection{Statements}
+
+A given statement might consist of a sequence of variable declarations, return statements or expression statements. We define a typing relation on such statements in two steps. First, we extract all type declarations and extend the given type environment by bindings of the names to the types of the type declarations.
+
+\begin{center}
+$\RuleWithName{\Gamma[x\leftarrow t]\Gamma' \ \  \Gamma' \vdash S : t'}{\Gamma \vdash x = t; \ S :\ t'}{Sequence}$
+\hfill
+$\RuleWithName{\Gamma \vdash E: \Gamma(x)}{\Gamma \vdash x = E;}{VarDeclaration}$
+\hfill
+$\RuleWithName{\Gamma \vdash S_1: t_1 \ \ \Gamma \vdash S_2: t_2 \ \ S_2 \ \text{is not a return statement}}{\Gamma \vdash S_1 S_2: t_2}{SequenceStatements}$
+
+\end{center}
+
+Functions in RECEC are allowed to avoid return statements. This means that the implicit return type would be \texttt{void}. For simplicity, we assume that every function then has a return type, which is defined in the rules below.
+
+\begin{center}
+$\RuleWithName{\Gamma \vdash E: t}{\Gamma \vdash \texttt{return} E; \ S : return(t)}{ReturnStatement}$
+\hfill
+$\RuleWithName{\Gamma(f) = t_1 * ... * t_n > \text{undefined} \ \ \Gamma[x_1\leftarrow t_1]\Gamma_1 \cdots \Gamma_{n-1}[x_{n-1}\leftarrow t_{n-1}]\Gamma_n, \Gamma_n \vdash S : return(t)}{\Gamma \vdash \texttt{return(t)}f(x_1, ..., x_n) \{S \}; \ : undefined}{FunctionDeclaration}$
+\end{center}
+
+
+In the case of loops, type checking is done for the loop bodies. No typing is enforced for \texttt{test} to be a boolean since in C, booleans are defined as either 0 or 1.
+
+Furthermore for \texttt{if-statement}, each block does not need to have the same resulting type. Type checking in RECEC does not perform execution, hence all possible branches are checked for their types. If there are no return statements in the blocks, the resulting return type would be undefined. 
+
+\begin{center}
+    $\RuleWithName{\Gamma c_n : int  \ \ \Gamma S_1 : t_1 \ \ \Gamma S_2 : t_2 ... \Gamma S_n : t_n}{\Gamma \vdash \texttt{if} (c_1)\{S_1\}\ \texttt{else if} (c_2) \{S_2\}\ ... \texttt{else}\ \{S_n\};\ : undefined}{if-statement}$
+\end{center}
+
+
+\subsection{Structural Operational Semantics of RECEC}
+
+We define result of executing a program \texttt{p} according to our structural operational semantics as the value \texttt{v}, where $(\epsilon_s, \Delta_0) \rightrightarrows^*_s (v, \epsilon_a, \Delta')$ and where $\rightrightarrows^*_s$ is the reflexive transitive closure of $\rightrightarrows_s$. Here $\epsilon_s$ is the empty stash, $\epsilon_a$ is the empty agenda, and $\Delta_0$ is an initial environment. 
+
+In other words, we execute a program \texttt{p} by making $\rightrightarrows_s$ transitions starting with the empty stash, \texttt{p} as the only item on the agenda, and the environment $\Delta_0$ until the agenda is empty. The stash then has the result of the program execution as its only agenda item. In this case, we values on the stash are actually addresses. A conversion from address to value is performed as the final step before returning the value. If the stash is empty however, then we return \texttt{undefined} instead.
+
+For the purpose of defining the semantics, we shall assume that the values are pushed onto the stash instead of the address in the actual implementation. 
+
+
+
+\subsubsection{Sequences}
+We guarantee that a sequence of statements are evaluated in the order they are presented, with the empty statement returning \texttt{undefined}. Let $C = \{c_1, c_2, ... c_n\}$ be the set of statements. Then we can define a sequence as follows:
+
+\begin{center}
+$\Rule{}{(s, C . a, \Delta) \rightrightarrows (s, c_1.POP.c_2.POP...c_n.a, \Delta)}$
+\end{center}
+
+\texttt{POP} removes the top most instruction from the stash. 
+
+\subsubsection{Names and Blocks}
+
+Names and blocks are interpreter on the fly. Since we are able to tell the difference between a declaration and an assignment, we can first place the value in the current environment. 
+
+Upon assignments, we then obtain the variable from the current environment/look at previous environments and set the appropriate value. For blocks, environments are restored after the block via a \texttt{RestoreEnvironment} instruction. 
+
+\begin{center}
+    $\Rule{}{(s, int x = e; . a, \Delta) \rightrightarrows (s, e.ASSIGN \ x.a, \Delta)}$
+    \hfill
+    $\Rule{}{(s,  x = e; . a, \Delta) \rightrightarrows (s, e.ASSIGN \ x.a, \Delta)}$
+\end{center}
+
+\subsubsection{Conditional Statements}
+
+The entire is conditional is pushed onto the agenda but with \texttt{test} on top. Depending on the outcome of \texttt{test}, we then decide which branch to take. 
+
+\begin{center}
+    $\Rule{}{(s, if \ (e) \ p_1 \ else \ p_2 . a, \Delta) \rightrightarrows (s, e.BRANCH \ p_1 \ p_2.a, \Delta)}$
+    \hfill
+    $\Rule{}{(1.s, BRANCH \ p_1 \ p_2.a, \Delta) \rightrightarrows (s, p_1.a, \Delta)}$
+    \hfill
+    $\Rule{}{(0.s, BRANCH \ p_1 \ p_2.a, \Delta) \rightrightarrows (s, p_2.a, \Delta)}$
+\end{center}
+
+\subsubsection{Loops}
+
+In RECEC, all loops are essentially some variable of the \texttt{while} loop. Here, we will describe the semantics of the \texttt{while} loop, which will cover all 3 loops present in RECEC. Since loops do not produce values, we push a empty statement, $S_e$ onto the agenda
+
+\begin{center}
+    $\Rule{}{(s, while(e) p.a, \Delta) \rightrightarrows (s, e.while(e) p.S_e.a, \Delta)}$
+    $\Rule{}{(1.s, while(e) p.S_e.a, \Delta) \rightrightarrows (s, p.POP.e.while(e) p.S_e.a, \Delta)}$
+    $\Rule{}{(0.s, while(e) p.S_e.a, \Delta) \rightrightarrows (s, S_e.a, \Delta)}$
+\end{center}
+
+If the condition $e$ evaluates to true, the body, \texttt{POP} and the entire while loop is pushed onto the agenda. Otherwise, we don't push anything onto the agenda. 
+
+\subsubsection{Functions}
+
+In the case of function declarations, they are implicitly converted to lambda expressions and stored as \texttt{CLOSURE} on the stash. Each value $x_n$ corresponds to a parameter of the syntax \texttt{<type> <name>}. 
+
+\begin{center}
+    $\Rule{}{(s, void foo(x_1 ... x_n) p.a, \Delta) \rightrightarrows (s, CLOSURE(x_1 ... x_n) p \Delta.a, \Delta)}$
+\end{center}
+
+Execution of an APPLY $n$ instruction expects its components on the stash: $n$ arguments (in reverse order), followed by the function to be applied. APPLY firstly checks that the number of arguments are valid. Then, it would perform a binding in the current CLOSURE environment to the respective parameter variables. 
+
+Finally a MARK instruction is left on the agenda so that execution of return statements can abandon subsequent statements. After MARK is reached, the current environment is removed.
+
+Return statements leave a RESET instruction on the agenda. It will pop an item from the agenda and push itself back on the agenda if a MARK instruction has not been reached.
+
+
+
 \subsection{Memory}
 
-TODO
+To account for memory usage in the RECEC, a stack and heap memory structure will be implemented. These are two distinct regions of memory used for different purposes. The stack is used for temporary data, and its size is typically limited. In contrast, the heap is used for data that needs to persist beyond the lifetime of a function or is too large for the stack. 
+
+Pointer tagging is used in the stack and heap memory to allocate type information and child nodes to each address in the memory. 
+
+Each valid address in the memory takes up 64 bits. Each block of 64 bits is divided into two blocks of 32 bits each for pointer tagging and value storage respectively. The functions \texttt{mem\_get} and \texttt{mem\_set} allow for reading and writing of individual blocks to memory. The memory only stores literal and pointer values.
+
+\begin{verbatim}
+
+  public mem_get = (address: number) => this.memoryView.getFloat32(address)
+
+  public mem_set = (address: number, x: number) => this.memoryView.setFloat32(address, x)
+
+\end{verbatim}
 
 \subsubsection{Stack}
 
-TODO
+The stack is a contiguous region of memory used to store local variables, function parameters, and return addresses. The stack utilizes 64 bits of memory per address. The first 32 bits are reserved for pointer tags. The last 32 bits are used for values.
+
+The stack memory contains a \texttt{base\_pointer}, which points to the base of the stack for the current scope, and a \texttt{stack\_pointer}, which used to keep track of the current position of the stack and to allocate and deallocate memory from the stack as needed..
+
+The stack contains two main functions, \texttt{push} and \texttt{pop}, which are responsible for allocating and deallocating memory. The \texttt{push} function returns the address of the allocated memory, while the \texttt{pop} function returns the value and type from the top of the stack.
+
+\begin{verbatim}
+  public push(tag: number, x: number) {
+    const address = this.stack_pointer
+    this.mem_set(address, tag)
+    this.mem_set(address + this.word_size / 2, x)
+
+    this.stack_pointer += this.word_size
+    return address
+  }
+
+  public pop() {
+    const address = this.stack_pointer
+    const val = this.mem_get(address - this.word_size / 2)
+    const type = this.mem_get(address - this.word_size)
+
+    this.stack_pointer -= this.word_size
+    return [~~type, val]
+  }
+\end{verbatim}
+
+Variables can be declared but not initialized. To account for this, a similar function can replace \texttt{push}, which is \texttt{allocate\_one}. When a variable is declared, \texttt{allocate\_one} will be called to allocate memory to the variable, but nothing is written to it.
+
+\begin{verbatim}
+  public allocate_one() {
+    //allocate one slot of data
+    const address = this.stack_pointer
+    this.stack_pointer += this.word_size
+    return address
+  }
+
+  \end{verbatim}
+  
+ When a function is called, the current \texttt{base\_pointer} will be pushed onto the stack, followed by the function arguments and declarations. This forms a stack frame. When the function returns, the stack frame will be popped to obtain the old \texttt{base\_pointer}, which will restore the \texttt{base\_pointer} to its position in the previous scope. 
+ 
+\begin{verbatim}
+   public enter_scope() {
+    this.push(TAGS.base_pointer_tag, this.base_pointer) // save old pointer
+    this.base_pointer = this.stack_pointer
+  }
+
+  public exit_scope() {
+    while (true) {
+      const [tag, value] = this.pop()
+      if (tag === TAGS.base_pointer_tag) {
+        this.base_pointer = value //reset base pointer to the previous scope
+        break
+      }
+    }
+  }
+\end{verbatim}
+
 
 \subsubsection{Heap}
 
-TODO
+The heap, on the other hand, is a region of memory used for dynamic memory allocation. It allows programs to allocate and deallocate memory at runtime, which is especially useful when the size of the data structures is not known at compile time. The stack utilizes 64 bits of memory per address. The heap is managed by the programmer and is not automatically freed by the runtime environment. Therefore, it's essential to explicitly free the memory once it's no longer needed to prevent memory leaks.
+
+In C, memory allocation is performed by calling \texttt{malloc}, while memory deallocation is performed by calling \texttt{free}. For each node (each node represents one address) in the heap, the first 16 bits are reserved for pointer tags. The next 16 bits are used for the node's children. The last 32 bits are used for values.
+
+When \texttt{malloc} is called, the function \texttt{allocate\_n} is used to allocate \texttt{n} nodes of memory to the heap based on the argument provided by malloc. \texttt{allocate\_n} tries to allocate a new node which is the next child of the previously allocated node until the size has been reached, or the heap runs out of memory. Once it has successfully allocated all \texttt{n} nodes, an \texttt{END\_OF\_MALLOC} tag will be written to the last node to indicate the end of the allocated memory, replacing its child node.
+\begin{verbatim}
+  public allocate_n(n: number) {
+    if (this.free === -1) {
+      throw Error('heap memory exhausted')
+    }
+    let index = 0
+    const initial_addr = this.free
+    while (index < n - 1) {
+      //get the current free node
+      // this.memoryView.setInt8(this.free, tag)
+      this.free = this.get_child(this.free)
+      if (this.free === TAGS.END_OF_FREE) {
+        throw Error('heap memory exhausted')
+      }
+      index++
+    }
+    //at the last allocated memory
+    const address = this.free
+    this.free = this.get_child(this.free)
+    this.set_child(address, TAGS.END_OF_MALLOC) 
+
+    //return start of memory allocated to the variable
+    return initial_addr
+  }
+\end{verbatim}
+
+When \texttt{free} is called, the function \texttt{free\_up\_memory} is used to ensure that the memory that is freed up can be reused by the system. Starting from the node designated to be freed, memory is freed up until it reaches the end of the allocated memory. The freed up nodes are then 'linked up' with the previous free nodes in the heap, and the \texttt{free} pointer starts at the designated node.
+
+\begin{verbatim}
+public free_up_memory(address: number) {
+    const initial_free = this.free
+
+    //set free to be start of memory that is freed up
+    this.free = address
+
+    //get the child address of the starting point
+    let child_addr = address
+    let prev_addr = address
+    while (true) {
+      prev_addr = child_addr
+      this.set_tag_and_value(child_addr, 0, 0)
+      child_addr = this.get_child(child_addr)
+
+      if (child_addr === TAGS.END_OF_MALLOC) {
+        break
+      }
+    }
+    this.set_tag_and_value(prev_addr, 0, 0)
+    this.set_child(prev_addr, initial_free)
+  }
+\end{verbatim}
+
+\subsubsection{Pointers and Arrays}
+In the memory, pointers are assigned pointer tags indicating the type of the literal it is pointing to, and that it is a pointer type. This helps to distinguish if the value read from memory is an address or a literal. Pointer types in memory will hold an address to another part of the memory that is also a pointer or a literal of the same type.
+
+For arrays, they are implemented as a pointer which points to a series of addresses, depending on the size of the array. For the stack, the array is implemented as a contiguous series of addresses, and the start of the array is assigned to the pointer (or variable) governing the array. For the heap, the array is implemented as a linked list, with each node possessing a child node. This excludes the end node, which is the last element of the array. The start address of the array is also assigned to the pointer governing the array. This means that after many \texttt{malloc} and \texttt{free} operations, it is possible for arrays in the heap to not consist of contiguous addresses but are fragmented instead.
+\subsection{Testing}
+
+Tests were written using Jest framework. In each key component of RECEC, tests were written extensively to ensure that the functionalities behave as expected. To run the tests, simply execute \texttt{yarn  test}. The instructions can also be found in the README of the RECEC repository \url{https://github.com/cs4215-2023/c-interpreter}.
+
+\subsection{Future Work}
+
+Though we were pleased with what we achieved and learnt from this project, there is definitely more work to be done. 
+
+\subsubsection{Unsatisfied stretched goals}
+
+Our stretch goals of function pointers and structures were not met. Such features are important in C and for RECEC to have them would be great. 
+
+In the case of structures, this builds on the system of some form of object oriented programming(OOP). Furthermore, these structures can be used as types too. Hence the implementation of structures would mean that we would need to incorporate OOP and user-defined types into RECEC.
+
+For function pointers, this would mean that now every function would require some memory on the heap.
+
+\subsubsection{Static memory}
+
+Static memory in C is a type of memory allocation that occurs at compile time and remains fixed throughout the execution of the program. Static memory is allocated for variables and data structures that are declared with the \texttt{static} keyword or outside of a function. Even though static memory and the \texttt{static} keyword were not implemented in RECEC, it would be useful to implement it in the future, since it represents a more realistic memory model for the C programming language.
+
+\subsubsection{Frontend syntax highlighting}
+
+It would be helpful for the online code editor to be able to visually highlight the exact location where a semantics or typing is violated.
 
 \end{document}
