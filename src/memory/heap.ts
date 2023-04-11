@@ -22,16 +22,14 @@ export default class Heap extends MemoryBuffer {
     this.heap_end = this.heap_size
     this.heap_bottom = 0
   }
-  //probably no need for most of these since we only need it for malloc
-  //probably move this to heap
   public init() {
     let current = this.heap_bottom
     while (current + this.word_size < this.heap_end) {
       //set the next node for current address
-      this.memoryView.setInt16(current, current + this.word_size)
+      this.memoryView.setInt16(current + 2, current + this.word_size)
       current += this.word_size
     }
-    this.memoryView.setInt16(current, TAGS.END_OF_FREE) //set end of heap to have a child of -1
+    this.memoryView.setInt16(current + 2, TAGS.END_OF_FREE) //set end of heap to have a child of -1
   }
   public allocate_one() {
     if (this.free === TAGS.END_OF_FREE) {
@@ -51,7 +49,6 @@ export default class Heap extends MemoryBuffer {
     const initial_addr = this.free
     while (index < n - 1) {
       //get the current free node
-      // this.memoryView.setInt8(this.free, tag)
       this.free = this.get_child(this.free)
       if (this.free === TAGS.END_OF_FREE) {
         throw Error('heap memory exhausted')
@@ -62,7 +59,6 @@ export default class Heap extends MemoryBuffer {
     const address = this.free
     this.free = this.get_child(this.free)
     this.set_child(address, TAGS.END_OF_MALLOC) //let heap know that this memory is at the end
-
     //return start of memory allocated to the variable
     return initial_addr
   }
@@ -82,7 +78,6 @@ export default class Heap extends MemoryBuffer {
       prev_addr = child_addr
       this.set_tag_and_value(child_addr, 0, 0)
       child_addr = this.get_child(child_addr)
-
       if (child_addr === TAGS.END_OF_MALLOC) {
         break
       }
@@ -92,21 +87,21 @@ export default class Heap extends MemoryBuffer {
   }
 
   public get_child(address: number): number {
-    return this.memoryView.getInt16(address)
+    return this.memoryView.getInt16(address + 2)
   }
 
   public set_child(address: number, child: number) {
-    this.memoryView.setInt16(address, child)
+    this.memoryView.setInt16(address + 2, child)
   }
 
   public get_tag_and_value(address: number): [number, number] {
-    const type = this.memoryView.getInt8(address)
+    const type = this.memoryView.getInt16(address)
     const val = this.mem_get(address + this.word_size / 2)
     return ~~type !== TAGS.float_tag ? [~~type, ~~val] : [~~type, val]
   }
 
   public set_tag_and_value(address: number, tag: number, x: number) {
-    this.memoryView.setInt8(address, tag)
+    this.memoryView.setInt16(address, tag)
     this.mem_set(address + this.word_size / 2, x)
   }
 
@@ -122,5 +117,8 @@ export default class Heap extends MemoryBuffer {
       }
     }
     return count
+  }
+  public print() {
+    console.log(this.memoryView)
   }
 }
