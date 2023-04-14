@@ -815,6 +815,25 @@ public free_up_memory(address: number) {
 \subsubsection{Pointers and Arrays}
 In the memory, pointers are assigned pointer tags indicating the type of the literal it is pointing to, and that it is a pointer type. This helps to distinguish if the value read from memory is an address or a literal. Pointer types in memory will hold an address to another part of the memory that is also a pointer or a literal of the same type.
 
+When addresses are referenced with \texttt{\&}, the memory does not perform any memory reads. Instead, the address(that is pointing to the referenced variable) at the top of the operand stack is popped, returning it as the result of the reference expression.
+
+When pointers are dereferenced with \texttt{*}, the memory performs two memory reads in sequence. The first memory read is to obtain the address the pointer is pointing to. The second memory read retrieves the value associated with that address, returning it as the result of the dereference expression.
+
+\begin{verbatim}
+    int a = 5;
+    int* c = &a; //reference pointer
+    *c; //dereference pointer
+\end{verbatim}
+
+Pointer arithmetic works only on binary expressions. When the type and value are read from memory on both sides of the binary expression, their types are checked for any pointers. If a pointer is found among those addresses, pointer arithmetic will be performed instead of regular arithmetic. Any literal value that is used during arithmetic will be multiplied by the word size of each address in the memory (8 bytes). 
+
+\begin{verbatim}
+    int c[] = {1,2,3,4};
+    int* b = *c +2; \\equivalent to (address of c + 2* MEMORY.WORD_SIZE)
+    *b; //3
+\end{verbatim}
+
+
 For arrays, they are implemented as a pointer which points to a series of addresses, depending on the size of the array. For the stack, the array is implemented as a contiguous series of addresses, and the start of the array is assigned to the pointer (or variable) governing the array. For the heap, the array is implemented as a linked list, with each node possessing a child node. This excludes the end node, which is the last element of the array. The start address of the array is also assigned to the pointer governing the array. This means that after many \texttt{malloc} and \texttt{free} operations, it is possible for arrays in the heap to not consist of contiguous addresses but are fragmented instead.
 \subsection{Testing}
 
